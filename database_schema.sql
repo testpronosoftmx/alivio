@@ -2,6 +2,7 @@
 -- Puedes ejecutar esto directamente en el SQL Editor de tu proyecto de Supabase.
 
 -- Crear el esquema personalizado "alivio" si no existe
+
 CREATE SCHEMA IF NOT EXISTS alivio;
 
 -- Crear la tabla para almacenar las suscripciones a notificaciones push dentro del esquema alivio

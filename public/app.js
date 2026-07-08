@@ -91,8 +91,8 @@ const FALLBACK_COMFORT_EN = {
 // Diccionario de Traducciones (Landing Page y App)
 const TRANSLATIONS = {
   es: {
-    landingTitle: "un refugio de paz en tu bolsillo",
-    landingTagline: "suelta tus cargas cotidianas, respira hondo y reconéctate con el creador en un instante.",
+    landingTitle: "Un refugio de paz en tu bolsillo",
+    landingTagline: "Suelta tus cargas cotidianas, respira hondo y reconéctate con el Creador en un instante.",
     btnEnterApp: "comenzar a orar",
     titleHowWorks: "¿cómo funciona Alivio?",
     step1Title: "Desahoga tu corazón",
@@ -147,8 +147,8 @@ const TRANSLATIONS = {
     defaultPrayer: "Señor, te entrego esta prisa y este cansancio. Concédeme la calma de saber que Tú caminas a mi lado y sostienes mi día. Amén."
   },
   en: {
-    landingTitle: "a refuge of peace in your pocket",
-    landingTagline: "release your daily burdens, take a deep breath and reconnect with the creator in an instant.",
+    landingTitle: "A refuge of peace in your pocket",
+    landingTagline: "Release your daily burdens, take a deep breath and reconnect with the Creator in an instant.",
     btnEnterApp: "start praying",
     titleHowWorks: "how does Alivio work?",
     step1Title: "Vent your heart",

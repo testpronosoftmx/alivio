@@ -109,23 +109,8 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased text-slate-800 selection:bg-indigo-100">
 
-  <!-- Selector de idioma y botón de apoyo superior flotante -->
-  <div id="global-header-lang-container" class="w-full max-w-md md:max-w-5xl mx-auto px-6 pt-6 flex justify-between items-center">
-    <!-- Botón de Apoyo (Corazón) -->
-    <button id="header-donate-btn" onclick="openDonateModal()" class="flex items-center gap-1 text-[11.5px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 text-rose-600 hover:text-rose-700 active:scale-95 transition-all font-semibold cursor-pointer">
-      <span>❤️</span> <span id="header-donate-text">Apoyar</span>
-    </button>
-    
-    <!-- Selector de idioma dual visible -->
-    <div id="global-lang-selector" class="flex items-center gap-1 text-[11px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60">
-      <button id="lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
-      <span class="text-slate-300">|</span>
-      <button id="lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
-    </div>
-  </div>
-
   <!-- Contenedor Principal (Flexible según la pantalla) -->
-  <div class="w-full flex-1 flex flex-col justify-start pb-8">
+  <div class="w-full flex-1 flex flex-col justify-start pt-6 md:pt-10 pb-8">
 
     <!-- ================= PANTALLA 0: LANDING PAGE (DISEÑO RESPONSIVO GRID TRIS ECCIONAL) ================= -->
     <main id="screen-landing" class="screen-fade w-full max-w-5xl mx-auto px-6 py-4 grid md:grid-cols-2 gap-x-12 gap-y-8 items-start">
@@ -133,17 +118,27 @@
       <!-- BLOQUE A: Copia de marketing, CTA grande y los 3 pasos (Columna Izquierda, Fila 1 en PC / Primero en móvil) -->
       <div class="space-y-6 md:col-start-1 md:row-start-1">
         <header class="space-y-4 text-center md:text-left">
-          <div class="flex justify-center md:justify-start mb-2">
+          <div class="flex items-center justify-center md:justify-start gap-4 mb-2">
             <img src="/icon-192.png" alt="Alivio Logo" class="w-20 h-20 rounded-full shadow-lg border border-white/40">
+            <!-- Botón de Apoyo reubicado -->
+            <button id="header-donate-btn" onclick="openDonateModal()" class="flex items-center gap-1 text-[11.5px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 text-rose-600 hover:text-rose-700 active:scale-95 transition-all font-semibold cursor-pointer shadow-sm">
+              <span>❤️</span> <span id="header-donate-text">Apoyar</span>
+            </button>
+            <!-- Selector de idioma dual reubicado -->
+            <div id="global-lang-selector" class="flex items-center gap-1 text-[11px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 shadow-sm">
+              <button id="lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
+              <span class="text-slate-300">|</span>
+              <button id="lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
+            </div>
           </div>
-          <h1 id="landing-title" class="text-4xl font-light tracking-tight text-slate-800 leading-tight">un refugio de paz en tu bolsillo</h1>
-          <p id="landing-tagline" class="text-base font-light text-slate-500 leading-relaxed max-w-md mx-auto md:mx-0">suelta tus cargas cotidianas, respira hondo y reconéctate con el creador en un instante.</p>
+          <h1 id="landing-title" class="text-4xl font-light tracking-tight text-slate-800 leading-tight">Un refugio de paz en tu bolsillo</h1>
+          <p id="landing-tagline" class="text-base font-light text-slate-500 leading-relaxed max-w-md mx-auto md:mx-0">Suelta tus cargas cotidianas, respira hondo y reconéctate con el Creador en un instante.</p>
         </header>
 
         <!-- Botón de Acción Principal a la App (Grande, llamativo y corregido del SVG) -->
         <div class="space-y-3">
           <button onclick="enterApp()" 
-            class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold tracking-widest text-xs uppercase py-5 rounded-2xl shadow-xl shadow-indigo-600/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+            class="w-full bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 text-white font-semibold tracking-widest text-xs uppercase py-5 rounded-2xl shadow-xl shadow-purple-500/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
             <span id="btn-enter-app">comenzar a orar</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
           </button>
@@ -159,7 +154,7 @@
               <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">1</div>
               <div>
                 <h3 id="step-1-title" class="text-sm font-medium text-slate-800">Desahoga tu corazón</h3>
-                <p id="step-1-desc" class="text-xs font-light text-slate-500 leading-relaxed">Escribe de forma 100% anónima y segura lo que te aflige hoy: deudas, cansancio, miedos...</p>
+                <p id="step-1-desc" class="text-xs font-light text-slate-600 leading-relaxed">Escribe de forma 100% anónima y segura lo que te aflige hoy: deudas, cansancio, miedos...</p>
               </div>
             </div>
             <!-- Paso 2 -->
@@ -167,7 +162,7 @@
               <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">2</div>
               <div>
                 <h3 id="step-2-title" class="text-sm font-medium text-slate-800">Aquieta tu templo</h3>
-                <p id="step-2-desc" class="text-xs font-light text-slate-500 leading-relaxed">Sigue el ciclo de respiración mandatorio de 12 segundos para calmar tu pecho y relajar la mente.</p>
+                <p id="step-2-desc" class="text-xs font-light text-slate-600 leading-relaxed">Sigue el ciclo de respiración mandatorio de 12 segundos para calmar tu pecho y relajar la mente.</p>
               </div>
             </div>
             <!-- Paso 3 -->
@@ -175,7 +170,7 @@
               <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">3</div>
               <div>
                 <h3 id="step-3-title" class="text-sm font-medium text-slate-800">Recibe consuelo y recordatorios</h3>
-                <p id="step-3-desc" class="text-xs font-light text-slate-500 leading-relaxed">Encuentra versículos personalizados, una plegaria íntima y programa un susurro de paz diario en tu teléfono a la hora que prefieras.</p>
+                <p id="step-3-desc" class="text-xs font-light text-slate-600 leading-relaxed">Encuentra versículos personalizados, una plegaria íntima y programa un susurro de paz diario en tu teléfono a la hora que prefieras.</p>
               </div>
             </div>
           </div>
@@ -207,16 +202,16 @@
         <!-- Explicación de la Captura de Pantalla Seleccionada -->
         <div class="w-[280px] text-center bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-white/50 shadow-sm min-h-[90px] flex flex-col justify-center">
           <h3 id="screenshot-title" class="text-xs uppercase tracking-wider text-indigo-700 font-semibold mb-1">Paso 1: El Desahogo</h3>
-          <p id="screenshot-desc" class="text-[11px] text-slate-500 font-light leading-relaxed">La pantalla inicial donde escribes de forma anónima todo lo que pesa en tu corazón y mente.</p>
+          <p id="screenshot-desc" class="text-[11px] text-slate-600 font-light leading-relaxed">La pantalla inicial donde escribes de forma anónima todo lo que pesa en tu corazón y mente.</p>
         </div>
       </div>
 
       <!-- BLOQUE C: Sección de Descarga PWA e Instalador + Enlaces de Privacidad y Footer (Columna Izquierda, Fila 2 en PC / Tercero en móvil) -->
       <div class="space-y-6 md:col-start-1 md:row-start-2">
-        <section class="space-y-4 p-6 rounded-3xl bg-indigo-900/90 text-white shadow-xl">
+        <section class="space-y-4 p-6 rounded-3xl bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white shadow-xl shadow-purple-500/20 border border-white/20">
           <div class="text-center md:text-left space-y-1">
             <h2 id="title-install" class="text-sm font-semibold tracking-wider uppercase">Lleva Alivio en tu teléfono</h2>
-            <p id="sub-install" class="text-2xs font-light text-indigo-200">Nuestra app es una PWA ligera. No requiere App Store ni Google Play.</p>
+            <p id="sub-install" class="text-2xs font-light text-white/80">Nuestra app es una PWA ligera. No requiere App Store ni Google Play.</p>
           </div>
 
           <!-- Botón de instalación nativa (Android / Chrome / Edge) -->
@@ -227,11 +222,11 @@
 
           <!-- Instrucciones para iOS Safari -->
           <div id="ios-instructions" class="space-y-3 pt-2">
-            <p id="ios-guide-title" class="text-xs font-medium text-center md:text-left text-indigo-100 flex items-center justify-center md:justify-start gap-1.5">
+            <p id="ios-guide-title" class="text-xs font-medium text-center md:text-left text-white/90 flex items-center justify-center md:justify-start gap-1.5">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
               Instrucciones para iPhone (Safari):
             </p>
-            <ol class="text-2xs space-y-2 list-decimal list-inside pl-1 text-indigo-200 font-light">
+            <ol class="text-2xs space-y-2 list-decimal list-inside pl-1 text-white/80 font-light">
               <li>Toca el icono de Compartir (el cuadro con una flecha hacia arriba) en la barra inferior de Safari.</li>
               <li>Desplázate hacia abajo y selecciona "Agregar a Inicio" (Add to Home Screen).</li>
               <li>Nombra la aplicación como Alivio y pulsa Agregar arriba a la derecha.</li>
@@ -525,7 +520,7 @@
   </div>
 
   <!-- Banner Flotante de Instalación PWA (Oculto por defecto con class 'hidden') -->
-  <div id="pwa-install-banner" class="hidden fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 z-50 bg-slate-900/80 backdrop-blur-md border border-slate-700/50 text-white p-4 rounded-2xl shadow-2xl flex flex-col gap-3 animate-fade-in-up">
+  <div id="pwa-install-banner" class="hidden fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 z-50 bg-indigo-950/90 backdrop-blur-md border border-indigo-800/50 text-white p-4 rounded-2xl shadow-2xl flex flex-col gap-3 animate-fade-in-up">
     <div class="flex items-start gap-3">
       <!-- Icono decorativo estilo app de oración/alivio -->
       <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0 text-white font-bold text-lg">
