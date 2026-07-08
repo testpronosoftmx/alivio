@@ -4,7 +4,7 @@ const PUBLIC_VAPID_KEY = "BH6Na8LGJ5FPFDz2fZJrYpWCQA8ZAxAvat-ka4C1_9DfHcNhraOvms
 window.afternoonMessage = "respira. el señor sostiene tus cargas hoy. estás a salvo.";
 
 // Registro del Service Worker
-if ('serviceWorker' in navigator && 'PushManager' in window) {
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(reg => console.log('✅ Service Worker registrado con éxito:', reg.scope))
