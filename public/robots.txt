@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alivio.pronosoftmx.com/sitemap.xml
