@@ -32,14 +32,15 @@ function changeScreen(screenId) {
     }
   });
 
-  // Ocultar botón de corazón de apoyo si el usuario está dentro de la app
+  // Ocultar cabecera flotante superior (corazón e idiomas de la landing) al entrar a la app
   const headerDonateBtn = document.getElementById('header-donate-btn');
-  if (headerDonateBtn) {
-    if (screenId === 'screen-landing') {
-      headerDonateBtn.classList.remove('hidden');
-    } else {
-      headerDonateBtn.classList.add('hidden');
-    }
+  const globalHeaderLang = document.getElementById('global-header-lang-container');
+  if (screenId === 'screen-landing') {
+    if (headerDonateBtn) headerDonateBtn.classList.remove('hidden');
+    if (globalHeaderLang) globalHeaderLang.classList.remove('hidden');
+  } else {
+    if (headerDonateBtn) headerDonateBtn.classList.add('hidden');
+    if (globalHeaderLang) globalHeaderLang.classList.add('hidden');
   }
 }
 
@@ -363,7 +364,7 @@ function setLang(lang) {
 function applyTranslations() {
   const dict = TRANSLATIONS[currentLang];
   
-  // Resaltar visualmente el idioma activo en el selector doble
+  // Resaltar visualmente el idioma activo en el selector doble (Landing)
   const btnEs = document.getElementById('lang-btn-es');
   const btnEn = document.getElementById('lang-btn-en');
   if (btnEs && btnEn) {
@@ -373,6 +374,19 @@ function applyTranslations() {
     } else {
       btnEs.className = "font-light text-slate-400 hover:text-indigo-600 transition-colors uppercase";
       btnEn.className = "font-bold text-indigo-600 border-b border-indigo-600 transition-colors uppercase";
+    }
+  }
+
+  // Resaltar visualmente el idioma activo en el selector integrado (App)
+  const appBtnEs = document.getElementById('app-lang-btn-es');
+  const appBtnEn = document.getElementById('app-lang-btn-en');
+  if (appBtnEs && appBtnEn) {
+    if (currentLang === 'es') {
+      appBtnEs.className = "font-bold text-indigo-600 transition-colors uppercase cursor-pointer";
+      appBtnEn.className = "font-light text-slate-400 hover:text-indigo-600 transition-colors uppercase cursor-pointer";
+    } else {
+      appBtnEs.className = "font-light text-slate-400 hover:text-indigo-600 transition-colors uppercase cursor-pointer";
+      appBtnEn.className = "font-bold text-indigo-600 transition-colors uppercase cursor-pointer";
     }
   }
 

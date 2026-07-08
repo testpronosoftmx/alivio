@@ -100,7 +100,7 @@
 <body class="min-h-screen flex flex-col justify-between antialiased text-slate-800 selection:bg-indigo-100">
 
   <!-- Selector de idioma y botón de apoyo superior flotante -->
-  <div class="w-full max-w-md md:max-w-5xl mx-auto px-6 pt-6 flex justify-between items-center">
+  <div id="global-header-lang-container" class="w-full max-w-md md:max-w-5xl mx-auto px-6 pt-6 flex justify-between items-center">
     <!-- Botón de Apoyo (Corazón) -->
     <button id="header-donate-btn" onclick="openDonateModal()" class="flex items-center gap-1 text-[11.5px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 text-rose-600 hover:text-rose-700 active:scale-95 transition-all font-semibold cursor-pointer">
       <span>❤️</span> <span id="header-donate-text">Apoyar</span>
@@ -253,27 +253,37 @@
       <!-- ================= PANTALLA 1: EL DESAHOGO ================= -->
       <main id="screen-desahogo" class="screen-fade screen-hidden w-full flex flex-col gap-6">
         <header class="space-y-3">
-          <div class="flex items-center justify-between">
-            <div onclick="changeScreen('screen-landing')" class="flex items-center gap-2.5 cursor-pointer group">
-              <img src="/icon-192.png" alt="Alivio Logo" class="w-8 h-8 rounded-full shadow-sm border border-white/20 group-hover:scale-105 transition-transform">
+          <div class="flex items-center justify-between gap-2">
+            <!-- Izquierda: Logo + Nombre -->
+            <div onclick="changeScreen('screen-landing')" class="flex items-center gap-2 cursor-pointer group shrink-0">
+              <img src="/icon-192.png" alt="Alivio Logo" class="w-9.5 h-9.5 rounded-full shadow-sm border border-white/20 group-hover:scale-105 transition-transform">
               <h1 class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">alivio</h1>
             </div>
-            <div class="flex items-center gap-3">
-              <!-- Botón directo para ir a la respiración -->
-              <button id="btn-just-breathe" onclick="startJustBreathing()" class="text-xs text-indigo-500 hover:text-indigo-600 transition-colors flex items-center gap-1 font-light">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                <span id="txt-just-breathe">solo respirar</span>
-              </button>
+
+            <!-- Centro: Selector de idioma integrado en la cabecera -->
+            <div id="app-lang-selector" class="flex items-center gap-1 text-[10px] bg-white/45 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 shrink-0">
+              <button id="app-lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
+              <span class="text-slate-300">|</span>
+              <button id="app-lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
             </div>
+
+            <!-- Derecha: Botón de Solo Respirar estilo píldora -->
+            <button id="btn-just-breathe" onclick="startJustBreathing()" class="text-xs bg-indigo-50/60 border border-indigo-100/40 px-3 py-1.5 rounded-full text-indigo-600 hover:text-indigo-700 active:scale-95 transition-all flex items-center gap-1 font-medium shadow-2xs shrink-0 cursor-pointer">
+              <!-- Icono de viento en SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12h18M3 8h12M3 16h16" />
+              </svg>
+              <span id="txt-just-breathe">solo respirar</span>
+            </button>
           </div>
           <p class="text-2xl font-light tracking-tight text-slate-800 leading-relaxed">
             <span id="welcome-greeting">buenos días.</span><br><span id="welcome-sub">suelta aquí lo que pese hoy.</span>
           </p>
         </header>
 
-        <!-- Guía explicativa del flujo en 3 pasos (Resaltado en recuadro de alto contraste) -->
-        <div class="bg-white/70 backdrop-blur-xs border border-indigo-100/40 rounded-xl px-4 py-2.5 text-center shadow-xs">
-          <p id="txt-flow-guide" class="text-[10.5px] tracking-wider text-indigo-950/80 font-medium uppercase">
+        <!-- Guía explicativa del flujo en 3 pasos (Resaltado en azul y blanco de alta visibilidad) -->
+        <div class="bg-indigo-600 border border-indigo-500/20 rounded-xl px-4 py-2.5 text-center shadow-md">
+          <p id="txt-flow-guide" class="text-[10.5px] tracking-wider text-white font-semibold uppercase">
             1. Escribe tu pesar • 2. Respira hondo • 3. Recibe tu consuelo
           </p>
         </div>
