@@ -127,7 +127,13 @@ const TRANSLATIONS = {
     toastJustBreathe: "¡Paz y bien! Gracias por regalarte este momento de respiración.",
     loadingText: "Elevando tu carga...",
     loadingSub: "Generando ilustración sagrada",
-    waitingText: "Terminando de preparar tu refugio de paz..."
+    waitingText: "Terminando de preparar tu refugio de paz...",
+    headerDonate: "Apoyar",
+    donateModalTitle: "Apoyar a Alivio",
+    btnStripeModal: "Apoyar con Donación",
+    defaultVerseText: '"El Señor es mi pastor, nada me falta. En verdes praderas me hace recostar..."',
+    defaultComfort: "Te escucho. Es completamente normal sentir que el espacio se reduce cuando las tareas se acumulan en la mente. No tienes que resolver el día entero en este segundo.",
+    defaultPrayer: "Señor, te entrego esta prisa y este cansancio. Concédeme la calma de saber que Tú caminas a mi lado y sostienes mi día. Amén."
   },
   en: {
     landingTitle: "a refuge of peace in your pocket",
@@ -177,7 +183,13 @@ const TRANSLATIONS = {
     toastJustBreathe: "Peace and goodness! Thank you for giving yourself this breathing moment.",
     loadingText: "Raising your burden...",
     loadingSub: "Generating sacred illustration",
-    waitingText: "Finishing preparing your refuge of peace..."
+    waitingText: "Finishing preparing your refuge of peace...",
+    headerDonate: "Support",
+    donateModalTitle: "Support Alivio",
+    btnStripeModal: "Support with Donation",
+    defaultVerseText: '"The Lord is my shepherd, I lack nothing. He makes me lie down in green pastures..."',
+    defaultComfort: "I hear you. It is completely normal to feel that space shrinks when tasks accumulate in the mind. You do not have to solve the whole day in this second.",
+    defaultPrayer: "Lord, I hand over this rush and this weariness to You. Grant me the calm of knowing that You walk by my side and sustain my day. Amen."
   }
 };
 
@@ -421,6 +433,31 @@ function applyTranslations() {
   // Textos de Carga
   document.getElementById('loading-text').innerText = dict.loadingText;
   document.getElementById('loading-sub').innerText = dict.loadingSub;
+
+  // Textos del Botón de Cabecera y del Modal de Donaciones
+  const headerDonateText = document.getElementById('header-donate-text');
+  if (headerDonateText) headerDonateText.innerText = dict.headerDonate;
+  
+  const donateModalTitle = document.getElementById('donate-modal-title');
+  if (donateModalTitle) donateModalTitle.innerText = dict.donateModalTitle;
+  
+  const stripeLegendModal = document.getElementById('stripe-legend-modal');
+  if (stripeLegendModal) stripeLegendModal.innerText = dict.stripeLegend;
+  
+  const stripeBtnTextModal = document.getElementById('stripe-btn-text-modal');
+  if (stripeBtnTextModal) stripeBtnTextModal.innerText = dict.btnStripeModal;
+
+  // Si no se ha realizado un desahogo aún, traducir los textos por defecto del ancla
+  const anclaVerseText = document.getElementById('ancla-verse-text');
+  const anclaComfort = document.getElementById('ancla-comfort');
+  const anclaPrayer = document.getElementById('ancla-prayer');
+  if (anclaVerseText && anclaComfort && anclaPrayer) {
+    if (!comfortDataResolved) {
+      anclaVerseText.innerText = dict.defaultVerseText;
+      anclaComfort.innerText = dict.defaultComfort;
+      anclaPrayer.innerText = dict.defaultPrayer;
+    }
+  }
 
   // Sincronizar idioma en el slider de capturas de marketing
   updateMarketingScreenshot();
@@ -940,3 +977,20 @@ window.addEventListener('DOMContentLoaded', () => {
     changeScreen('screen-landing');
   }
 });
+
+/**
+ * Funciones de Control del Modal de Donaciones
+ */
+function openDonateModal() {
+  const modal = document.getElementById('modal-donate');
+  if (modal) {
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+  }
+}
+
+function closeDonateModal() {
+  const modal = document.getElementById('modal-donate');
+  if (modal) {
+    modal.classList.add('opacity-0', 'pointer-events-none');
+  }
+}
