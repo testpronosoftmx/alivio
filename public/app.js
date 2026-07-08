@@ -110,7 +110,7 @@ const TRANSLATIONS = {
     iosStep2: "Desplázate hacia abajo y selecciona \"Agregar a Inicio\" (Add to Home Screen).",
     iosStep3: "Nombra la aplicación como Alivio y pulsa Agregar arriba a la derecha.",
 
-    justBreathe: "solo respirar",
+    justBreathe: "respirar",
     greetingMorning: "Buenos días. Inicia con paz. Entrega tu día al Señor.",
     greetingAfternoon: "Buenas tardes. Entrega lo que hoy te abruma.",
     greetingNight: "Buenas noches. Descansa en Él. Entrega tus cargas de este día.",
@@ -166,7 +166,7 @@ const TRANSLATIONS = {
     iosStep2: "Scroll down and select \"Add to Home Screen\".",
     iosStep3: "Name the application Alivio and tap Add in the upper right.",
 
-    justBreathe: "just breathe",
+    justBreathe: "breathe",
     greetingMorning: "Good morning. Start with peace. Surrender your day to the Lord.",
     greetingAfternoon: "Good afternoon. Surrender what overwhelms you today.",
     greetingNight: "Good night. Rest in Him. He carries your burdens today.",
