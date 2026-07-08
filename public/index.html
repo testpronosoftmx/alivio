@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alivio - Espacio Seguro, Meditación y Oración Católica PWA</title>
+  
+  <!-- SEO & Search Console Optimization -->
+  <link rel="canonical" href="https://alivio.pronosoftmx.com">
+  <meta name="description" content="Alivio es una aplicación web y PWA católica diseñada para desahogar tus penas, realizar respiración profunda guiada y recibir versículos de consuelo y oraciones en español e inglés.">
+  <meta name="keywords" content="alivio, oracion catolica, biblia, desahogo espiritual, paz mental, meditar, estres, ansiedad, pwa catolica, pronosoft">
+  <meta name="robots" content="index, follow">
+  
+  <!-- OpenGraph -->
+  <meta property="og:title" content="Alivio - Espacio Seguro, Meditación y Oración Católica">
+  <meta property="og:description" content="Suelta tus cargas, respira hondo y recibe el consuelo de Dios a través de las Sagradas Escrituras Católicas.">
+  <meta property="og:image" content="https://alivio.pronosoftmx.com/screenshot1.png">
+  <meta property="og:url" content="https://alivio.pronosoftmx.com">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#6366f1">
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN Play -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      /* Gradiente zen y cálido en HSL ajustado */
+      background: linear-gradient(135deg, #fef2f2 0%, #f5f3ff 50%, #ecfdf5 100%);
+      background-attachment: fixed;
+    }
+    
+    /* Animación flotante zen para el lienzo sagrado */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(0px); }
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Animación de pulsación para el círculo de respiración */
+    @keyframes inhaleGrow {
+      0% { transform: scale(1); background-color: rgba(99, 102, 241, 0.2); }
+      100% { transform: scale(2.2); background-color: rgba(99, 102, 241, 0.45); }
+    }
+    @keyframes holdStay {
+      0% { transform: scale(2.2); background-color: rgba(99, 102, 241, 0.45); }
+      100% { transform: scale(2.2); background-color: rgba(79, 70, 229, 0.55); }
+    }
+    @keyframes exhaleShrink {
+      0% { transform: scale(2.2); background-color: rgba(79, 70, 229, 0.55); }
+      100% { transform: scale(1); background-color: rgba(99, 102, 241, 0.2); }
+    }
+
+    .breathing-circle {
+      transition: all 1s ease-in-out;
+    }
+    .breathing-circle.inhale {
+      animation: inhaleGrow 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .breathing-circle.hold {
+      animation: holdStay 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .breathing-circle.exhale {
+      animation: exhaleShrink 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Ocultar scrollbars sin perder funcionalidad */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Efectos de transición entre pantallas */
+    .screen-fade {
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+    .screen-hidden {
+      display: none !important;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased text-slate-800 selection:bg-indigo-100">
+
+  <!-- Selector de idioma global superior flotante -->
+  <div class="w-full max-w-md md:max-w-5xl mx-auto px-6 pt-6 flex justify-end">
+    <!-- Selector de idioma dual visible -->
+    <div id="global-lang-selector" class="flex items-center gap-1 text-[11px] bg-white/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/50">
+      <button id="lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase">ES</button>
+      <span class="text-slate-300">|</span>
+      <button id="lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase">EN</button>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal (Flexible según la pantalla) -->
+  <div class="w-full flex-1 flex flex-col justify-start pb-8">
+
+    <!-- ================= PANTALLA 0: LANDING PAGE (DISEÑO RESPONSIVO GRID TRIS ECCIONAL) ================= -->
+    <main id="screen-landing" class="screen-fade w-full max-w-5xl mx-auto px-6 py-4 grid md:grid-cols-2 gap-x-12 gap-y-8 items-start">
+      
+      <!-- BLOQUE A: Copia de marketing, CTA grande y los 3 pasos (Columna Izquierda, Fila 1 en PC / Primero en móvil) -->
+      <div class="space-y-6 md:col-start-1 md:row-start-1">
+        <header class="space-y-4 text-center md:text-left">
+          <div class="flex justify-center md:justify-start mb-2">
+            <img src="/icon-192.png" alt="Alivio Logo" class="w-20 h-20 rounded-full shadow-lg border border-white/40">
+          </div>
+          <h1 id="landing-title" class="text-4xl font-light tracking-tight text-slate-800 leading-tight">un refugio de paz en tu bolsillo</h1>
+          <p id="landing-tagline" class="text-base font-light text-slate-500 leading-relaxed max-w-md mx-auto md:mx-0">suelta tus cargas cotidianas, respira hondo y reconéctate con el creador en un instante.</p>
+        </header>
+
+        <!-- Botón de Acción Principal a la App (Grande, llamativo y corregido del SVG) -->
+        <div class="space-y-3">
+          <button onclick="enterApp()" 
+            class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold tracking-widest text-xs uppercase py-5 rounded-2xl shadow-xl shadow-indigo-600/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+            <span id="btn-enter-app">comenzar a orar</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+
+        <!-- El Flujo Explicado (SEO) -->
+        <section class="space-y-4">
+          <h2 id="title-how-works" class="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold text-center md:text-left">¿cómo funciona Alivio?</h2>
+          
+          <div class="space-y-3">
+            <!-- Paso 1 -->
+            <div class="flex gap-4 p-4 rounded-2xl bg-white/45 border border-white/60">
+              <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">1</div>
+              <div>
+                <h3 id="step-1-title" class="text-sm font-medium text-slate-800">Desahoga tu corazón</h3>
+                <p id="step-1-desc" class="text-xs font-light text-slate-500 leading-relaxed">Escribe de forma 100% anónima y segura lo que te aflige hoy: deudas, cansancio, miedos...</p>
+              </div>
+            </div>
+            <!-- Paso 2 -->
+            <div class="flex gap-4 p-4 rounded-2xl bg-white/45 border border-white/60">
+              <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">2</div>
+              <div>
+                <h3 id="step-2-title" class="text-sm font-medium text-slate-800">Aquieta tu templo</h3>
+                <p id="step-2-desc" class="text-xs font-light text-slate-500 leading-relaxed">Sigue el ciclo de respiración mandatorio de 12 segundos para calmar tu pecho y relajar la mente.</p>
+              </div>
+            </div>
+            <!-- Paso 3 -->
+            <div class="flex gap-4 p-4 rounded-2xl bg-white/45 border border-white/60">
+              <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">3</div>
+              <div>
+                <h3 id="step-3-title" class="text-sm font-medium text-slate-800">Recibe consuelo y recordatorios</h3>
+                <p id="step-3-desc" class="text-xs font-light text-slate-500 leading-relaxed">Encuentra versículos personalizados, una plegaria íntima y programa un susurro de paz diario en tu teléfono a la hora que prefieras.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- BLOQUE B: Mockup de Celular interactivo y explicaciones (Columna Derecha en PC / Segundo en móvil - debajo de los 3 pasos) -->
+      <div class="flex flex-col items-center gap-6 md:col-start-2 md:row-start-1 md:row-span-2 justify-self-center">
+        <h2 id="title-screenshots" class="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold md:hidden">capturas de la aplicación</h2>
+        
+        <div class="w-[280px] bg-slate-900/5 backdrop-blur-md border border-white/40 rounded-[2.5rem] p-4 shadow-xl flex flex-col items-center relative">
+          <!-- Marco de teléfono celular estético -->
+          <div class="relative w-full aspect-[9/16] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-slate-300 bg-[#f8f6fc]">
+            <img id="marketing-screenshot" src="/SS1.png" alt="Captura de pantalla de Alivio" class="w-full h-full object-contain transition-opacity duration-300">
+          </div>
+          
+          <!-- Controles del carrusel -->
+          <div class="flex justify-between w-full max-w-[200px] items-center mt-4">
+            <button onclick="prevMarketingScreenshot()" class="p-2 rounded-full bg-white hover:bg-slate-50 shadow-md text-indigo-600 transition-transform active:scale-90">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <span id="marketing-indicator" class="text-2xs font-bold text-slate-600 font-mono">1 / 4</span>
+            <button onclick="nextMarketingScreenshot()" class="p-2 rounded-full bg-white hover:bg-slate-50 shadow-md text-indigo-600 transition-transform active:scale-90">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Explicación de la Captura de Pantalla Seleccionada -->
+        <div class="w-[280px] text-center bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-white/50 shadow-sm min-h-[90px] flex flex-col justify-center">
+          <h3 id="screenshot-title" class="text-xs uppercase tracking-wider text-indigo-700 font-semibold mb-1">Paso 1: El Desahogo</h3>
+          <p id="screenshot-desc" class="text-[11px] text-slate-500 font-light leading-relaxed">La pantalla inicial donde escribes de forma anónima todo lo que pesa en tu corazón y mente.</p>
+        </div>
+      </div>
+
+      <!-- BLOQUE C: Sección de Descarga PWA e Instalador + Enlaces de Privacidad y Footer (Columna Izquierda, Fila 2 en PC / Tercero en móvil) -->
+      <div class="space-y-6 md:col-start-1 md:row-start-2">
+        <section class="space-y-4 p-6 rounded-3xl bg-indigo-900/90 text-white shadow-xl">
+          <div class="text-center md:text-left space-y-1">
+            <h2 id="title-install" class="text-sm font-semibold tracking-wider uppercase">Lleva Alivio en tu teléfono</h2>
+            <p id="sub-install" class="text-2xs font-light text-indigo-200">Nuestra app es una PWA ligera. No requiere App Store ni Google Play.</p>
+          </div>
+
+          <!-- Botón de instalación nativa (Android / Chrome / Edge) -->
+          <button id="pwa-install-btn" class="hidden w-full bg-white text-indigo-950 font-semibold text-xs uppercase tracking-wider py-4 rounded-xl shadow-md hover:bg-indigo-50 transition-all flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            <span id="btn-install-pwa">Instalar en este Dispositivo</span>
+          </button>
+
+          <!-- Instrucciones para iOS Safari -->
+          <div id="ios-instructions" class="space-y-3 pt-2">
+            <p id="ios-guide-title" class="text-xs font-medium text-center md:text-left text-indigo-100 flex items-center justify-center md:justify-start gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+              Instrucciones para iPhone (Safari):
+            </p>
+            <ol class="text-2xs space-y-2 list-decimal list-inside pl-1 text-indigo-200 font-light">
+              <li>Toca el icono de Compartir (el cuadro con una flecha hacia arriba) en la barra inferior de Safari.</li>
+              <li>Desplázate hacia abajo y selecciona "Agregar a Inicio" (Add to Home Screen).</li>
+              <li>Nombra la aplicación como Alivio y pulsa Agregar arriba a la derecha.</li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- Pie de página con Enlaces Legales de SEO -->
+        <footer class="text-center md:text-left space-y-4 pt-6 border-t border-slate-200/50">
+          <p class="text-[10px] text-slate-400 font-light leading-relaxed">
+            © 2026 Alivio • ventas@pronosoftmx.com<br>
+            Desarrollado para proveer confort espiritual anónimo de forma privada.
+          </p>
+          <div class="flex justify-center md:justify-start gap-4 text-3xs uppercase tracking-wider text-slate-500 font-medium">
+            <button onclick="openLegal('privacy')" class="hover:text-indigo-600 transition-colors">Privacidad</button>
+            <span>•</span>
+            <button onclick="openLegal('cookies')" class="hover:text-indigo-600 transition-colors">Cookies</button>
+            <span>•</span>
+            <button onclick="openLegal('terms')" class="hover:text-indigo-600 transition-colors">Aviso Legal</button>
+          </div>
+        </footer>
+      </div>
+
+    </main>
+
+    <!-- Contenedor para las pantallas de la App (Se mantienen en max-w-md para un enfoque devocional y meditación íntima) -->
+    <div class="w-full max-w-md mx-auto px-6 flex-1 flex flex-col justify-start">
+      
+      <!-- ================= PANTALLA 1: EL DESAHOGO ================= -->
+      <main id="screen-desahogo" class="screen-fade screen-hidden w-full flex flex-col gap-6">
+        <header class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h1 class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold">alivio</h1>
+            <div class="flex items-center gap-3">
+              <!-- Botón directo para ir a la respiración -->
+              <button id="btn-just-breathe" onclick="startJustBreathing()" class="text-xs text-indigo-500 hover:text-indigo-600 transition-colors flex items-center gap-1 font-light">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                <span id="txt-just-breathe">solo respirar</span>
+              </button>
+            </div>
+          </div>
+          <p class="text-3xl font-light tracking-tight text-slate-800 leading-relaxed">
+            <span id="welcome-greeting">buenos días.</span><br><span id="welcome-sub">suelta aquí lo que pese hoy.</span>
+          </p>
+        </header>
+
+        <!-- Guía explicativa del flujo en 3 pasos -->
+        <p id="txt-flow-guide" class="text-[11px] tracking-wider text-slate-400 font-light italic pl-1">
+          1. escribe tu pesar • 2. respira hondo • 3. recibe tu consuelo
+        </p>
+
+        <!-- Caja de texto orgánica con Glassmorphism -->
+        <div class="relative group">
+          <textarea id="vent-input" maxlength="300"
+            class="w-full h-48 bg-white/50 backdrop-blur-lg rounded-3xl p-6 text-base tracking-wide text-slate-700 placeholder-slate-400 border border-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-300/40 resize-none shadow-md shadow-indigo-100/10 hover:shadow-xl hover:shadow-indigo-100/20 focus:bg-white/80 transition-all duration-500 pb-12"
+            placeholder="cuéntale a Dios lo que pasa por tu mente y corazón... desahógate con total libertad y detalle..."></textarea>
+          <!-- Contador de caracteres discreto -->
+          <span id="char-counter" class="absolute bottom-4 right-6 text-[10px] font-mono text-slate-400/80 font-light">0 / 300</span>
+        </div>
+
+        <!-- Botón de acción principal -->
+        <button id="btn-release" onclick="handleRelease()"
+          class="w-full bg-slate-900/90 hover:bg-slate-900 hover:scale-[1.01] active:scale-[0.99] text-white font-light tracking-widest text-xs uppercase py-4 rounded-2xl shadow-xl shadow-slate-900/10 hover:shadow-slate-900/25 transition-all duration-300 flex items-center justify-center gap-2">
+          <span id="btn-release-text">soltar carga</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 19l9 2-2-9-7-2-2 7zm0 0L9 9" /></svg>
+        </button>
+
+        <!-- Logo estético de la App en el inicio -->
+        <div class="flex flex-col items-center mt-6">
+          <img src="/icon-192.png" alt="Alivio Logo" class="w-20 h-20 rounded-full opacity-60 hover:opacity-90 transition-opacity cursor-pointer" onclick="changeScreen('screen-landing')">
+        </div>
+
+        <!-- Botón de Donación Stripe en el Inicio -->
+        <section class="p-5 rounded-3xl bg-indigo-50/40 border border-indigo-100/30 text-center space-y-3">
+          <p id="stripe-legend-home" class="text-[11px] text-slate-500 leading-relaxed font-light">
+            "Tu donación permite que una persona en crisis reciba una palabra de aliento gratis hoy."
+          </p>
+          <a id="stripe-btn-home" href="https://buy.stripe.com/4gM8wP5ZkcWyeIYfx6gYU04" 
+             class="inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+            <span id="stripe-btn-text-home">Apoyar a Alivio</span>
+          </a>
+        </section>
+      </main>
+
+      <!-- ================= PANTALLA 2: EL SUSPIRO (RESPIRACIÓN ZEN) ================= -->
+      <main id="screen-suspiro" class="screen-fade screen-hidden w-full flex flex-col items-center justify-between gap-12 py-6">
+        <header class="w-full text-center space-y-1">
+          <h1 id="txt-breathing-title" class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold">el suspiro</h1>
+          <p id="txt-breathing-sub" class="text-sm font-light text-slate-500">libera la tensión de tu pecho</p>
+        </header>
+
+        <!-- Círculo de Respiración Concéntrico -->
+        <div class="relative w-72 h-72 flex items-center justify-center my-6">
+          <!-- Círculo que se anima -->
+          <div id="breathing-node" class="breathing-circle exhale w-24 h-24 rounded-full flex items-center justify-center text-white transition-all duration-1000">
+          </div>
+          <!-- Texto de instrucción en el centro -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="breathing-instruction" class="text-xs uppercase tracking-[0.25em] text-indigo-950 font-bold mb-1">Prepárate</span>
+            <span id="breathing-timer" class="text-5xl font-mono font-medium text-slate-900 tracking-tighter">3</span>
+          </div>
+        </div>
+
+        <div class="w-full space-y-4">
+          <!-- Indicador de Ciclos / Barra de progreso sutil -->
+          <div class="text-center">
+            <p id="breathing-cycle-text" class="text-xs tracking-wider text-slate-400 font-light">Iniciando respiración de 3 tiempos automáticamente...</p>
+          </div>
+
+          <button id="btn-breathing-control" onclick="toggleBreathing()"
+            class="w-full bg-white/70 border border-slate-200/80 hover:bg-slate-50 text-slate-700 font-light tracking-widest text-xs uppercase py-4 rounded-2xl transition-all duration-300">
+            Terminar
+          </button>
+        </div>
+      </main>
+
+      <!-- ================= PANTALLA 3: EL ANCLA (EL CONFORT) ================= -->
+      <main id="screen-ancla" class="screen-fade screen-hidden w-full flex flex-col gap-6 py-4">
+        <header class="flex items-center justify-between">
+          <h1 id="ancla-verse" class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-medium">Confort</h1>
+          <!-- Botón para volver a empezar -->
+          <button onclick="resetApp()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18" /></svg>
+            <span id="txt-ancla-otra-vez">otra vez</span>
+          </button>
+        </header>
+
+        <!-- Imagen Sacra con marco zen -->
+        <div class="w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/50 bg-slate-100 relative group animate-float">
+          <!-- Overlay sutil de luz divina -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10 mix-blend-overlay"></div>
+          <img id="ancla-image" src="https://images.unsplash.com/photo-1507692049790-de58290a4334?q=80&w=800" 
+               onerror="this.onerror=null; this.src='/fallback-misericordia.png';"
+               alt="Ilustración sacra de paz" 
+               class="w-full h-full object-cover transition-transform duration-[20s] group-hover:scale-105">
+        </div>
+
+        <!-- Texto bíblico y confort -->
+        <article class="space-y-4 px-1">
+          <!-- Carrusel de Versículos Bíblicos -->
+          <div class="relative bg-indigo-50/20 rounded-2xl border border-slate-100 p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span id="verse-indicator" class="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold">Versículo 1 de 3</span>
+              <div class="flex gap-2">
+                <button onclick="prevVerse()" class="p-1 rounded-lg hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button onclick="nextVerse()" class="p-1 rounded-lg hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            </div>
+            <blockquote id="ancla-verse-text" class="text-sm italic font-light leading-relaxed text-indigo-950 border-l-2 border-indigo-200 pl-4 py-1 min-h-[50px] transition-all duration-300">
+              "El Señor es mi pastor, nada me falta. En verdes praderas me hace recostar..."
+            </blockquote>
+          </div>
+
+          <p id="ancla-comfort" class="text-base font-light leading-relaxed text-slate-800 tracking-wide">
+            Te escucho. Es completamente normal sentir que el espacio se reduce cuando las tareas se acumulan en la mente. No tienes que resolver el día entero en este segundo.
+          </p>
+
+          <div class="bg-indigo-50/50 backdrop-blur-sm rounded-2xl p-4 border border-indigo-100/50">
+            <h3 id="txt-ancla-prayer-title" class="text-2xs uppercase tracking-widest text-indigo-400 font-semibold mb-1">Oración silenciosa</h3>
+            <p id="ancla-prayer" class="text-xs font-light text-indigo-900 leading-relaxed">
+              Señor, te entrego esta prisa y este cansancio. Concédeme la calma de saber que Tú caminas a mi lado y sostienes mi día. Amén.
+            </p>
+          </div>
+        </article>
+
+        <!-- Configuración del Recordatorio Push -->
+        <section class="bg-white/50 backdrop-blur-lg border border-white/80 rounded-3xl p-6 space-y-4 shadow-sm shadow-indigo-100/10">
+          <div class="space-y-1">
+            <p id="txt-push-title" class="text-xs font-medium tracking-wide text-slate-600">¿A qué hora deseas tu recordatorio esta tarde?</p>
+            <p id="txt-push-sub" class="text-[10px] text-slate-400 font-light">Te enviaremos un susurro de paz personalizado a tu teléfono.</p>
+          </div>
+          <div class="flex gap-3">
+            <input type="time" id="alert-time" value="17:00" 
+              class="flex-1 bg-white/90 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-light focus:outline-none focus:ring-2 focus:ring-indigo-300/40">
+            <button id="btn-activate-push" onclick="activatePush()"
+              class="bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-light text-xs uppercase tracking-widest px-6 rounded-xl transition-all duration-300 shadow-md shadow-indigo-600/10">
+              <span id="btn-push-text">activar</span>
+            </button>
+          </div>
+          <p id="push-status" class="text-center text-[10px] font-light text-slate-400 hidden"></p>
+        </section>
+
+        <!-- Botón de Donación Stripe en el Ancla (In-App) -->
+        <section class="p-5 rounded-3xl bg-indigo-50/40 border border-indigo-100/30 text-center space-y-3">
+          <p id="stripe-legend-ancla" class="text-[11px] text-slate-500 leading-relaxed font-light">
+            "Tu donación permite que una persona en crisis reciba una palabra de aliento gratis hoy."
+          </p>
+          <a id="stripe-btn-ancla" href="https://buy.stripe.com/4gM8wP5ZkcWyeIYfx6gYU04" 
+             class="inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+            <span id="stripe-btn-text-ancla">Apoyar a Alivio</span>
+          </a>
+        </section>
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Contenedor de Modal de Textos Legales (SEO Search Console) -->
+  <div id="modal-legal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-white/95 rounded-3xl max-w-sm w-11/12 p-6 space-y-4 border border-white/60 shadow-2xl max-h-[80vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+        <h3 id="legal-modal-title" class="text-sm font-semibold text-slate-800 uppercase tracking-wider">Políticas</h3>
+        <button onclick="closeLegal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      
+      <!-- Contenedores SEO legibles para los rastreadores pero ocultos al modal -->
+      <div id="legal-modal-body" class="text-xs font-light text-slate-600 space-y-4 leading-relaxed pr-1"></div>
+    </div>
+  </div>
+
+  <!-- TEXTOS LEGALES INDEXABLES EN EL DOM PARA CUMPLIR CON SEARCH CONSOLE (SEO) -->
+  <div class="hidden">
+    <div id="seo-privacy-es">
+      <p class="font-semibold text-slate-800 mb-2">POLÍTICA DE PRIVACIDAD</p>
+      <p>La aplicación Alivio está comprometida con la protección de tus datos personales. Alivio no recolecta, almacena ni comparte información identificativa. Los desahogos y textos ingresados por los usuarios se procesan de forma 100% anónima directamente a través de servidores seguros y encriptados de procesamiento, sin guardar registros de identidad.</p>
+      <p>Cualquier dato local, como las preferencias de idioma y los recordatorios de la tarde, se guarda estrictamente de forma local en tu dispositivo (LocalStorage). Para solicitudes de soporte o dudas, puedes contactarnos en: **ventas@pronosoftmx.com**.</p>
+    </div>
+    <div id="seo-privacy-en">
+      <p class="font-semibold text-slate-800 mb-2">PRIVACY POLICY</p>
+      <p>The Alivio application is committed to protecting your personal data. Alivio does not collect, store, or share identifying information. The vents and text typed by users are processed 100% anonymously directly through secure and encrypted processing servers without saving identity logs.</p>
+      <p>Any local data, such as language preferences and afternoon reminders, is stored strictly on your local device (LocalStorage). For support requests or inquiries, you can contact us at: **ventas@pronosoftmx.com**.</p>
+    </div>
+
+    <div id="seo-cookies-es">
+      <p class="font-semibold text-slate-800 mb-2">POLÍTICA DE COOKIES</p>
+      <p>Alivio no utiliza cookies de seguimiento publicitario ni de terceros. Únicamente utilizamos tecnologías de almacenamiento local en el navegador (como LocalStorage y Caché del Service Worker) para garantizar que la aplicación funcione en modo sin conexión (offline) y para recordar tu idioma seleccionado.</p>
+      <p>Para más información o aclaraciones, puedes escribirnos a: **ventas@pronosoftmx.com**.</p>
+    </div>
+    <div id="seo-cookies-en">
+      <p class="font-semibold text-slate-800 mb-2">COOKIES POLICY</p>
+      <p>Alivio does not use advertising or third-party tracking cookies. We only use browser storage technologies (such as LocalStorage and Service Worker Cache) to ensure the application works offline and to remember your selected language.</p>
+      <p>For more information or clarifications, you can write to us at: **ventas@pronosoftmx.com**.</p>
+    </div>
+
+    <div id="seo-terms-es">
+      <p class="font-semibold text-slate-800 mb-2">AVISO LEGAL Y TÉRMINOS</p>
+      <p>Alivio es un espacio de soporte y confort espiritual basado en las Sagradas Escrituras Católicas. Esta aplicación no constituye terapia médica, psicológica ni asesoramiento profesional en salud mental. Si experimentas una crisis severa o pensamientos de autolesión, por favor busca ayuda profesional de inmediato.</p>
+      <p>Contacto del titular responsable: ventas@pronosoftmx.com.</p>
+    </div>
+    <div id="seo-terms-en">
+      <p class="font-semibold text-slate-800 mb-2">LEGAL NOTICE AND TERMS</p>
+      <p>Alivio is a space for spiritual support and comfort based on Catholic Holy Scriptures. This application does not constitute medical, psychological therapy, or professional mental health advice. If you are experiencing a severe crisis or thoughts of self-harm, please seek professional help immediately.</p>
+      <p>Responsible publisher contact: ventas@pronosoftmx.com.</p>
+    </div>
+  </div>
+
+  <!-- Pantalla de Carga (Overlay con Glassmorphism) -->
+  <div id="loading-overlay" class="fixed inset-0 bg-slate-900/20 backdrop-blur-md flex flex-col items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-500">
+    <div class="relative w-20 h-20 flex items-center justify-center">
+      <!-- Spinner premium concéntrico -->
+      <div class="absolute inset-0 rounded-full border-[3px] border-indigo-200/30"></div>
+      <div class="absolute inset-0 rounded-full border-[3px] border-t-indigo-600 animate-spin"></div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+    </div>
+    <p id="loading-text" class="text-xs uppercase tracking-[0.2em] text-slate-800 font-light mt-4">Elevando tu carga...</p>
+    <p id="loading-sub" class="text-[10px] text-slate-500 font-light mt-1">Generando ilustración sagrada</p>
+  </div>
+
+  <!-- JS Principal -->
+  <script src="/app.js"></script>
+</body>
+</html>

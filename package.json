@@ -1,0 +1,23 @@
+{
+  "name": "alivio-pwa",
+  "version": "1.0.0",
+  "description": "Alivio PWA - Tu espacio seguro y confortable",
+  "main": "api/comfort.ts",
+  "scripts": {
+    "start": "vercel dev",
+    "build": "echo 'No build step needed for PWA static files, Vercel compiles /api functions dynamically.'"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "*",
+    "@google/genai": "*",
+    "@supabase/supabase-js": "*",
+    "dotenv": "*",
+    "web-push": "*"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "@types/web-push": "*",
+    "@vercel/node": "^5.8.22",
+    "typescript": "*"
+  }
+}

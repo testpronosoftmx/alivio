@@ -1,0 +1,40 @@
+{
+  "name": "Alivio",
+  "short_name": "Alivio",
+  "description": "Tu espacio seguro para soltar cargas y encontrar confort bíblico.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/SS1.png",
+      "sizes": "345x752",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Escribe tu desahogo en Alivio"
+    },
+    {
+      "src": "/screenshot3.png",
+      "sizes": "1920x869",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Consuelo y Paz en Escritorio"
+    }
+  ]
+}

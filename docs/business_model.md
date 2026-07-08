@@ -7,7 +7,7 @@ Evitar el muro de pago (paywall) duro restrictivo que bloquea contenido esencial
 - **Mensaje Clave:** *"No estás pagando por contenido premium; estás financiando a que usuarios jóvenes y personas en países en desarrollo puedan usar Ecclesia OS gratis."*
 - **Precio:** **$4.99 / mes** o **$49.99 / año**.
 - **Beneficios (Perks):** 
-  - Insignia dorada de "Sustentador" en su perfil (Social & Dating).
+  - Insignia dorada de "Sustentador" en su perfil (Comunidad y Oración).
   - Acceso a reportes de transparencia global ("Has ayudado a que X personas oren este mes").
 
 ## 2. Micro-suscripciones (Retos de Temporada)
