@@ -87,10 +87,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
   } catch (error: any) {
-    console.error("❌ Error en endpoint comfort:", error.message || error);
+    console.error("❌ Error en endpoint comfort:", error.stack || error.message || error);
     return res.status(500).json({
       error: "Ocurrió un error al procesar el confort espiritual.",
-      details: error.message || error
+      details: error.message || error,
+      stack: error.stack
     });
   }
 }
