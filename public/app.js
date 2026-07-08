@@ -269,6 +269,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   
+  // Si ya se instaló previamente o está en modo standalone, no mostrar el banner
+  if (localStorage.getItem('pwa_installed') === 'true' || window.matchMedia('(display-mode: standalone)').matches) {
+    return;
+  }
+  
   // Si el usuario ya rechazó el banner en esta sesión actual, no hacemos nada
   if (sessionStorage.getItem('pwa_dismissed') === 'true') {
     return;
@@ -329,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Escuchador global de instalación exitosa
 window.addEventListener('appinstalled', () => {
+  localStorage.setItem('pwa_installed', 'true');
   const installBanner = document.getElementById('pwa-install-banner');
   const installFooterBtn = document.getElementById('pwa-install-btn');
   if (installBanner) {
@@ -488,6 +494,24 @@ function applyTranslations() {
 }
 
 /**
+ * Mostrar Toast Notification
+ */
+function showToast(message) {
+  const toast = document.getElementById('toast-notification');
+  const toastMsg = document.getElementById('toast-message');
+  if (toast && toastMsg) {
+    toastMsg.innerText = message;
+    toast.classList.remove('opacity-0', '-translate-y-8', 'pointer-events-none');
+    toast.classList.add('opacity-100', 'translate-y-0');
+    
+    setTimeout(() => {
+      toast.classList.remove('opacity-100', 'translate-y-0');
+      toast.classList.add('opacity-0', '-translate-y-8', 'pointer-events-none');
+    }, 3500);
+  }
+}
+
+/**
  * Enviar el desahogo a la API y procesar respuesta en segundo plano
  */
 async function handleRelease() {
@@ -495,7 +519,7 @@ async function handleRelease() {
   const text = ventInput.value.trim();
 
   if (!text) {
-    alert(currentLang === 'en' ? "Please write what is weighing you down to release the burden." : "Por favor, escribe lo que te abruma para poder soltar la carga.");
+    showToast(currentLang === 'en' ? "Please write what is weighing you down to release the burden." : "Por favor, escribe lo que te abruma para poder soltar la carga.");
     return;
   }
 
@@ -642,7 +666,7 @@ function startBreathingCycle() {
       document.getElementById('breathing-timer').innerText = "";
       document.getElementById('breathing-cycle-text').innerText = (currentLang === 'en') ? "Thank you for taking care of your temple." : "Gracias por cuidar de tu templo.";
       setTimeout(() => {
-        alert(dict.toastJustBreathe);
+        showToast(dict.toastJustBreathe);
         resetApp();
       }, 1200);
       return;
