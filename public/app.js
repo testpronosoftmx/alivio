@@ -101,7 +101,7 @@ const TRANSLATIONS = {
 
     justBreathe: "solo respirar",
     greetingMorning: "buenos días. inicia con paz. entrega tu día al Señor.",
-    greetingAfternoon: "buenas tardes. regálate un suspiro. entrega lo que hoy te abruma.",
+    greetingAfternoon: "buenas tardes. entrega lo que hoy te abruma.",
     greetingNight: "buenas noches. descansa en Él. suelta las cargas de este día.",
     greetingSub: "",
     flowGuide: "1. escribe tu pesar • 2. respira hondo • 3. recibe tu consuelo",
@@ -151,7 +151,7 @@ const TRANSLATIONS = {
 
     justBreathe: "just breathe",
     greetingMorning: "good morning. start with peace. surrender your day to the Lord.",
-    greetingAfternoon: "good afternoon. take a sigh. surrender what overwhelms you today.",
+    greetingAfternoon: "good afternoon. surrender what overwhelms you today.",
     greetingNight: "good night. rest in Him. release the burdens of this day.",
     greetingSub: "",
     flowGuide: "1. write your concern • 2. breathe deeply • 3. receive your comfort",
