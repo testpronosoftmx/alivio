@@ -245,6 +245,19 @@ let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  
+  // Si el usuario ya rechazó el banner en esta sesión actual, no hacemos nada
+  if (sessionStorage.getItem('pwa_dismissed') === 'true') {
+    return;
+  }
+  
+  // Mostrar el banner flotante
+  const installBanner = document.getElementById('pwa-install-banner');
+  if (installBanner) {
+    installBanner.classList.remove('hidden');
+  }
+  
+  // Mostrar el botón clásico del footer si existe y está cargado
   const installBtn = document.getElementById('pwa-install-btn');
   if (installBtn) {
     installBtn.classList.remove('hidden');
@@ -255,17 +268,53 @@ window.addEventListener('beforeinstallprompt', (e) => {
  * Ejecutar la instalación nativa de la PWA
  */
 document.addEventListener('DOMContentLoaded', () => {
-  const installBtn = document.getElementById('pwa-install-btn');
-  if (installBtn) {
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to install prompt: ${outcome}`);
-      deferredPrompt = null;
-      installBtn.classList.add('hidden');
+  const installBanner = document.getElementById('pwa-install-banner');
+  const installBannerBtn = document.getElementById('pwa-banner-install-btn');
+  const installFooterBtn = document.getElementById('pwa-install-btn'); // Botón del footer
+  const dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+  const triggerInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    if (outcome === 'accepted') {
+      if (installBanner) installBanner.classList.add('hidden');
+      if (installFooterBtn) installFooterBtn.classList.add('hidden');
+    }
+    deferredPrompt = null;
+  };
+
+  // Asignar listeners de instalación a ambos botones
+  if (installBannerBtn) {
+    installBannerBtn.addEventListener('click', triggerInstall);
+  }
+  if (installFooterBtn) {
+    installFooterBtn.addEventListener('click', triggerInstall);
+  }
+
+  // Acción: Presionar "Más tarde"
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', () => {
+      sessionStorage.setItem('pwa_dismissed', 'true');
+      if (installBanner) {
+        installBanner.classList.add('hidden');
+      }
     });
   }
+});
+
+// Escuchador global de instalación exitosa
+window.addEventListener('appinstalled', () => {
+  const installBanner = document.getElementById('pwa-install-banner');
+  const installFooterBtn = document.getElementById('pwa-install-btn');
+  if (installBanner) {
+    installBanner.classList.add('hidden');
+  }
+  if (installFooterBtn) {
+    installFooterBtn.classList.add('hidden');
+  }
+  deferredPrompt = null;
 });
 
 /**
