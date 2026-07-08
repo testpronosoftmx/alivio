@@ -31,6 +31,16 @@ function changeScreen(screenId) {
       el.style.opacity = '0';
     }
   });
+
+  // Ocultar botón de corazón de apoyo si el usuario está dentro de la app
+  const headerDonateBtn = document.getElementById('header-donate-btn');
+  if (headerDonateBtn) {
+    if (screenId === 'screen-landing') {
+      headerDonateBtn.classList.remove('hidden');
+    } else {
+      headerDonateBtn.classList.add('hidden');
+    }
+  }
 }
 
 // Datos estáticos de contingencia (Fallback) en Español
@@ -100,11 +110,11 @@ const TRANSLATIONS = {
     iosStep3: "Nombra la aplicación como Alivio y pulsa Agregar arriba a la derecha.",
 
     justBreathe: "solo respirar",
-    greetingMorning: "buenos días. inicia con paz. entrega tu día al Señor.",
-    greetingAfternoon: "buenas tardes. entrega lo que hoy te abruma.",
-    greetingNight: "buenas noches. descansa en Él. suelta las cargas de este día.",
-    greetingSub: "",
-    flowGuide: "1. escribe tu pesar • 2. respira hondo • 3. recibe tu consuelo",
+    greetingMorning: "Buenos días. Inicia con paz. Entrega tu día al Señor.",
+    greetingAfternoon: "Buenas tardes. Entrega lo que hoy te abruma.",
+    greetingNight: "Buenas noches. Descansa en Él. Entrega tus cargas de este día.",
+    greetingSub: "Deja aquí lo que pese hoy.",
+    flowGuide: "1. Escribe tu pesar • 2. Respira hondo • 3. Recibe tu consuelo",
     placeholder: "cuéntale a Dios lo que pasa por tu mente y corazón... desahógate con total libertad y detalle...",
     btnRelease: "soltar carga",
     breathingTitle: "el suspiro",
@@ -156,11 +166,11 @@ const TRANSLATIONS = {
     iosStep3: "Name the application Alivio and tap Add in the upper right.",
 
     justBreathe: "just breathe",
-    greetingMorning: "good morning. start with peace. surrender your day to the Lord.",
-    greetingAfternoon: "good afternoon. surrender what overwhelms you today.",
-    greetingNight: "good night. rest in Him. release the burdens of this day.",
-    greetingSub: "",
-    flowGuide: "1. write your concern • 2. breathe deeply • 3. receive your comfort",
+    greetingMorning: "Good morning. Start with peace. Surrender your day to the Lord.",
+    greetingAfternoon: "Good afternoon. Surrender what overwhelms you today.",
+    greetingNight: "Good night. Rest in Him. He carries your burdens today.",
+    greetingSub: "Leave here what is weighing you down today.",
+    flowGuide: "1. Write your concern • 2. Breathe deeply • 3. Receive your comfort",
     placeholder: "tell God what is on your mind and heart... vent with total freedom and detail...",
     btnRelease: "release burden",
     breathingTitle: "the sigh",
@@ -927,6 +937,7 @@ function urlBase64ToUint8Array(base64String) {
 // Cambiar el saludo dinámicamente
 function updateDynamicGreeting() {
   const greetingEl = document.getElementById('welcome-greeting');
+  const subGreetingEl = document.getElementById('welcome-sub');
   if (!greetingEl) return;
   const hour = new Date().getHours();
   const dict = TRANSLATIONS[currentLang];
@@ -937,6 +948,10 @@ function updateDynamicGreeting() {
     greetingEl.innerText = dict.greetingAfternoon;
   } else {
     greetingEl.innerText = dict.greetingNight;
+  }
+
+  if (subGreetingEl) {
+    subGreetingEl.innerText = dict.greetingSub;
   }
 }
 

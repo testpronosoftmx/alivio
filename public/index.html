@@ -51,23 +51,26 @@
       animation: float 6s ease-in-out infinite;
     }
 
-    /* Animación de pulsación para el círculo de respiración */
-    @keyframes inhaleGrow {
-      0% { transform: scale(1); background-color: rgba(99, 102, 241, 0.2); }
-      100% { transform: scale(2.2); background-color: rgba(99, 102, 241, 0.45); }
-    }
-    @keyframes holdStay {
-      0% { transform: scale(2.2); background-color: rgba(99, 102, 241, 0.45); }
-      100% { transform: scale(2.2); background-color: rgba(79, 70, 229, 0.55); }
-    }
-    @keyframes exhaleShrink {
-      0% { transform: scale(2.2); background-color: rgba(79, 70, 229, 0.55); }
-      100% { transform: scale(1); background-color: rgba(99, 102, 241, 0.2); }
-    }
-
+    /* Animación de pulsación para el círculo de respiración con Gradiente Dinámico */
     .breathing-circle {
       transition: all 1s ease-in-out;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.6) 0%, rgba(168, 85, 247, 0.6) 100%);
+      box-shadow: 0 0 35px rgba(99, 102, 241, 0.25);
     }
+
+    @keyframes inhaleGrow {
+      0% { transform: scale(1); filter: hue-rotate(0deg); opacity: 0.6; }
+      100% { transform: scale(2.2); filter: hue-rotate(40deg); opacity: 0.9; }
+    }
+    @keyframes holdStay {
+      0% { transform: scale(2.2); filter: hue-rotate(40deg); opacity: 0.9; }
+      100% { transform: scale(2.2); filter: hue-rotate(90deg); opacity: 0.95; }
+    }
+    @keyframes exhaleShrink {
+      0% { transform: scale(2.2); filter: hue-rotate(90deg); opacity: 0.95; }
+      100% { transform: scale(1); filter: hue-rotate(0deg); opacity: 0.6; }
+    }
+
     .breathing-circle.inhale {
       animation: inhaleGrow 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
@@ -251,9 +254,9 @@
       <main id="screen-desahogo" class="screen-fade screen-hidden w-full flex flex-col gap-6">
         <header class="space-y-3">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <img src="/icon-192.png" alt="Alivio Logo" class="w-6 h-6 rounded-full shadow-sm cursor-pointer border border-white/20" onclick="changeScreen('screen-landing')">
-              <h1 class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold">alivio</h1>
+            <div onclick="changeScreen('screen-landing')" class="flex items-center gap-2.5 cursor-pointer group">
+              <img src="/icon-192.png" alt="Alivio Logo" class="w-8 h-8 rounded-full shadow-sm border border-white/20 group-hover:scale-105 transition-transform">
+              <h1 class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">alivio</h1>
             </div>
             <div class="flex items-center gap-3">
               <!-- Botón directo para ir a la respiración -->
@@ -268,10 +271,10 @@
           </p>
         </header>
 
-        <!-- Guía explicativa del flujo en 3 pasos (Resaltado en recuadro) -->
-        <div class="bg-indigo-50/50 backdrop-blur-xs border border-indigo-100/30 rounded-xl px-4 py-2.5 text-center shadow-xs">
-          <p id="txt-flow-guide" class="text-[10px] tracking-wider text-indigo-900/80 font-medium uppercase">
-            1. escribe tu pesar • 2. respira hondo • 3. recibe tu consuelo
+        <!-- Guía explicativa del flujo en 3 pasos (Resaltado en recuadro de alto contraste) -->
+        <div class="bg-white/70 backdrop-blur-xs border border-indigo-100/40 rounded-xl px-4 py-2.5 text-center shadow-xs">
+          <p id="txt-flow-guide" class="text-[10.5px] tracking-wider text-indigo-950/80 font-medium uppercase">
+            1. Escribe tu pesar • 2. Respira hondo • 3. Recibe tu consuelo
           </p>
         </div>
 
