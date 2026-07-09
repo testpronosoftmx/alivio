@@ -488,11 +488,16 @@
               <h1 class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">alivio</h1>
             </div>
 
-            <!-- Centro: Selector de idioma integrado en la cabecera -->
-            <div id="app-lang-selector" class="flex items-center gap-1 text-[10px] bg-white/45 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 shrink-0">
-              <button id="app-lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
-              <span class="text-slate-300">|</span>
-              <button id="app-lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
+            <!-- Centro: Selector de idioma y favoritos integrados en la cabecera -->
+            <div class="flex items-center gap-2 shrink-0">
+              <div id="app-lang-selector" class="flex items-center gap-1 text-[10px] bg-white/45 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60">
+                <button id="app-lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
+                <span class="text-slate-300">|</span>
+                <button id="app-lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
+              </div>
+              <button onclick="openFavorites()" class="text-xs bg-white/45 backdrop-blur-md p-1 rounded-full border border-white/60 text-slate-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm flex items-center justify-center w-[26px] h-[26px]" title="Mis Oraciones">
+                <span>🔖</span>
+              </button>
             </div>
 
             <!-- Derecha: Botón de Solo Respirar estilo píldora con Gradiente de la Marca -->

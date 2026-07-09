@@ -1443,6 +1443,9 @@ async function cancelPush() {
       throw new Error("No se pudo cancelar el recordatorio en el servidor.");
     }
 
+    // Desactivar nativamente en el navegador también
+    await subscription.unsubscribe();
+
     // Limpiar localStorage
     localStorage.removeItem('alivio_alert_time');
 
