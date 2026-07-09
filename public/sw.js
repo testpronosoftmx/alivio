@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alivio-cache-v2';
+const CACHE_NAME = 'alivio-cache-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -48,8 +48,8 @@ self.addEventListener('activate', (event) => {
 
 // Estrategia de Cache: Network First falling back to Cache
 self.addEventListener('fetch', (event) => {
-  // No cachear peticiones a la API
-  if (event.request.url.includes('/api/')) {
+  // No cachear peticiones a la API ni peticiones que no sean GET (como POST)
+  if (event.request.url.includes('/api/') || event.request.method !== 'GET') {
     return;
   }
 
