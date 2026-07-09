@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alivio-cache-v3';
+const CACHE_NAME = 'alivio-cache-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -14,15 +14,19 @@ const ASSETS_TO_CACHE = [
   '/SS44.png'
 ];
 
-// Instalar el Service Worker y cachear recursos
+// Instalar el Service Worker y cachear recursos de forma segura (uno a uno)
 self.addEventListener('install', (event) => {
   self.skipWaiting(); // Forzar activación inmediata
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('📦 Guardando recursos estáticos en cache...');
-      return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
-        console.warn('⚠️ Error parcial al cachear archivos (pueden faltar iconos):', err);
-      });
+      console.log('📦 Guardando recursos estáticos en cache de forma tolerante...');
+      return Promise.all(
+        ASSETS_TO_CACHE.map((asset) => {
+          return cache.add(asset).catch((err) => {
+            console.warn(`⚠️ No se pudo cachear el recurso: ${asset}`, err);
+          });
+        })
+      );
     })
   );
 });
