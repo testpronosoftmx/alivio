@@ -135,6 +135,8 @@ const TRANSLATIONS = {
     stripeLegend: '"Tu donación permite que una persona en crisis reciba una palabra de aliento gratis hoy."',
     btnStripe: "Apoyar a Alivio",
     alertActivated: "Alerta activada",
+    alertDeactivated: "🔔 Recordatorio desactivado.",
+    btnCancelPush: "desactivar",
     toastJustBreathe: "¡Paz y bien! Gracias por regalarte este momento de respiración.",
     loadingText: "Elevando tu carga...",
     loadingSub: "Generando ilustración sagrada",
@@ -188,9 +190,11 @@ const TRANSLATIONS = {
     pushTitle: "What time do you want your reminder this afternoon?",
     pushSub: "We will send a personalized whisper of peace to your phone.",
     btnPush: "activate",
+    btnCancelPush: "deactivate",
     stripeLegend: '"Your donation allows a person in crisis to receive a free word of comfort today."',
     btnStripe: "Support Alivio",
     alertActivated: "Alert activated",
+    alertDeactivated: "🔔 Reminder deactivated.",
     toastJustBreathe: "Peace and goodness! Thank you for giving yourself this breathing moment.",
     loadingText: "Raising your burden...",
     loadingSub: "Generating sacred illustration",
@@ -772,6 +776,9 @@ function displayComfortAndNavigate() {
 
   localStorage.setItem('ultimo_confort', JSON.stringify(data));
 
+  // Verificar suscripción activa para pintar los botones de push correctamente
+  checkActiveSubscription();
+
   changeScreen('screen-ancla');
 }
 
@@ -945,6 +952,13 @@ async function activatePush() {
       throw new Error("No se pudo guardar la suscripción en el servidor.");
     }
 
+    // Guardar el estado de hora configurada
+    localStorage.setItem('alivio_alert_time', alertTime);
+
+    // Cambiar la visualización de los botones
+    document.getElementById('btn-activate-push').classList.add('hidden');
+    document.getElementById('btn-cancel-push').classList.remove('hidden');
+
     statusEl.classList.remove('text-slate-400');
     statusEl.classList.add('text-emerald-600');
     statusEl.innerText = (currentLang === 'en') ? `🔔 Alert activated for ${alertTime}!` : `🔔 ¡Alerta activada para las ${alertTime}!`;
@@ -954,6 +968,93 @@ async function activatePush() {
     statusEl.classList.remove('text-slate-400');
     statusEl.classList.add('text-red-500');
     statusEl.innerText = (currentLang === 'en') ? "Configuration error. Try again." : "Error de configuración. Intenta nuevamente.";
+  }
+}
+
+/**
+ * Cancelar / Desactivar el recordatorio push activo
+ */
+async function cancelPush() {
+  const statusEl = document.getElementById('push-status');
+  statusEl.classList.remove('hidden', 'text-emerald-600', 'text-red-500');
+  statusEl.classList.add('text-slate-400');
+  statusEl.innerText = (currentLang === 'en') ? "Deactivating..." : "Desactivando recordatorio...";
+
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const subscription = await reg.pushManager.getSubscription();
+
+    if (!subscription) {
+      statusEl.classList.add('text-red-500');
+      statusEl.innerText = (currentLang === 'en') ? "No active reminder found." : "No se encontró ningún recordatorio activo.";
+      // Si no hay suscripción en el navegador, limpiar UI de todos modos
+      document.getElementById('btn-activate-push').classList.remove('hidden');
+      document.getElementById('btn-cancel-push').classList.add('hidden');
+      localStorage.removeItem('alivio_alert_time');
+      return;
+    }
+
+    const response = await fetch('/api/subscribe', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ subscription })
+    });
+
+    if (!response.ok) {
+      throw new Error("No se pudo cancelar el recordatorio en el servidor.");
+    }
+
+    // Limpiar localStorage
+    localStorage.removeItem('alivio_alert_time');
+
+    // Cambiar la visualización de los botones
+    document.getElementById('btn-activate-push').classList.remove('hidden');
+    document.getElementById('btn-cancel-push').classList.add('hidden');
+
+    statusEl.classList.remove('text-slate-400');
+    statusEl.classList.add('text-emerald-600');
+    statusEl.innerText = TRANSLATIONS[currentLang].alertDeactivated;
+
+  } catch (error) {
+    console.error("Error al desactivar push:", error);
+    statusEl.classList.remove('text-slate-400');
+    statusEl.classList.add('text-red-500');
+    statusEl.innerText = (currentLang === 'en') ? "Error deactivating alert." : "Error al desactivar la alerta.";
+  }
+}
+
+/**
+ * Verificar si el navegador ya cuenta con una suscripción push activa y actualizar la UI
+ */
+async function checkActiveSubscription() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const subscription = await reg.pushManager.getSubscription();
+
+    const actBtn = document.getElementById('btn-activate-push');
+    const cancelBtn = document.getElementById('btn-cancel-push');
+    const timeInput = document.getElementById('alert-time');
+
+    if (subscription) {
+      // Si hay una suscripción activa, mostrar botón de desactivar
+      if (actBtn) actBtn.classList.add('hidden');
+      if (cancelBtn) cancelBtn.classList.remove('hidden');
+
+      // Intentar restaurar la hora configurada guardada en LocalStorage
+      const savedTime = localStorage.getItem('alivio_alert_time');
+      if (savedTime && timeInput) {
+        timeInput.value = savedTime;
+      }
+    } else {
+      if (actBtn) actBtn.classList.remove('hidden');
+      if (cancelBtn) cancelBtn.classList.add('hidden');
+    }
+  } catch (e) {
+    console.warn("Error verificando suscripción activa:", e);
   }
 }
 
@@ -1012,6 +1113,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const hasVisited = localStorage.getItem('alivio_visited');
   const urlParams = new URLSearchParams(window.location.search);
   const isRedirected = urlParams.get('action') === 'ancla' || urlParams.get('from_push') === 'true';
+
+  // Verificar la existencia de notificaciones activas para pintar la UI
+  checkActiveSubscription();
 
   if (isRedirected) {
     const saved = localStorage.getItem('ultimo_confort');

@@ -43,6 +43,86 @@
   <!-- Tailwind CSS CDN Play -->
   <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- JSON-LD Estructurado para SEO Local, FAQ y AEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LocalBusiness",
+        "@id": "https://alivio.pronosoftmx.com/#organization",
+        "name": "Alivio - Oración y Meditación Católica",
+        "url": "https://alivio.pronosoftmx.com",
+        "logo": "https://alivio.pronosoftmx.com/icon-192.png",
+        "image": "https://alivio.pronosoftmx.com/screenshot3.png",
+        "description": "Espacio seguro católico y PWA para desahogo espiritual, ejercicios de respiración y oraciones de consuelo.",
+        "telephone": "",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Av. Eugenio Garza Sada",
+          "addressLocality": "Monterrey",
+          "addressRegion": "NL",
+          "postalCode": "64840",
+          "addressCountry": "MX"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 25.6489,
+          "longitude": -100.2894
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://alivio.pronosoftmx.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Cómo funciona Alivio?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Alivio te permite desahogar tus aflicciones de forma 100% anónima, realizar un ejercicio mandatorio de respiración de 12 segundos para aquietar tu mente y, finalmente, recibir versículos bíblicos de consuelo y oraciones personalizadas."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Es Alivio una aplicación gratuita?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí, Alivio es completamente gratuito para desahogarse, respirar y recibir oraciones y lecturas bíblicas. Contamos con una opción de apoyo voluntario para mantener el servicio activo."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://alivio.pronosoftmx.com/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://alivio.pronosoftmx.com"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <style>
     body {
       font-family: 'Outfit', sans-serif;
@@ -419,6 +499,10 @@
             <button id="btn-activate-push" onclick="activatePush()"
               class="bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-light text-xs uppercase tracking-widest px-6 rounded-xl transition-all duration-300 shadow-md shadow-indigo-600/10">
               <span id="btn-push-text">activar</span>
+            </button>
+            <button id="btn-cancel-push" onclick="cancelPush()"
+              class="hidden bg-rose-50 hover:bg-rose-100 border border-rose-100 active:scale-[0.98] text-rose-600 font-light text-xs uppercase tracking-widest px-6 rounded-xl transition-all duration-300 shadow-sm">
+              <span id="btn-cancel-push-text">desactivar</span>
             </button>
           </div>
           <p id="push-status" class="text-center text-[10px] font-light text-slate-400 hidden"></p>

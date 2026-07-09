@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Allow: /llm.txt
 
 Sitemap: https://alivio.pronosoftmx.com/sitemap.xml
+Link: https://alivio.pronosoftmx.com/llm.txt

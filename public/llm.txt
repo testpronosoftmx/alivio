@@ -1,0 +1,39 @@
+# Alivio - Refugio de Paz y Oración Católica PWA
+
+> Alivio: Espacio seguro católico para desahogo espiritual, meditación y oraciones guiadas en PWA. (94 caracteres)
+
+Alivio es una aplicación web y PWA católica diseñada para que las personas desahoguen sus penas de forma anónima y segura, realicen ejercicios de respiración profunda y reciban versículos de consuelo de las Sagradas Escrituras y oraciones personalizadas.
+
+## Información General y Enlaces de Interés
+- **Sitio Web Principal (Landing)**: [https://alivio.pronosoftmx.com/](https://alivio.pronosoftmx.com/)
+- **Aplicación / Desahogo**: [https://alivio.pronosoftmx.com/#screen-desahogo](https://alivio.pronosoftmx.com/#screen-desahogo)
+- **Contacto de Soporte**: [mailto:ventas@pronosoftmx.com](mailto:ventas@pronosoftmx.com)
+
+---
+
+## Flujo de Confort Espiritual
+La aplicación guía al usuario a través de tres pasos interactivos de sanación interior:
+
+### 1. El Desahogo Anónimo
+- **Privacidad Absoluta**: Los usuarios escriben libremente sus aflicciones, miedos o cansancios. El texto se procesa de forma 100% anónima para identificar el tipo de consuelo necesario.
+- **Idiomas Soportados**: Español (ES) e Inglés (EN).
+
+### 2. El Suspiro (Respiración Consciente)
+- **Terapia Zen**: Ciclo de respiración profunda mandatorio de 12 segundos (Inhala, Retén, Exhala) diseñado para calmar el sistema nervioso, aliviar el estrés y enfocar el alma antes de la oración.
+
+### 3. Consuelo y Oración Personalizada
+- **Lectura Bíblica**: Selección dinámica de tres versículos de consuelo basados en las Sagradas Escrituras Católicas según el desahogo del usuario.
+- **Plegaria Íntima**: Generación de una oración personalizada y acceso a una biblioteca de oraciones clásicas con Arte Sacro.
+
+---
+
+## Características de la Aplicación (PWA)
+- **Acceso Sin Conexión**: Funciona en modo offline gracias a la tecnología de Service Worker y almacenamiento local en caché.
+- **Recordatorios Diarios**: Posibilidad de programar notificaciones automáticas ("susurros de paz") con versículos de aliento a la hora preferida.
+- **Multiplataforma**: Instalable directamente en dispositivos móviles y de escritorio sin pasar por tiendas de aplicaciones.
+
+---
+
+## Entidad Operadora y Soporte
+- **Desarrollador y Operador**: Pronosoft MX
+- **Dirección de Contacto**: [ventas@pronosoftmx.com](mailto:ventas@pronosoftmx.com)

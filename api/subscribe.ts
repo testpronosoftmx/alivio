@@ -15,22 +15,39 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed. Use POST." });
+  if (req.method !== "POST" && req.method !== "DELETE") {
+    return res.status(405).json({ error: "Method not allowed. Use POST or DELETE." });
   }
 
   const { subscription, alertTime, message, timezoneOffset } = req.body;
 
-  if (!subscription || !alertTime || !message) {
-    return res.status(400).json({ error: "Faltan parámetros obligatorios: subscription, alertTime o message." });
+  if (!subscription) {
+    return res.status(400).json({ error: "Faltan parámetros obligatorios: subscription." });
   }
 
   try {
-    console.log(`💾 Registrando suscripción push para las ${alertTime} (offset: ${timezoneOffset}) en esquema alivio...`);
-
     // Validar formato básico de la suscripción
-    if (!subscription.endpoint || !subscription.keys || !subscription.keys.auth || !subscription.keys.p256dh) {
-      return res.status(400).json({ error: "El objeto subscription es inválido." });
+    if (!subscription.endpoint) {
+      return res.status(400).json({ error: "El objeto subscription es inválido o no tiene endpoint." });
+    }
+
+    if (req.method === "DELETE") {
+      console.log(`🗑️ Eliminando suscripción push para el endpoint: ${subscription.endpoint}`);
+      const { error: deleteError } = await supabase
+        .from("push_subscriptions")
+        .delete()
+        .eq("subscription->>endpoint", subscription.endpoint);
+
+      if (deleteError) throw deleteError;
+
+      return res.status(200).json({
+        success: true,
+        message: "Recordatorio cancelado con éxito en la base de datos."
+      });
+    }
+
+    if (!alertTime || !message) {
+      return res.status(400).json({ error: "Faltan parámetros obligatorios para registro (POST): alertTime o message." });
     }
 
     // Buscar si ya existe una suscripción con el mismo endpoint en la tabla alivio.push_subscriptions
