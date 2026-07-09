@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
-  const { text, lang } = req.body;
+  const { text, lang, denomination } = req.body;
 
   if (!text || typeof text !== "string" || text.trim() === "") {
     return res.status(400).json({ error: "El campo 'text' es requerido y no puede estar vacío." });
@@ -23,38 +23,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const targetLang = (lang === "en") ? "en" : "es";
   const languageName = (targetLang === "en") ? "English" : "Spanish/Español";
+  const denom = (denomination === "evangelical" || denomination === "spiritual") ? denomination : "catholic";
+
+  // Configuración por denominación
+  const denomConfig: Record<string, { role: string; bibleStyle: string; prayerStyle: string; imageStyle: string; }> = {
+    catholic: {
+      role: "consejero espiritual y teólogo católico compasivo",
+      bibleStyle: "traducciones católicas (Biblia de Jerusalén o Nacar-Colunga), incluyendo libros deuterocanónicos cuando sea apropiado",
+      prayerStyle: "oración tradicional católica, que puede incluir invocaciones a la Virgen María o santos si es contextualmente apropiado",
+      imageStyle: "a beautiful classic Catholic religious oil painting with divine light, the Virgin Mary, Sacred Heart of Jesus, angels, or a serene church interior"
+    },
+    evangelical: {
+      role: "consejero espiritual cristiano evangélico compasivo",
+      bibleStyle: "versiones protestantes comunes (Reina Valera 1960 en español o NIV/NLT en inglés)",
+      prayerStyle: "oración conversacional directa al Dios Padre y Jesucristo, sin intermediarios ni invocaciones a santos",
+      imageStyle: "majestic nature landscape with divine light breaking through clouds, an empty cross, open Bible, or serene pastoral scenery"
+    },
+    spiritual: {
+      role: "guía espiritual compasivo y humanista, no religioso pero profundamente empático",
+      bibleStyle: "citas de sabiduría universal, reflexiones de autores humanistas, poetas o filósofos (no necesariamente bíblicas)",
+      prayerStyle: "intención de paz o meditación guiada de auto-compasión, sin lenguaje religioso explícito",
+      imageStyle: "minimalist peaceful nature landscape, gentle watercolor abstract, sacred geometry, or soft sunset over calm waters"
+    }
+  };
+
+  const cfg = denomConfig[denom];
 
   try {
-    console.log(`🧠 Procesando desahogo del usuario con Claude 3.5 Sonnet en idioma: ${languageName}...`);
+    console.log(`🧠 Procesando desahogo [${denom}] con Claude Sonnet en idioma: ${languageName}...`);
 
-    // 1. Llamar a Claude 3.5 Sonnet para obtener el confort y el prompt para la imagen
-    const systemInstruction = `Eres un consejero espiritual y teólogo católico compasivo. Tu misión es proveer confort basado en la Biblia. Debes responder estrictamente en formato JSON válido y redactado en el idioma: ${languageName}. No incluyas explicaciones ni etiquetas markdown de código (como \`\`\`json) en tu respuesta, solo el objeto JSON plano.`;
+    // 1. Llamar a Claude Sonnet para obtener el confort y el prompt para la imagen
+    const systemInstruction = `Eres un ${cfg.role}. Tu misión es proveer confort espiritual y emocional. Debes responder estrictamente en formato JSON válido y redactado en el idioma: ${languageName}. No incluyas explicaciones ni etiquetas markdown de código (como \`\`\`json) en tu respuesta, solo el objeto JSON plano.`;
 
     const prompt = `Un usuario ha compartido el siguiente desahogo de su mente/corazón: "${text}".
     
-    Analiza su dolor o angustia y genera un confort espiritual basado en las Sagradas Escrituras de la Iglesia Católica.
+    Analiza su dolor o angustia y genera un confort espiritual adaptado al enfoque: ${denom}.
+    Usa ${cfg.bibleStyle} para las citas de sabiduría o versículos.
+    Para la oración/reflexión, sigue este estilo: ${cfg.prayerStyle}.
     Todos los campos de la respuesta JSON (bibleVerse, verseText, comfort, prayer, afternoonMessage) DEBEN estar escritos obligatoriamente en el idioma: ${languageName}.
     
     Retorna un objeto JSON con este formato exacto:
     {
       "verses": [
         {
-          "bibleVerse": "Cita bíblica 1 (Ej en español: 'Salmo 23, 1-3' | Ej en inglés: 'Psalm 23:1-3')",
-          "verseText": "El texto completo de la cita bíblica 1 en el idioma: ${languageName}"
+          "bibleVerse": "Cita o referencia 1",
+          "verseText": "El texto completo de la cita 1 en el idioma: ${languageName}"
         },
         {
-          "bibleVerse": "Cita bíblica 2 (Ej en español: 'Mateo 11, 28' | Ej en inglés: 'Matthew 11:28')",
-          "verseText": "El texto completo de la cita bíblica 2 en el idioma: ${languageName}"
+          "bibleVerse": "Cita o referencia 2",
+          "verseText": "El texto completo de la cita 2 en el idioma: ${languageName}"
         },
         {
-          "bibleVerse": "Cita bíblica 3 (Ej en español: 'Filipenses 4, 6-7' | Ej en inglés: 'Philippians 4:6-7')",
-          "verseText": "El texto completo de la cita bíblica 3 en el idioma: ${languageName}"
+          "bibleVerse": "Cita o referencia 3",
+          "verseText": "El texto completo de la cita 3 en el idioma: ${languageName}"
         }
       ],
-      "comfort": "Un mensaje corto de consuelo, empatía y esperanza cristiana (máximo 100 palabras) en el idioma: ${languageName} que le hable directamente a su desahogo actual.",
-      "prayer": "Una oración silenciosa hermosa, profunda y reposada (de entre 40 y 50 palabras) en el idioma: ${languageName} para entregar esta carga a Dios con devoción.",
-      "imagePrompt": "An artistic and sacred text-to-image prompt in English. Must describe a beautiful, high-quality classic religious oil painting or stained glass window representing the spiritual essence of the main comforting bible verse. Focus on divine light, calm waters, gentle holy illumination, angel presence or serene atmospheres. Avoid modern objects, text, or digital art styles. (Must be in English regardless of the target language)",
-      "afternoonMessage": "Un recordatorio cortísimo en minúsculas (máximo 12 palabras) en el idioma: ${languageName} para el recordatorio de la tarde (Ej en español: 'respira. el señor sostiene tus cargas hoy.' | Ej en inglés: 'breathe. the lord carries your burdens today.')"
+      "comfort": "Un mensaje corto de consuelo, empatía y esperanza (máximo 100 palabras) en el idioma: ${languageName} que le hable directamente a su desahogo actual.",
+      "prayer": "Una ${denom === 'spiritual' ? 'intención de paz o meditación guiada de auto-compasión' : 'oración silenciosa hermosa y profunda'} (de entre 40 y 50 palabras) en el idioma: ${languageName}.",
+      "imagePrompt": "An artistic text-to-image prompt in English. ${cfg.imageStyle}. Avoid modern objects, text, or digital art styles. High quality, serene atmosphere. (Always in English)",
+      "afternoonMessage": "Un recordatorio cortísimo en minúsculas (máximo 12 palabras) en el idioma: ${languageName} para el recordatorio de la tarde."
     }`;
 
     const claudeResponse = await anthropic.messages.create({

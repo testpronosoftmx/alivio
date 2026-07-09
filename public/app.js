@@ -96,11 +96,11 @@ const TRANSLATIONS = {
     btnEnterApp: "comenzar a orar",
     titleHowWorks: "¿cómo funciona Alivio?",
     step1Title: "Desahoga tu corazón",
-    step1Desc: "Escribe de forma 100% anónima y segura lo que te aflige hoy: deudas, cansancio, miedos...",
+    step1Desc: "Escribe lo que te aflige hoy de forma segura. Elige tu enfoque: Católico, Evangélico o Espiritual para recibir el consuelo idóneo.",
     step2Title: "Aquieta tu templo",
-    step2Desc: "Sigue el ciclo de respiración mandatorio de 12 segundos para calmar tu pecho y relajar la mente.",
+    step2Desc: "Sigue el ciclo de respiración guiado de 12 segundos para calmar tu pecho y relajar la mente.",
     step3Title: "Recibe consuelo y recordatorios",
-    step3Desc: "Encuentra versículos personalizados, una plegaria íntima y programa un susurro de paz diario en tu teléfono a la hora que prefieras.",
+    step3Desc: "Recibe versículos personalizados, tu plegaria íntima y haz un recordatorio. Además, guarda tus oraciones favoritas y mantén tu racha diaria.",
     titleScreenshots: "capturas de la aplicación",
     titleInstall: "Lleva Alivio en tu teléfono",
     subInstall: "Nuestra app es una PWA ligera. No requiere App Store ni Google Play.",
@@ -146,7 +146,38 @@ const TRANSLATIONS = {
     btnStripeModal: "Apoyar con Donación",
     defaultVerseText: '"El Señor es mi pastor, nada me falta. En verdes praderas me hace recostar..."',
     defaultComfort: "Te escucho. Es completamente normal sentir que el espacio se reduce cuando las tareas se acumulan en la mente. No tienes que resolver el día entero en este segundo.",
-    defaultPrayer: "Señor, te entrego esta prisa y este cansancio. Concédeme la calma de saber que Tú caminas a mi lado y sostienes mi día. Amén."
+    defaultPrayer: "Señor, te entrego esta prisa y este cansancio. Concédeme la calma de saber que Tú caminas a mi lado y sostienes mi día. Amén.",
+
+    // Denominación
+    denomLabel: "Enfoque",
+    denomCatholic: "Católico",
+    denomEvangelical: "Evangélico",
+    denomSpiritual: "Espiritual",
+
+    // Pasos sugeridos
+    nextStepsTitle: "¿Qué deseas hacer ahora?",
+    nextStepBreathe: "Otra respiración",
+    nextStepReflect: "Guardar oracíón",
+    nextStepReminder: "Mi recordatorio",
+
+    // Feedback emocional
+    feelingQuestion: "¿Cómo te sientes ahora?",
+    feelingBetter: "Mejor 🙏",
+    feelingSame: "Igual 💚",
+    feelingOverwhelmed: "Aún abrumado 🙍",
+    feelingThanks: "Gracias por compartir cómo te sientes. Recuerda: este momento fue un paso valiente.",
+    feelingThanksOverwhelmed: "Sigue aquí. Respira de nuevo. No estás solo/a. Si necesitas más ayuda, no dudes en buscarla.",
+    savedFavorite: "✔ Oración guardada en tus favoritos.",
+    alreadySaved: "Ya guardaste esta oración anteriormente.",
+
+    // Crisis
+    crisisTitle: "Si estás en una situación de crisis",
+    crisisDesc: "No estás solo/a. Hay personas capacitadas listas para escucharte ahora mismo.",
+    crisisCall: "Llamar al *0311",
+    crisisWeb: "Visitar recurso de apoyo",
+
+    // Racha
+    streakDays: (n) => n === 1 ? "1 día contigo" : `${n} días contigo`
   },
   en: {
     landingTitle: "A refuge of peace in your pocket",
@@ -154,11 +185,11 @@ const TRANSLATIONS = {
     btnEnterApp: "start praying",
     titleHowWorks: "how does Alivio work?",
     step1Title: "Vent your heart",
-    step1Desc: "Write 100% anonymously and securely what afflicts you today: debts, fatigue, fears...",
+    step1Desc: "Write what troubles you today securely. Choose your focus: Catholic, Evangelical, or Spiritual to receive the ideal comfort.",
     step2Title: "Quiet your temple",
     step2Desc: "Follow the mandatory 12-second breathing cycle to calm your chest and relax your mind.",
     step3Title: "Receive comfort & reminders",
-    step3Desc: "Find personalized verses, a sincere prayer, and schedule a daily whisper of peace to your phone at the hour you prefer.",
+    step3Desc: "Receive personalized verses, your intimate prayer, and set a reminder. Plus, save your favorite prayers and keep your daily streak.",
     titleScreenshots: "application screenshots",
     titleInstall: "Carry Alivio on your phone",
     subInstall: "Our app is a lightweight PWA. No App Store or Google Play required.",
@@ -204,7 +235,38 @@ const TRANSLATIONS = {
     btnStripeModal: "Support with Donation",
     defaultVerseText: '"The Lord is my shepherd, I lack nothing. He makes me lie down in green pastures..."',
     defaultComfort: "I hear you. It is completely normal to feel that space shrinks when tasks accumulate in the mind. You do not have to solve the whole day in this second.",
-    defaultPrayer: "Lord, I hand over this rush and this weariness to You. Grant me the calm of knowing that You walk by my side and sustain my day. Amen."
+    defaultPrayer: "Lord, I hand over this rush and this weariness to You. Grant me the calm of knowing that You walk by my side and sustain my day. Amen.",
+
+    // Denomination
+    denomLabel: "Focus",
+    denomCatholic: "Catholic",
+    denomEvangelical: "Evangelical",
+    denomSpiritual: "Spiritual",
+
+    // Next steps
+    nextStepsTitle: "What would you like to do now?",
+    nextStepBreathe: "Another breath",
+    nextStepReflect: "Save prayer",
+    nextStepReminder: "My reminder",
+
+    // Emotional feedback
+    feelingQuestion: "How do you feel now?",
+    feelingBetter: "Better 🙏",
+    feelingSame: "The same 💚",
+    feelingOverwhelmed: "Still overwhelmed 🙍",
+    feelingThanks: "Thank you for sharing how you feel. Remember: this moment was a brave step.",
+    feelingThanksOverwhelmed: "Stay here. Breathe again. You are not alone. If you need more help, don't hesitate to seek it.",
+    savedFavorite: "✔ Prayer saved to your favorites.",
+    alreadySaved: "You already saved this prayer.",
+
+    // Crisis
+    crisisTitle: "If you are in crisis",
+    crisisDesc: "You are not alone. Trained people are ready to listen to you right now.",
+    crisisCall: "Call *0311",
+    crisisWeb: "Visit support resource",
+
+    // Streak
+    streakDays: (n) => n === 1 ? "1 day with you" : `${n} days with you`
   }
 };
 
@@ -213,7 +275,7 @@ const SCREENSHOTS_DATA = {
   es: [
     {
       title: "Paso 1: El Desahogo",
-      desc: "La pantalla inicial donde escribes de forma 100% anónima todo lo que pesa en tu corazón y mente."
+      desc: "Escribe con total libertad todo lo que pesa en tu corazón y personaliza el enfoque de fe antes de empezar."
     },
     {
       title: "Paso 2: El Suspiro",
@@ -221,17 +283,17 @@ const SCREENSHOTS_DATA = {
     },
     {
       title: "Paso 3: Versículos de Consuelo",
-      desc: "Recibe tres versículos bíblicos de aliento seleccionados especialmente para tu aflicción y Arte Sacro clásico."
+      desc: "Recibe versículos seleccionados especialmente, guarda la plegaria en tus favoritos y visualiza tu racha consecutiva en el ancla."
     },
     {
       title: "Paso 4: Oración y Recordatorio",
-      desc: "Una plegaria íntima, la opción de programar tu recordatorio diario (susurro de paz) en tu teléfono, y nuestro canal de donación."
+      desc: "Programa tu recordatorio diario para recibir un susurro de paz personalizado directamente en tu teléfono."
     }
   ],
   en: [
     {
       title: "Step 1: The Vent",
-      desc: "The initial screen where you write 100% anonymously whatever is weighing down your heart and mind."
+      desc: "Write freely whatever weighs down your heart and customize your faith focus before starting."
     },
     {
       title: "Step 2: The Sigh",
@@ -239,17 +301,149 @@ const SCREENSHOTS_DATA = {
     },
     {
       title: "Step 3: Verses of Comfort",
-      desc: "Receive three encouraging biblical verses chosen especially for your affliction and classic Sacred Art."
+      desc: "Receive verses selected especially for you, save the prayer to your favorites, and track your daily streak."
     },
     {
       title: "Step 4: Prayer & Reminder",
-      desc: "An intimate prayer, the option to schedule your daily reminder (whisper of peace) on your phone, and our support channel."
+      desc: "Schedule your daily reminder to receive a personalized whisper of peace directly on your phone."
     }
   ]
 };
 
 // Estado global de idioma (por defecto español o lo guardado)
 let currentLang = localStorage.getItem('alivio_lang') || 'es';
+
+// ── DENOMINACIÓN ──────────────────────────────────────────────────────────────
+let currentDenomination = localStorage.getItem('alivio_denom') || 'catholic';
+
+function setDenomination(denom) {
+  currentDenomination = denom;
+  localStorage.setItem('alivio_denom', denom);
+  applyDenominationUI();
+}
+
+function applyDenominationUI() {
+  const btns = ['catholic', 'evangelical', 'spiritual'];
+  btns.forEach(d => {
+    const btn = document.getElementById(`denom-btn-${d}`);
+    if (!btn) return;
+    if (d === currentDenomination) {
+      btn.className = 'denom-btn denom-btn-active';
+    } else {
+      btn.className = 'denom-btn';
+    }
+  });
+  const labelEl = document.getElementById('denom-label');
+  const dict = TRANSLATIONS[currentLang];
+  if (labelEl && dict) {
+    const map = { catholic: dict.denomCatholic, evangelical: dict.denomEvangelical, spiritual: dict.denomSpiritual };
+    labelEl.innerText = map[currentDenomination] || '';
+  }
+}
+
+// ── RACHA DE DÍAS ─────────────────────────────────────────────────────────────
+function updateStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  const lastDate = localStorage.getItem('alivio_streak_date');
+  let streak = parseInt(localStorage.getItem('alivio_streak') || '0', 10);
+
+  if (lastDate === today) return streak; // ya contado hoy
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toISOString().slice(0, 10);
+
+  if (lastDate === yStr) {
+    streak += 1;
+  } else {
+    streak = 1; // racha rota o primer día
+  }
+
+  localStorage.setItem('alivio_streak', String(streak));
+  localStorage.setItem('alivio_streak_date', today);
+  return streak;
+}
+
+function renderStreak() {
+  const streak = parseInt(localStorage.getItem('alivio_streak') || '0', 10);
+  const el = document.getElementById('streak-display');
+  if (!el || streak < 1) return;
+  el.classList.remove('hidden');
+  const dict = TRANSLATIONS[currentLang];
+  const countSpan = el.querySelector('#streak-count');
+  if (countSpan && dict && typeof dict.streakDays === 'function') {
+    countSpan.innerText = dict.streakDays(streak);
+  } else if (countSpan) {
+    countSpan.innerText = streak;
+  }
+}
+
+// ── FAVORITOS ──────────────────────────────────────────────────────────────────
+function saveFavorite() {
+  if (!comfortDataResolved) return;
+  const dict = TRANSLATIONS[currentLang];
+  const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
+  const entry = {
+    date: new Date().toISOString(),
+    prayer: comfortDataResolved.prayer,
+    verse: comfortDataResolved.verses?.[0]?.verseText || '',
+    verseRef: comfortDataResolved.verses?.[0]?.bibleVerse || ''
+  };
+  // Evitar duplicados por prayer
+  const exists = favorites.some(f => f.prayer === entry.prayer);
+  if (exists) {
+    showToast(dict.alreadySaved);
+    return;
+  }
+  favorites.unshift(entry);
+  if (favorites.length > 30) favorites.pop(); // máx 30
+  localStorage.setItem('alivio_favorites', JSON.stringify(favorites));
+  showToast(dict.savedFavorite);
+  // Cambiar icono del botón a confirmado
+  const btn = document.getElementById('btn-save-favorite');
+  if (btn) {
+    btn.innerHTML = '✔ ' + (currentLang === 'en' ? 'Saved' : 'Guardada');
+    btn.classList.add('btn-saved');
+  }
+}
+
+// ── FEEDBACK EMOCIONAL ────────────────────────────────────────────────────────
+function handleFeeling(type) {
+  const dict = TRANSLATIONS[currentLang];
+  const btns = document.querySelectorAll('.feeling-btn');
+  btns.forEach(b => b.classList.remove('feeling-btn-active'));
+  const activeBtn = document.getElementById(`feeling-${type}`);
+  if (activeBtn) activeBtn.classList.add('feeling-btn-active');
+
+  const msg = document.getElementById('feeling-response-msg');
+  if (msg) {
+    msg.innerText = (type === 'overwhelmed') ? dict.feelingThanksOverwhelmed : dict.feelingThanks;
+    msg.classList.remove('hidden');
+  }
+
+  // Si aún abrumado, hacer scroll suave a la sección de crisis
+  if (type === 'overwhelmed') {
+    setTimeout(() => {
+      const crisis = document.getElementById('crisis-section');
+      if (crisis) crisis.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 500);
+  }
+}
+
+// ── PASOS SUGERIDOS ───────────────────────────────────────────────────────────
+function goToBreathing() {
+  // Vuelve a respiración sin borrar el desahogo actual ni reiniciar la API
+  isJustBreathing = true;
+  changeScreen('screen-suspiro');
+  setupBreathingFlow();
+}
+
+function scrollToPush() {
+  const pushSection = document.getElementById('push-section');
+  if (pushSection) {
+    pushSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
 
 // Variables para control de la API en segundo plano
 let comfortDataResolved = null;
@@ -269,31 +463,212 @@ const totalMarketingScreenshots = 4;
 // Captura del prompt nativo de instalación
 let deferredPrompt = null;
 
-window.addEventListener('beforeinstallprompt', (e) => {
+// ── AUDIO AMBIENTE (Web Audio API — Sin archivos externos) ──────────────────
+let audioCtx = null;
+let ambientNodes = [];
+let audioGain = null;
+let audioActive = false;
+let audioFadeInterval = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  // Nodo de ganancia maestro
+  audioGain = audioCtx.createGain();
+  audioGain.gain.setValueAtTime(0, audioCtx.currentTime);
+  audioGain.connect(audioCtx.destination);
+
+  // ─ Pink Noise (buf fer con ruido filtrado a frecuencias bajas) ─
+  const bufferSize = audioCtx.sampleRate * 4; // 4 segundos de buffer
+  const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = noiseBuffer.getChannelData(0);
+  let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    b0 = 0.99886 * b0 + white * 0.0555179;
+    b1 = 0.99332 * b1 + white * 0.0750759;
+    b2 = 0.96900 * b2 + white * 0.1538520;
+    b3 = 0.86650 * b3 + white * 0.3104856;
+    b4 = 0.55000 * b4 + white * 0.5329522;
+    b5 = -0.7616 * b5 - white * 0.0168980;
+    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+    b6 = white * 0.115926;
+  }
+  const noiseSource = audioCtx.createBufferSource();
+  noiseSource.buffer = noiseBuffer;
+  noiseSource.loop = true;
+
+  // Filtro paso-bajo para suavizar el ruido (suena a lluvia suave)
+  const lpFilter = audioCtx.createBiquadFilter();
+  lpFilter.type = 'lowpass';
+  lpFilter.frequency.value = 500;
+  lpFilter.Q.value = 0.5;
+
+  noiseSource.connect(lpFilter);
+  lpFilter.connect(audioGain);
+  noiseSource.start();
+
+  // ─ Pad Ambiental: dos osciladores detuneados (efecto de dron tranquilo) ─
+  const freqs = [55, 82.41]; // A1 y E2 (armonia perfecta)
+  freqs.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const oscGain = audioCtx.createGain();
+    const oscFilter = audioCtx.createBiquadFilter();
+
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    osc.detune.value = i === 0 ? -8 : 8; // ligero detune para efecto coral
+    oscGain.gain.value = 0.04;
+    oscFilter.type = 'lowpass';
+    oscFilter.frequency.value = 300;
+
+    osc.connect(oscFilter);
+    oscFilter.connect(oscGain);
+    oscGain.connect(audioGain);
+    osc.start();
+    ambientNodes.push(osc);
+  });
+}
+
+function fadeAudio(targetVolume, durationMs) {
+  if (!audioGain) return;
+  clearInterval(audioFadeInterval);
+  const startVol = audioGain.gain.value;
+  const steps = 30;
+  const stepTime = durationMs / steps;
+  const delta = (targetVolume - startVol) / steps;
+  let step = 0;
+  audioFadeInterval = setInterval(() => {
+    step++;
+    const newVol = Math.max(0, Math.min(1, startVol + delta * step));
+    audioGain.gain.setValueAtTime(newVol, audioCtx.currentTime);
+    if (step >= steps) clearInterval(audioFadeInterval);
+  }, stepTime);
+}
+
+function toggleAudio() {
+  const btn = document.getElementById('audio-toggle-btn');
+  const icon = document.getElementById('audio-icon');
+  
+  if (!audioCtx) initAudio();
+
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  if (!audioActive) {
+    audioActive = true;
+    fadeAudio(0.6, 2000);
+    if (icon) icon.textContent = '🔊';
+    if (btn) btn.title = 'Silenciar';
+    localStorage.setItem('alivio_audio', 'on');
+  } else {
+    audioActive = false;
+    fadeAudio(0, 1500);
+    if (icon) icon.textContent = '🔇';
+    if (btn) btn.title = 'Activar música ambient';
+    localStorage.setItem('alivio_audio', 'off');
+  }
+}
+
+function initAudioPreference() {
+  // Audio desactivado por default — solo activar si el usuario lo hizo antes
+  const pref = localStorage.getItem('alivio_audio');
+  if (pref === 'on') {
+    setTimeout(() => {
+      if (!audioCtx) initAudio();
+      audioActive = true;
+      fadeAudio(0.6, 3000);
+      const icon = document.getElementById('audio-icon');
+      const btn = document.getElementById('audio-toggle-btn');
+      if (icon) icon.textContent = '🔊';
+      if (btn) btn.title = 'Silenciar';
+    }, 1000);
+  }
+}
+
+// ── MODAL DE FAVORITOS ─────────────────────────────────────────────────────────
+function openFavorites() {
+  const modal = document.getElementById('modal-favorites');
+  if (modal) {
+    renderFavoritesList();
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+  }
+}
+
+function closeFavorites() {
+  const modal = document.getElementById('modal-favorites');
+  if (modal) modal.classList.add('opacity-0', 'pointer-events-none');
+}
+
+function renderFavoritesList() {
+  const list = document.getElementById('favorites-list');
+  if (!list) return;
+  const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
+  const dict = TRANSLATIONS[currentLang];
+
+  if (favorites.length === 0) {
+    list.innerHTML = `<p class="text-center text-slate-400 text-sm font-light py-8">${currentLang === 'en' ? 'No saved prayers yet.' : 'Aún no tienes oraciones guardadas.'}</p>`;
+    return;
+  }
+
+  list.innerHTML = favorites.map((fav, i) => {
+    const date = new Date(fav.date).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'es-MX', { day: '2-digit', month: 'short' });
+    return `
+      <div class="border border-slate-100 rounded-2xl p-4 space-y-2 bg-white/70">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold">${fav.verseRef || (currentLang === 'en' ? 'Verse' : 'Versículo')}</span>
+          <span class="text-[10px] text-slate-400">${date}</span>
+        </div>
+        ${fav.verse ? `<p class="text-xs italic font-light text-slate-600 leading-relaxed border-l-2 border-indigo-200 pl-3">&ldquo;${fav.verse}&rdquo;</p>` : ''}
+        <p class="text-xs font-light text-indigo-900 leading-relaxed">${fav.prayer}</p>
+        <button onclick="deleteFavorite(${i})" class="text-[10px] text-rose-400 hover:text-rose-600 transition-colors">
+          × ${currentLang === 'en' ? 'Remove' : 'Eliminar'}
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteFavorite(index) {
+  const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
+  favorites.splice(index, 1);
+  localStorage.setItem('alivio_favorites', JSON.stringify(favorites));
+  renderFavoritesList();
+}
+
+// ── PWA INSTALL PROMPT (con detección de instalación previa) ──────────────────
+window.addEventListener('beforeinstallprompt', async (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  
-  // Si ya se instaló previamente o está en modo standalone, no mostrar el banner
-  if (localStorage.getItem('pwa_installed') === 'true' || window.matchMedia('(display-mode: standalone)').matches) {
-    return;
+
+  // Capa 1: ¿Corriendo en modo standalone (ya instalado)?
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+
+  // Capa 2: getInstalledRelatedApps (Chrome/Edge)
+  if ('getInstalledRelatedApps' in navigator) {
+    try {
+      const apps = await navigator.getInstalledRelatedApps();
+      if (apps.length > 0) {
+        // Ya está instalada — marcar en localStorage y no mostrar
+        localStorage.setItem('pwa_installed', 'true');
+        return;
+      }
+    } catch (_) { /* ignora errores de la API */ }
   }
-  
-  // Si el usuario ya rechazó el banner en esta sesión actual, no hacemos nada
-  if (sessionStorage.getItem('pwa_dismissed') === 'true') {
-    return;
-  }
-  
+
+  // Capa 3: localStorage (usuario ya lo marcó como instalado)
+  if (localStorage.getItem('pwa_installed') === 'true') return;
+
+  // Capa 4: banner rechazado en esta sesión
+  if (sessionStorage.getItem('pwa_dismissed') === 'true') return;
+
   // Mostrar el banner flotante
   const installBanner = document.getElementById('pwa-install-banner');
-  if (installBanner) {
-    installBanner.classList.remove('hidden');
-  }
-  
-  // Mostrar el botón clásico del footer si existe y está cargado
+  if (installBanner) installBanner.classList.remove('hidden');
+
+  // Mostrar el botón del footer si existe
   const installBtn = document.getElementById('pwa-install-btn');
-  if (installBtn) {
-    installBtn.classList.remove('hidden');
-  }
+  if (installBtn) installBtn.classList.remove('hidden');
 });
 
 /**
@@ -459,6 +834,39 @@ function applyTranslations() {
   document.getElementById('stripe-legend-ancla').innerText = dict.stripeLegend;
   document.getElementById('stripe-btn-text-ancla').innerText = dict.btnStripe;
 
+  // Nuevas secciones del Ancla
+  const nextStepsTitle = document.getElementById('txt-next-steps-title');
+  if (nextStepsTitle) nextStepsTitle.innerText = dict.nextStepsTitle;
+  const btnBreathe = document.getElementById('txt-step-breathe');
+  if (btnBreathe) btnBreathe.innerText = dict.nextStepBreathe;
+  const btnReflect = document.getElementById('txt-step-reflect');
+  if (btnReflect) btnReflect.innerText = dict.nextStepReflect;
+  const btnReminder = document.getElementById('txt-step-reminder');
+  if (btnReminder) btnReminder.innerText = dict.nextStepReminder;
+
+  const feelingQ = document.getElementById('txt-feeling-question');
+  if (feelingQ) feelingQ.innerText = dict.feelingQuestion;
+  const feelingBetter = document.getElementById('txt-feeling-better');
+  if (feelingBetter) feelingBetter.innerText = dict.feelingBetter;
+  const feelingSame = document.getElementById('txt-feeling-same');
+  if (feelingSame) feelingSame.innerText = dict.feelingSame;
+  const feelingOver = document.getElementById('txt-feeling-overwhelmed');
+  if (feelingOver) feelingOver.innerText = dict.feelingOverwhelmed;
+
+  const crisisTitle = document.getElementById('txt-crisis-title');
+  if (crisisTitle) crisisTitle.innerText = dict.crisisTitle;
+  const crisisDesc = document.getElementById('txt-crisis-desc');
+  if (crisisDesc) crisisDesc.innerText = dict.crisisDesc;
+  const crisisCall = document.getElementById('txt-crisis-call');
+  if (crisisCall) crisisCall.innerText = dict.crisisCall;
+  const crisisWeb = document.getElementById('txt-crisis-web');
+  if (crisisWeb) crisisWeb.innerText = dict.crisisWeb;
+
+  // Denominación
+  const denomLabelEl = document.getElementById('denom-label-text');
+  if (denomLabelEl) denomLabelEl.innerText = dict.denomLabel;
+  applyDenominationUI();
+
   // Textos de Notificaciones
   document.getElementById('txt-push-title').innerText = dict.pushTitle;
   document.getElementById('txt-push-sub').innerText = dict.pushSub;
@@ -534,13 +942,13 @@ async function handleRelease() {
   breathingFinishedAndWaiting = false;
   isJustBreathing = false;
 
-  // 1. Disparar API en segundo plano pasando el idioma actual
+  // 1. Disparar API en segundo plano pasando el idioma y denominación actuales
   fetch('/api/comfort', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ text, lang: currentLang })
+    body: JSON.stringify({ text, lang: currentLang, denomination: currentDenomination })
   })
   .then(async (response) => {
     if (!response.ok) {
@@ -617,6 +1025,21 @@ function setupBreathingFlow() {
   breathingState = 'prepare';
   currentCycle = 0;
   breathingFinishedAndWaiting = false;
+
+  // Activar o resumir audio si está configurado en 'on'
+  if (localStorage.getItem('alivio_audio') === 'on') {
+    if (!audioCtx) initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    audioActive = true;
+    fadeAudio(0.6, 1000);
+    const icon = document.getElementById('audio-icon');
+    const btn = document.getElementById('audio-toggle-btn');
+    if (icon) icon.textContent = '🔊';
+    if (btn) btn.title = 'Silenciar';
+  }
+
   
   const node = document.getElementById('breathing-node');
   node.className = "breathing-circle exhale w-24 h-24 rounded-full flex items-center justify-center text-white transition-all duration-1000";
@@ -779,6 +1202,20 @@ function displayComfortAndNavigate() {
   // Verificar suscripción activa para pintar los botones de push correctamente
   checkActiveSubscription();
 
+  // Resetear estado de feedback emocional y botón de guardar
+  const feelingMsg = document.getElementById('feeling-response-msg');
+  if (feelingMsg) { feelingMsg.innerText = ''; feelingMsg.classList.add('hidden'); }
+  document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('feeling-btn-active'));
+  const saveFavBtn = document.getElementById('btn-save-favorite');
+  if (saveFavBtn) {
+    saveFavBtn.classList.remove('btn-saved');
+    saveFavBtn.innerHTML = `<span>🔖</span><span id="txt-step-reflect">${TRANSLATIONS[currentLang].nextStepReflect}</span>`;
+  }
+
+  // Actualizar racha al completar el flujo
+  updateStreak();
+  renderStreak();
+
   changeScreen('screen-ancla');
 }
 
@@ -811,7 +1248,7 @@ function prevVerse() {
   renderActiveVerse();
 }
 
-const SCREENSHOT_FILES = ['SS1.png', 'SS4.png', 'SS2.png', 'SS3.png'];
+const SCREENSHOT_FILES = ['SS11.png', 'SS22.png', 'SS33.png', 'SS44.png'];
 
 function updateMarketingScreenshot() {
   const imgEl = document.getElementById('marketing-screenshot');
@@ -1099,6 +1536,14 @@ window.addEventListener('DOMContentLoaded', () => {
   // Aplicar traducciones
   applyTranslations();
   updateDynamicGreeting();
+
+  // Denominación y racha
+  applyDenominationUI();
+  updateStreak();
+  renderStreak();
+
+  // Audio ambiente (restaurar preferencia del usuario)
+  initAudioPreference();
 
   // Escuchar entrada de caracteres para el contador
   const ventInput = document.getElementById('vent-input');

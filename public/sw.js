@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alivio-cache-v1';
+const CACHE_NAME = 'alivio-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -8,10 +8,10 @@ const ASSETS_TO_CACHE = [
   '/icon-192.png',
   '/icon-512.png',
   '/fallback-misericordia.png',
-  '/SS1.png',
-  '/SS2.png',
-  '/SS3.png',
-  '/SS4.png'
+  '/SS11.png',
+  '/SS22.png',
+  '/SS33.png',
+  '/SS44.png'
 ];
 
 // Instalar el Service Worker y cachear recursos

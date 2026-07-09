@@ -94,7 +94,7 @@
             "name": "¿Cómo funciona Alivio?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Alivio te permite desahogar tus aflicciones de forma 100% anónima, realizar un ejercicio mandatorio de respiración de 12 segundos para aquietar tu mente y, finalmente, recibir versículos bíblicos de consuelo y oraciones personalizadas."
+              "text": "Alivio te permite desahogar tus aflicciones de forma 100% anónima, realizar un ejercicio guiado de respiración de 12 segundos para aquietar tu mente y, finalmente, recibir versículos bíblicos de consuelo y oraciones personalizadas."
             }
           },
           {
@@ -185,9 +185,152 @@
       opacity: 0;
       transform: translateY(10px);
     }
+
+    /* ── DENOMINACIÓN ───────────────────────────────── */
+    .denom-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      border: 1px solid #e2e8f0;
+      color: #94a3b8;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .denom-btn:hover { background: #f1f5f9; color: #6366f1; border-color: #c7d2fe; }
+    .denom-btn-active {
+      background: #eef2ff;
+      color: #4f46e5;
+      border-color: #a5b4fc;
+      font-weight: 600;
+    }
+
+    /* ── FEELING BUTTONS ─────────────────────────────── */
+    .feeling-btn {
+      flex: 1;
+      padding: 8px 6px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 300;
+      color: #64748b;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .feeling-btn:hover { background: #f0f0ff; color: #4f46e5; border-color: #a5b4fc; }
+    .feeling-btn-active {
+      background: #eef2ff;
+      color: #4338ca;
+      border-color: #6366f1;
+      font-weight: 500;
+    }
+
+    /* ── NEXT STEP BUTTONS ────────────────────────────── */
+    .step-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+      padding: 12px 8px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 400;
+      color: #475569;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .step-btn:hover { background: #eef2ff; color: #4338ca; border-color: #a5b4fc; transform: translateY(-1px); }
+    .step-btn .step-icon { font-size: 18px; }
+    .step-btn.btn-saved { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
+
+    /* ── CRISIS SECTION ───────────────────────────────── */
+    .crisis-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .crisis-link-call {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    .crisis-link-call:hover { background: #fee2e2; }
+    .crisis-link-web {
+      background: #f0f9ff;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+    .crisis-link-web:hover { background: #e0f2fe; }
+
+    /* ── STREAK ─────────────────────────────────────── */
+    #streak-display {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #a78bfa;
+      background: #f5f3ff;
+      border: 1px solid #ddd6fe;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    /* ── AUDIO BUTTON ──────────────────────────────── */
+    #audio-toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(99,102,241,0.2);
+      box-shadow: 0 4px 15px rgba(99,102,241,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s;
+      z-index: 40;
+    }
+    #audio-toggle-btn:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(99,102,241,0.2); }
+    #audio-toggle-btn:active { transform: scale(0.95); }
+
+    /* ── FAVORITES MODAL ───────────────────────────── */
+    #favorites-list {
+      max-height: 55vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    #favorites-list::-webkit-scrollbar { width: 4px; }
+    #favorites-list::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 4px; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased text-slate-800 selection:bg-indigo-100">
+
+  <!-- Botón flotante de Audio Ambiente -->
+  <button id="audio-toggle-btn" onclick="toggleAudio()" title="Activar música ambient" aria-label="Toggle audio ambiente">
+    <span id="audio-icon">🔇</span>
+  </button>
 
   <!-- Contenedor Principal (Flexible según la pantalla) -->
   <div class="w-full flex-1 flex flex-col justify-start pt-6 md:pt-10 pb-8">
@@ -242,7 +385,7 @@
               <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">2</div>
               <div>
                 <h3 id="step-2-title" class="text-sm font-medium text-slate-800">Aquieta tu templo</h3>
-                <p id="step-2-desc" class="text-xs font-light text-slate-600 leading-relaxed">Sigue el ciclo de respiración mandatorio de 12 segundos para calmar tu pecho y relajar la mente.</p>
+                <p id="step-2-desc" class="text-xs font-light text-slate-600 leading-relaxed">Sigue el ciclo de respiración guiado de 12 segundos para calmar tu pecho y relajar la mente.</p>
               </div>
             </div>
             <!-- Paso 3 -->
@@ -361,6 +504,23 @@
               <span id="txt-just-breathe">solo respirar</span>
             </button>
           </div>
+
+          <!-- Selector de Denominación — sutil, debajo del header -->
+          <div class="flex items-center gap-2 pt-1">
+            <span id="denom-label-text" class="text-[10px] text-slate-400 uppercase tracking-wider shrink-0">Enfoque</span>
+            <div class="flex gap-1 flex-wrap">
+              <button id="denom-btn-catholic" class="denom-btn denom-btn-active" onclick="setDenomination('catholic')">
+                ✝ <span id="txt-denom-catholic">Católico</span>
+              </button>
+              <button id="denom-btn-evangelical" class="denom-btn" onclick="setDenomination('evangelical')">
+                📖 <span id="txt-denom-evangelical">Evangélico</span>
+              </button>
+              <button id="denom-btn-spiritual" class="denom-btn" onclick="setDenomination('spiritual')">
+                🌱 <span id="txt-denom-spiritual">Espiritual</span>
+              </button>
+            </div>
+            <span id="denom-label" class="hidden"></span>
+          </div>
           <p class="text-2xl font-light tracking-tight text-slate-800 leading-relaxed">
             <span id="welcome-greeting">buenos días.</span><br><span id="welcome-sub">suelta aquí lo que pese hoy.</span>
           </p>
@@ -438,11 +598,22 @@
       <main id="screen-ancla" class="screen-fade screen-hidden w-full flex flex-col gap-6 py-4">
         <header class="flex items-center justify-between">
           <h1 id="ancla-verse" class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-medium">Confort</h1>
-          <!-- Botón para volver a empezar -->
-          <button onclick="resetApp()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18" /></svg>
-            <span id="txt-ancla-otra-vez">otra vez</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <!-- Racha de días -->
+            <div id="streak-display" class="hidden">
+              <span>🔥</span><span id="streak-count">0</span>
+            </div>
+            <!-- Botón Mis Oraciones -->
+            <button onclick="openFavorites()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1">
+              <span>🔖</span>
+            </button>
+            <span class="text-slate-300">|</span>
+            <!-- Botón para volver a empezar -->
+            <button onclick="resetApp()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18" /></svg>
+              <span id="txt-ancla-otra-vez">otra vez</span>
+            </button>
+          </div>
         </header>
 
         <!-- Imagen Sacra con marco zen -->
@@ -487,8 +658,44 @@
           </div>
         </article>
 
+        <!-- ── FEEDBACK EMOCIONAL ──────────────────────────────────────── -->
+        <section class="bg-white/60 backdrop-blur-sm border border-slate-100 rounded-2xl p-4 space-y-3">
+          <p id="txt-feeling-question" class="text-xs font-medium tracking-wide text-slate-600 text-center">¿Cómo te sientes ahora?</p>
+          <div class="flex gap-2">
+            <button id="feeling-better" class="feeling-btn" onclick="handleFeeling('better')">
+              <span id="txt-feeling-better">Mejor 🙏</span>
+            </button>
+            <button id="feeling-same" class="feeling-btn" onclick="handleFeeling('same')">
+              <span id="txt-feeling-same">Igual 💚</span>
+            </button>
+            <button id="feeling-overwhelmed" class="feeling-btn" onclick="handleFeeling('overwhelmed')">
+              <span id="txt-feeling-overwhelmed">Aún abrumado 🙍</span>
+            </button>
+          </div>
+          <p id="feeling-response-msg" class="hidden text-[11px] font-light text-indigo-700 text-center leading-relaxed px-2"></p>
+        </section>
+
+        <!-- ── PASOS SUGERIDOS ──────────────────────────────────────── -->
+        <section class="space-y-3">
+          <p id="txt-next-steps-title" class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold text-center">¿Qué deseas hacer ahora?</p>
+          <div class="flex gap-2">
+            <button class="step-btn" onclick="goToBreathing()">
+              <span class="step-icon">🌬️</span>
+              <span id="txt-step-breathe">Otra respiración</span>
+            </button>
+            <button id="btn-save-favorite" class="step-btn" onclick="saveFavorite()">
+              <span class="step-icon">🔖</span>
+              <span id="txt-step-reflect">Guardar oración</span>
+            </button>
+            <button class="step-btn" onclick="scrollToPush()">
+              <span class="step-icon">🔔</span>
+              <span id="txt-step-reminder">Mi recordatorio</span>
+            </button>
+          </div>
+        </section>
+
         <!-- Configuración del Recordatorio Push -->
-        <section class="bg-white/50 backdrop-blur-lg border border-white/80 rounded-3xl p-6 space-y-4 shadow-sm shadow-indigo-100/10">
+        <section id="push-section" class="bg-white/50 backdrop-blur-lg border border-white/80 rounded-3xl p-6 space-y-4 shadow-sm shadow-indigo-100/10">
           <div class="space-y-1">
             <p id="txt-push-title" class="text-xs font-medium tracking-wide text-slate-600">¿A qué hora deseas tu recordatorio esta tarde?</p>
             <p id="txt-push-sub" class="text-[10px] text-slate-400 font-light">Te enviaremos un susurro de paz personalizado a tu teléfono.</p>
@@ -519,10 +726,49 @@
             <span id="stripe-btn-text-ancla">Apoyar a Alivio</span>
           </a>
         </section>
+
+        <!-- ── SECCIÓN DE CRISIS ─────────────────────────────────────── -->
+        <section id="crisis-section" class="border border-rose-100 rounded-2xl p-4 bg-rose-50/40 space-y-3">
+          <div class="flex items-start gap-2">
+            <span class="text-lg mt-0.5">🧡</span>
+            <div>
+              <p id="txt-crisis-title" class="text-xs font-semibold text-rose-700 tracking-wide">Si estás en una situación de crisis</p>
+              <p id="txt-crisis-desc" class="text-[11px] font-light text-rose-600 leading-relaxed">No estás solo/a. Hay personas capacitadas listas para escucharte ahora mismo.</p>
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <a href="tel:*0311" class="crisis-link crisis-link-call">
+              <span>📞</span>
+              <span id="txt-crisis-call">Llamar al *0311</span>
+            </a>
+            <a href="https://cms311.cdmx.gob.mx/prevencion-suicidio/" target="_blank" rel="noopener noreferrer" class="crisis-link crisis-link-web">
+              <span>🌐</span>
+              <span id="txt-crisis-web">Visitar recurso de apoyo</span>
+            </a>
+          </div>
+        </section>
       </main>
 
     </div>
 
+  </div>
+
+  <!-- Modal de Favoritos — Mis Oraciones Guardadas -->
+  <div id="modal-favorites" class="fixed inset-0 bg-slate-900/45 backdrop-blur-md flex items-end justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-white/97 rounded-t-3xl w-full max-w-sm p-6 space-y-4 border-t border-white/60 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🔖</span>
+          <h3 class="text-sm font-semibold text-slate-800 uppercase tracking-wider">Mis oraciones</h3>
+        </div>
+        <button onclick="closeFavorites()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div id="favorites-list" class="space-y-3">
+        <!-- Renderizado dinámicamente por JS -->
+      </div>
+    </div>
   </div>
 
   <!-- Modal de Donaciones Premium -->

@@ -7,6 +7,13 @@
   "orientation": "portrait",
   "background_color": "#f8fafc",
   "theme_color": "#4f46e5",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://alivio.pronosoftmx.com/manifest.json"
+    }
+  ],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
