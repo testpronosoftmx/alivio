@@ -1,5 +1,25 @@
 const PUBLIC_VAPID_KEY = "BH6Na8LGJ5FPFDz2fZJrYpWCQA8ZAxAvat-ka4C1_9DfHcNhraOvmszXslbN9YmgQW6L7Z8gjPIK_TByuvrpdb4";
 
+// Base URL de la API: en Android nativo usa Vercel directamente, en web usa URLs relativas (sin cambios)
+const API_BASE = (window.Capacitor && window.Capacitor.isNativePlatform())
+  ? 'https://alivio.pronosoftmx.com'
+  : '';
+
+// Helper: obtener FCM token en Android nativo usando Capacitor Firebase Messaging
+async function getFcmToken() {
+  try {
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      const { FirebaseMessaging } = await import('https://cdn.jsdelivr.net/npm/@capacitor-firebase/messaging/dist/esm/index.js');
+      await FirebaseMessaging.requestPermissions();
+      const { token } = await FirebaseMessaging.getToken();
+      return token;
+    }
+  } catch (e) {
+    console.warn('⚠️ No se pudo obtener FCM token:', e);
+  }
+  return null;
+}
+
 // Guardar datos globales de la IA
 window.afternoonMessage = "respira. el señor sostiene tus cargas hoy. estás a salvo.";
 
@@ -943,7 +963,7 @@ async function handleRelease() {
   isJustBreathing = false;
 
   // 1. Disparar API en segundo plano pasando el idioma y denominación actuales
-  fetch('/api/comfort', {
+  fetch(API_BASE + '/api/comfort', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -1336,7 +1356,9 @@ function closeLegal() {
 }
 
 /**
- * Activar las notificaciones push en el navegador
+ * Activar las notificaciones push
+ * - En Android nativo (Capacitor): usa Firebase Cloud Messaging (FCM)
+ * - En web/PWA: usa Web Push (VAPID) como siempre
  */
 async function activatePush() {
   const statusEl = document.getElementById('push-status');
@@ -1344,13 +1366,51 @@ async function activatePush() {
   statusEl.classList.add('text-slate-400');
   statusEl.innerText = (currentLang === 'en') ? "Requesting permissions..." : "Solicitando permisos...";
 
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    statusEl.classList.add('text-red-500');
-    statusEl.innerText = (currentLang === 'en') ? "This browser does not support push notifications." : "Este navegador no soporta notificaciones push.";
-    return;
-  }
-
   try {
+    const alertTime = document.getElementById('alert-time').value;
+
+    // ── ANDROID NATIVO: usar FCM ─────────────────────────────────────────────
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      statusEl.innerText = (currentLang === 'en') ? "Configuring push notifications..." : "Configurando notificaciones...";
+      const fcmToken = await getFcmToken();
+
+      if (!fcmToken) {
+        statusEl.classList.add('text-red-500');
+        statusEl.innerText = (currentLang === 'en') ? "Could not get notification token. Try again." : "No se pudo obtener el token. Intenta nuevamente.";
+        return;
+      }
+
+      statusEl.innerText = (currentLang === 'en') ? "Saving alert in the cloud..." : "Guardando alerta...";
+      const response = await fetch(API_BASE + '/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fcmToken,
+          alertTime,
+          timezoneOffset: new Date().getTimezoneOffset(),
+          message: window.afternoonMessage
+        })
+      });
+
+      if (!response.ok) throw new Error("No se pudo guardar la suscripción en el servidor.");
+
+      localStorage.setItem('alivio_alert_time', alertTime);
+      localStorage.setItem('alivio_fcm_token', fcmToken);
+      document.getElementById('btn-activate-push').classList.add('hidden');
+      document.getElementById('btn-cancel-push').classList.remove('hidden');
+      statusEl.classList.remove('text-slate-400');
+      statusEl.classList.add('text-emerald-600');
+      statusEl.innerText = (currentLang === 'en') ? `🔔 Alert activated for ${alertTime}!` : `🔔 ¡Alerta activada para las ${alertTime}!`;
+      return;
+    }
+
+    // ── WEB / PWA: usar VAPID (comportamiento original) ──────────────────────
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      statusEl.classList.add('text-red-500');
+      statusEl.innerText = (currentLang === 'en') ? "This browser does not support push notifications." : "Este navegador no soporta notificaciones push.";
+      return;
+    }
+
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       statusEl.classList.add('text-red-500');
@@ -1370,13 +1430,10 @@ async function activatePush() {
     }
 
     statusEl.innerText = (currentLang === 'en') ? "Saving alert in the cloud..." : "Saving alert...";
-    const alertTime = document.getElementById('alert-time').value;
 
-    const response = await fetch('/api/subscribe', {
+    const response = await fetch(API_BASE + '/api/subscribe', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         subscription,
         alertTime,
@@ -1389,7 +1446,6 @@ async function activatePush() {
       throw new Error("No se pudo guardar la suscripción en el servidor.");
     }
 
-    // Guardar el estado de hora configurada
     localStorage.setItem('alivio_alert_time', alertTime);
 
     // Cambiar la visualización de los botones
@@ -1431,7 +1487,7 @@ async function cancelPush() {
       return;
     }
 
-    const response = await fetch('/api/subscribe', {
+    const response = await fetch(API_BASE + '/api/subscribe', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'

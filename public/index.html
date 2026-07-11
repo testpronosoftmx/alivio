@@ -567,11 +567,11 @@
           <p id="stripe-legend-home" class="text-[11px] text-slate-500 leading-relaxed font-light">
             "Tu donación permite que una persona en crisis reciba una palabra de aliento gratis hoy."
           </p>
-          <a id="stripe-btn-home" href="https://buy.stripe.com/4gM8wP5ZkcWyeIYfx6gYU04" 
-             class="inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm">
+          <button id="stripe-btn-home" onclick="openDonation()" 
+             class="inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm cursor-pointer border-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
             <span id="stripe-btn-text-home">Apoyar a Alivio</span>
-          </a>
+          </button>
         </section>
       </main>
 
@@ -733,11 +733,11 @@
           <p id="stripe-legend-ancla" class="text-[11px] text-slate-500 leading-relaxed font-light">
             "Tu donación permite que una persona en crisis reciba una palabra de aliento gratis hoy."
           </p>
-          <a id="stripe-btn-ancla" href="https://buy.stripe.com/4gM8wP5ZkcWyeIYfx6gYU04" 
-             class="inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm">
+          <button id="stripe-btn-ancla" onclick="openDonation()" 
+             class="inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm cursor-pointer border-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
             <span id="stripe-btn-text-ancla">Apoyar a Alivio</span>
-          </a>
+          </button>
         </section>
 
         <!-- ── SECCIÓN DE CRISIS ─────────────────────────────────────── -->
@@ -803,11 +803,11 @@
         </p>
       </div>
 
-      <a id="stripe-btn-modal" href="https://buy.stripe.com/4gM8wP5ZkcWyeIYfx6gYU04" 
-         class="inline-flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm">
+      <button id="stripe-btn-modal" onclick="openDonation()" 
+         class="inline-flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-600 hover:to-fuchsia-600 active:scale-[0.99] text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all shadow-sm cursor-pointer border-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
         <span id="stripe-btn-text-modal">Apoyar con Donación</span>
-      </a>
+      </button>
     </div>
   </div>
 
@@ -901,6 +901,30 @@
     <p id="loading-text" class="text-xs uppercase tracking-[0.2em] text-slate-800 font-light mt-4">Elevando tu carga...</p>
     <p id="loading-sub" class="text-[10px] text-slate-500 font-light mt-1">Generando ilustración sagrada</p>
   </div>
+
+  <!-- Capacitor Runtime (In-App Browser para donaciones) -->
+  <script>
+    // openDonation: usa Capacitor Browser en Android/iOS, window.open en web
+    const STRIPE_DONATION_URL = 'https://buy.stripe.com/4gM8wP5ZkcWyeIYfx6gYU04';
+    async function openDonation() {
+      try {
+        // Si estamos en Capacitor nativo (Android/iOS)
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+          // Capacitor inyecta los plugins como globales en el WebView nativo
+          await window.Capacitor.Plugins.Browser.open({
+            url: STRIPE_DONATION_URL,
+            toolbarColor: '#4f46e5'
+          });
+        } else {
+          // Fallback para web normal (PWA en navegador de escritorio/móvil)
+          window.open(STRIPE_DONATION_URL, '_blank', 'noopener,noreferrer');
+        }
+      } catch (e) {
+        // Fallback seguro en caso de error
+        window.open(STRIPE_DONATION_URL, '_blank', 'noopener,noreferrer');
+      }
+    }
+  </script>
 
   <!-- JS Principal -->
   <script src="/app.js"></script>

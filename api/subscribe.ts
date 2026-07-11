@@ -15,31 +15,45 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Headers CORS — necesarios para Android nativo (Capacitor) y cualquier origen externo
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Preflight OPTIONS
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST" && req.method !== "DELETE") {
     return res.status(405).json({ error: "Method not allowed. Use POST or DELETE." });
   }
 
-  const { subscription, alertTime, message, timezoneOffset } = req.body;
 
-  if (!subscription) {
-    return res.status(400).json({ error: "Faltan parámetros obligatorios: subscription." });
+  const { subscription, alertTime, message, timezoneOffset, fcmToken } = req.body;
+
+  // En Android nativo puede venir solo fcmToken sin subscription VAPID
+  if (!subscription && !fcmToken) {
+    return res.status(400).json({ error: "Faltan parámetros obligatorios: subscription o fcmToken." });
   }
 
   try {
-    // Validar formato básico de la suscripción
-    if (!subscription.endpoint) {
-      return res.status(400).json({ error: "El objeto subscription es inválido o no tiene endpoint." });
-    }
-
+    // Para DELETE: buscar por endpoint VAPID o por fcmToken
     if (req.method === "DELETE") {
-      console.log(`🗑️ Eliminando suscripción push para el endpoint: ${subscription.endpoint}`);
-      const { error: deleteError } = await supabase
-        .from("push_subscriptions")
-        .delete()
-        .eq("subscription->>endpoint", subscription.endpoint);
-
-      if (deleteError) throw deleteError;
-
+      if (subscription && subscription.endpoint) {
+        console.log(`🗑️ Eliminando suscripción VAPID para el endpoint: ${subscription.endpoint}`);
+        await supabase
+          .from("push_subscriptions")
+          .delete()
+          .eq("subscription->>endpoint", subscription.endpoint);
+      }
+      if (fcmToken) {
+        console.log(`🗑️ Eliminando suscripción FCM para el token: ${fcmToken.substring(0, 20)}...`);
+        await supabase
+          .from("push_subscriptions")
+          .delete()
+          .eq("fcm_token", fcmToken);
+      }
       return res.status(200).json({
         success: true,
         message: "Recordatorio cancelado con éxito en la base de datos."
@@ -50,44 +64,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Faltan parámetros obligatorios para registro (POST): alertTime o message." });
     }
 
-    // Buscar si ya existe una suscripción con el mismo endpoint en la tabla alivio.push_subscriptions
-    const { data: existing, error: findError } = await supabase
-      .from("push_subscriptions")
-      .select("id")
-      .eq("subscription->>endpoint", subscription.endpoint)
-      .maybeSingle();
+    // Buscar registro existente por endpoint VAPID o por fcmToken
+    let existing: any = null;
+    if (subscription && subscription.endpoint) {
+      const { data } = await supabase
+        .from("push_subscriptions")
+        .select("id")
+        .eq("subscription->>endpoint", subscription.endpoint)
+        .maybeSingle();
+      existing = data;
+    } else if (fcmToken) {
+      const { data } = await supabase
+        .from("push_subscriptions")
+        .select("id")
+        .eq("fcm_token", fcmToken)
+        .maybeSingle();
+      existing = data;
+    }
 
-    if (findError) throw findError;
+    const payload: any = {
+      alert_time: alertTime,
+      timezone_offset: timezoneOffset || 0,
+      message,
+      created_at: new Date().toISOString()
+    };
+    // Guardar subscription VAPID si existe (web/PWA)
+    if (subscription) payload.subscription = subscription;
+    // Guardar FCM token si existe (Android nativo)
+    if (fcmToken) payload.fcm_token = fcmToken;
 
     let result;
     if (existing) {
       console.log(`🔄 Actualizando suscripción existente (ID: ${existing.id})...`);
       const { data, error: updateError } = await supabase
         .from("push_subscriptions")
-        .update({
-          subscription,
-          alert_time: alertTime,
-          timezone_offset: timezoneOffset || 0,
-          message,
-          created_at: new Date().toISOString()
-        })
+        .update(payload)
         .eq("id", existing.id)
         .select();
-
       if (updateError) throw updateError;
       result = data;
     } else {
       console.log("🆕 Insertando nueva suscripción...");
+      // subscription es requerida por el schema; para FCM puede ser objeto vacío
+      if (!payload.subscription) payload.subscription = {};
       const { data, error: insertError } = await supabase
         .from("push_subscriptions")
-        .insert({
-          subscription,
-          alert_time: alertTime,
-          timezone_offset: timezoneOffset || 0,
-          message
-        })
+        .insert(payload)
         .select();
-
       if (insertError) throw insertError;
       result = data;
     }
