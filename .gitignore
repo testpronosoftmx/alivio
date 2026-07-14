@@ -16,3 +16,7 @@ yarn-error.log*
 
 .vercel
 .env*
+
+# Firebase - archivos sensibles (NUNCA subir a Git)
+*firebase-adminsdk*.json
+android/app/google-services.json

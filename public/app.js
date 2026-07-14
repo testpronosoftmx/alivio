@@ -9,7 +9,7 @@ const API_BASE = (window.Capacitor && window.Capacitor.isNativePlatform())
 async function getFcmToken() {
   try {
     if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-      const { FirebaseMessaging } = await import('https://cdn.jsdelivr.net/npm/@capacitor-firebase/messaging/dist/esm/index.js');
+      const { FirebaseMessaging } = window.Capacitor.Plugins;
       await FirebaseMessaging.requestPermissions();
       const { token } = await FirebaseMessaging.getToken();
       return token;
@@ -1309,51 +1309,7 @@ function prevMarketingScreenshot() {
   updateMarketingScreenshot();
 }
 
-/**
- * Control del Modal de Textos Legales
- */
-function openLegal(type) {
-  const modal = document.getElementById('modal-legal');
-  const title = document.getElementById('legal-modal-title');
-  const body = document.getElementById('legal-modal-body');
-  
-  if (!modal || !title || !body) return;
 
-  // Cargar contenidos desde los contenedores indexables de index.html
-  let contentId = '';
-  let titleText = '';
-
-  if (type === 'privacy') {
-    contentId = (currentLang === 'en') ? 'seo-privacy-en' : 'seo-privacy-es';
-    titleText = (currentLang === 'en') ? 'Privacy Policy' : 'Política de Privacidad';
-  } else if (type === 'cookies') {
-    contentId = (currentLang === 'en') ? 'seo-cookies-en' : 'seo-cookies-es';
-    titleText = (currentLang === 'en') ? 'Cookies Policy' : 'Política de Cookies';
-  } else if (type === 'terms') {
-    contentId = (currentLang === 'en') ? 'seo-terms-en' : 'seo-terms-es';
-    titleText = (currentLang === 'en') ? 'Legal Terms' : 'Aviso Legal';
-  }
-
-  const sourceContent = document.getElementById(contentId);
-  if (sourceContent) {
-    body.innerHTML = sourceContent.innerHTML;
-    title.innerText = titleText;
-    
-    // Mostrar modal
-    modal.classList.remove('pointer-events-none');
-    modal.classList.remove('opacity-0');
-    modal.classList.add('opacity-100');
-  }
-}
-
-function closeLegal() {
-  const modal = document.getElementById('modal-legal');
-  if (modal) {
-    modal.classList.add('pointer-events-none');
-    modal.classList.remove('opacity-100');
-    modal.classList.add('opacity-0');
-  }
-}
 
 /**
  * Activar las notificaciones push

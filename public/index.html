@@ -24,7 +24,10 @@
   <!-- OpenGraph -->
   <meta property="og:title" content="Alivio - Espacio Seguro, Meditación y Oración Católica">
   <meta property="og:description" content="Suelta tus cargas, respira hondo y recibe el consuelo de Dios a través de las Sagradas Escrituras Católicas.">
-  <meta property="og:image" content="https://alivio.pronosoftmx.com/screenshot3.png">
+  <meta property="og:image" content="https://alivio.pronosoftmx.com/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://alivio.pronosoftmx.com">
   <meta property="og:type" content="website">
 
@@ -472,11 +475,11 @@
             Desarrollado para proveer confort espiritual anónimo de forma privada.
           </p>
           <div class="flex justify-center md:justify-start gap-4 text-3xs uppercase tracking-wider text-slate-500 font-medium">
-            <button onclick="openLegal('privacy')" class="hover:text-indigo-600 transition-colors">Privacidad</button>
+            <a href="/privacidad.html" class="hover:text-indigo-600 transition-colors">Privacidad</a>
             <span>•</span>
-            <button onclick="openLegal('cookies')" class="hover:text-indigo-600 transition-colors">Cookies</button>
+            <a href="/cookies.html" class="hover:text-indigo-600 transition-colors">Cookies</a>
             <span>•</span>
-            <button onclick="openLegal('terms')" class="hover:text-indigo-600 transition-colors">Aviso Legal</button>
+            <a href="/aviso-legal.html" class="hover:text-indigo-600 transition-colors">Aviso Legal</a>
           </div>
         </footer>
       </div>
@@ -811,56 +814,6 @@
     </div>
   </div>
 
-  <!-- Contenedor de Modal de Textos Legales (SEO Search Console) -->
-  <div id="modal-legal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
-    <div class="bg-white/95 rounded-3xl max-w-sm w-11/12 p-6 space-y-4 border border-white/60 shadow-2xl max-h-[80vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-        <h3 id="legal-modal-title" class="text-sm font-semibold text-slate-800 uppercase tracking-wider">Políticas</h3>
-        <button onclick="closeLegal()" class="text-slate-400 hover:text-slate-600 p-1">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-      </div>
-      
-      <!-- Contenedores SEO legibles para los rastreadores pero ocultos al modal -->
-      <div id="legal-modal-body" class="text-xs font-light text-slate-600 space-y-4 leading-relaxed pr-1"></div>
-    </div>
-  </div>
-
-  <!-- TEXTOS LEGALES INDEXABLES EN EL DOM PARA CUMPLIR CON SEARCH CONSOLE (SEO) -->
-  <div class="hidden">
-    <div id="seo-privacy-es">
-      <p class="font-semibold text-slate-800 mb-2">POLÍTICA DE PRIVACIDAD</p>
-      <p>La aplicación Alivio está comprometida con la protección de tus datos personales. Alivio no recolecta, almacena ni comparte información identificativa. Los desahogos y textos ingresados por los usuarios se procesan de forma 100% anónima directamente a través de servidores seguros y encriptados de procesamiento, sin guardar registros de identidad.</p>
-      <p>Cualquier dato local, como las preferencias de idioma y los recordatorios de la tarde, se guarda estrictamente de forma local en tu dispositivo (LocalStorage). Para solicitudes de soporte o dudas, puedes contactarnos en: **ventas@pronosoftmx.com**.</p>
-    </div>
-    <div id="seo-privacy-en">
-      <p class="font-semibold text-slate-800 mb-2">PRIVACY POLICY</p>
-      <p>The Alivio application is committed to protecting your personal data. Alivio does not collect, store, or share identifying information. The vents and text typed by users are processed 100% anonymously directly through secure and encrypted processing servers without saving identity logs.</p>
-      <p>Any local data, such as language preferences and afternoon reminders, is stored strictly on your local device (LocalStorage). For support requests or inquiries, you can contact us at: **ventas@pronosoftmx.com**.</p>
-    </div>
-
-    <div id="seo-cookies-es">
-      <p class="font-semibold text-slate-800 mb-2">POLÍTICA DE COOKIES</p>
-      <p>Alivio no utiliza cookies de seguimiento publicitario ni de terceros. Únicamente utilizamos tecnologías de almacenamiento local en el navegador (como LocalStorage y Caché del Service Worker) para garantizar que la aplicación funcione en modo sin conexión (offline) y para recordar tu idioma seleccionado.</p>
-      <p>Para más información o aclaraciones, puedes escribirnos a: **ventas@pronosoftmx.com**.</p>
-    </div>
-    <div id="seo-cookies-en">
-      <p class="font-semibold text-slate-800 mb-2">COOKIES POLICY</p>
-      <p>Alivio does not use advertising or third-party tracking cookies. We only use browser storage technologies (such as LocalStorage and Service Worker Cache) to ensure the application works offline and to remember your selected language.</p>
-      <p>For more information or clarifications, you can write to us at: **ventas@pronosoftmx.com**.</p>
-    </div>
-
-    <div id="seo-terms-es">
-      <p class="font-semibold text-slate-800 mb-2">AVISO LEGAL Y TÉRMINOS</p>
-      <p>Alivio es un espacio de soporte y confort espiritual basado en las Sagradas Escrituras Católicas. Esta aplicación no constituye terapia médica, psicológica ni asesoramiento profesional en salud mental. Si experimentas una crisis severa o pensamientos de autolesión, por favor busca ayuda profesional de inmediato.</p>
-      <p>Contacto del titular responsable: ventas@pronosoftmx.com.</p>
-    </div>
-    <div id="seo-terms-en">
-      <p class="font-semibold text-slate-800 mb-2">LEGAL NOTICE AND TERMS</p>
-      <p>Alivio is a space for spiritual support and comfort based on Catholic Holy Scriptures. This application does not constitute medical, psychological therapy, or professional mental health advice. If you are experiencing a severe crisis or thoughts of self-harm, please seek professional help immediately.</p>
-      <p>Responsible publisher contact: ventas@pronosoftmx.com.</p>
-    </div>
-  </div>
 
   <!-- Toast Notification (Oculto por defecto) -->
   <div id="toast-notification" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] bg-indigo-900/95 backdrop-blur-md border border-indigo-700/50 text-white px-5 py-3 rounded-2xl shadow-xl shadow-indigo-900/20 flex items-center gap-2 transition-all duration-500 opacity-0 pointer-events-none -translate-y-8">
