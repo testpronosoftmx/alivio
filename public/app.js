@@ -137,6 +137,7 @@ const TRANSLATIONS = {
     greetingSub: "Suelta aquí lo que te pesa hoy.",
     flowGuide: "1. Escribe tu pesar • 2. Respira hondo • 3. Recibe tu consuelo",
     placeholder: "cuéntale a Dios lo que pasa por tu mente y corazón... desahógate con total libertad y detalle...",
+    placeholderSpiritual: "escribe lo que pasa por tu mente y corazón... desahógate con total libertad y detalle...",
     btnRelease: "soltar carga",
     breathingTitle: "el suspiro",
     breathingSub: "libera la tensión de tu pecho",
@@ -226,6 +227,7 @@ const TRANSLATIONS = {
     greetingSub: "Release what weighs you down today.",
     flowGuide: "1. Write your concern • 2. Breathe deeply • 3. Receive your comfort",
     placeholder: "tell God what is on your mind and heart... vent with total freedom and detail...",
+    placeholderSpiritual: "write what is on your mind and heart... vent with total freedom and detail...",
     btnRelease: "release burden",
     breathingTitle: "the sigh",
     breathingSub: "release the tension in your chest",
@@ -355,9 +357,25 @@ function applyDenominationUI() {
   });
   const labelEl = document.getElementById('denom-label');
   const dict = TRANSLATIONS[currentLang];
-  if (labelEl && dict) {
-    const map = { catholic: dict.denomCatholic, evangelical: dict.denomEvangelical, spiritual: dict.denomSpiritual };
-    labelEl.innerText = map[currentDenomination] || '';
+  if (dict) {
+    // Traducir los textos internos de los botones de enfoque
+    const spanCatholic = document.getElementById('txt-denom-catholic');
+    if (spanCatholic) spanCatholic.innerText = dict.denomCatholic;
+    const spanEvangelical = document.getElementById('txt-denom-evangelical');
+    if (spanEvangelical) spanEvangelical.innerText = dict.denomEvangelical;
+    const spanSpiritual = document.getElementById('txt-denom-spiritual');
+    if (spanSpiritual) spanSpiritual.innerText = dict.denomSpiritual;
+
+    if (labelEl) {
+      const map = { catholic: dict.denomCatholic, evangelical: dict.denomEvangelical, spiritual: dict.denomSpiritual };
+      labelEl.innerText = map[currentDenomination] || '';
+    }
+
+    // Actualizar dinámicamente el placeholder de la caja de texto según denominación
+    const ventInput = document.getElementById('vent-input');
+    if (ventInput) {
+      ventInput.placeholder = currentDenomination === 'spiritual' ? dict.placeholderSpiritual : dict.placeholder;
+    }
   }
 }
 
