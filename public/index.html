@@ -103,7 +103,7 @@
             "name": "¿Cómo funciona Alivio?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Alivio te permite desahogar tus aflicciones de forma 100% anónima, realizar un ejercicio guiado de respiración de 12 segundos para aquietar tu mente y, finalmente, recibir versículos bíblicos de consuelo y oraciones personalizadas."
+              "text": "Alivio te guía en 3 pasos: desahoga tus aflicciones de forma 100% anónima, realiza un ejercicio de respiración profunda de 12 segundos y recibe versículos bíblicos de consuelo y una oración personalizada según lo que escribiste."
             }
           },
           {
@@ -111,7 +111,39 @@
             "name": "¿Es Alivio una aplicación gratuita?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sí, Alivio es completamente gratuito para desahogarse, respirar y recibir oraciones y lecturas bíblicas. Contamos con una opción de apoyo voluntario para mantener el servicio activo."
+              "text": "Sí, Alivio es completamente gratuita. Puedes desahogarte, respirar y recibir oraciones y lecturas bíblicas sin costo. Ofrecemos una opción de apoyo voluntario para mantener el servicio activo para todos."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Es segura mi información en Alivio?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Alivio procesa tu desahogo de forma 100% anónima. No almacenamos datos personales identificables. No usamos cookies de seguimiento. Tu privacidad es nuestra prioridad absoluta."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Funciona Alivio sin conexión a internet?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Alivio es una PWA con tecnología de Service Worker. Una vez visitada, funciona en modo offline. Tus oraciones guardadas y el ejercicio de respiración estarán disponibles sin internet."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Alivio es solo para católicos?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Aunque su base es bíblica católica, Alivio ofrece tres enfoques: Católico, Evangélico y Espiritual. Cualquier persona que busque paz interior y consuelo espiritual puede usarla."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo instalo Alivio en mi teléfono?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "En Android/Chrome: toca el menú y selecciona 'Instalar app'. En iPhone/Safari: toca el ícono de Compartir y selecciona 'Agregar a Inicio'. No requiere App Store ni Google Play."
             }
           }
         ]
@@ -351,7 +383,7 @@
       <div class="space-y-6 md:col-start-1 md:row-start-1">
         <header class="space-y-4 text-center md:text-left">
           <div class="flex items-center justify-center md:justify-start gap-4 mb-2">
-            <img src="/icon-192.png" alt="Alivio Logo" class="w-20 h-20 rounded-full shadow-lg border border-white/40">
+            <img src="/icon-192.png" alt="Alivio Logo" width="80" height="80" class="w-20 h-20 rounded-full shadow-lg border border-white/40">
             <!-- Botón de Apoyo reubicado -->
             <button id="header-donate-btn" onclick="openDonateModal()" class="flex items-center gap-1 text-[11.5px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 text-rose-600 hover:text-rose-700 active:scale-95 transition-all font-semibold cursor-pointer shadow-sm">
               <span>❤️</span> <span id="header-donate-text">Apoyar</span>
@@ -385,30 +417,30 @@
             <div class="flex gap-4 p-4 rounded-2xl bg-white/45 border border-white/60">
               <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">1</div>
               <div>
-                <h3 id="step-1-title" class="text-sm font-medium text-slate-800">Desahoga tu corazón</h3>
-                <p id="step-1-desc" class="text-xs font-light text-slate-600 leading-relaxed">Escribe de forma 100% anónima y segura lo que te aflige hoy: deudas, cansancio, miedos...</p>
+                <h3 id="step-1-title" class="text-sm font-medium text-slate-800">¿Cómo desahogo mi corazón?</h3>
+                <p id="step-1-desc" class="text-xs font-light text-slate-600 leading-relaxed">Escribe de forma 100% anónima y segura lo que te aflige hoy: deudas, cansancio, miedos o frustraciones cotidianas.</p>
               </div>
             </div>
             <!-- Paso 2 -->
             <div class="flex gap-4 p-4 rounded-2xl bg-white/45 border border-white/60">
               <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">2</div>
               <div>
-                <h3 id="step-2-title" class="text-sm font-medium text-slate-800">Aquieta tu templo</h3>
-                <p id="step-2-desc" class="text-xs font-light text-slate-600 leading-relaxed">Sigue el ciclo de respiración guiado de 12 segundos para calmar tu pecho y relajar la mente.</p>
+                <h3 id="step-2-title" class="text-sm font-medium text-slate-800">¿Cómo aquieto mi mente?</h3>
+                <p id="step-2-desc" class="text-xs font-light text-slate-600 leading-relaxed">Sigue el ciclo de respiración zen guiado de 12 segundos para calmar tu pecho, reducir el estrés y relajar la mente.</p>
               </div>
             </div>
             <!-- Paso 3 -->
             <div class="flex gap-4 p-4 rounded-2xl bg-white/45 border border-white/60">
               <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-semibold shrink-0">3</div>
               <div>
-                <h3 id="step-3-title" class="text-sm font-medium text-slate-800">Recibe consuelo y recordatorios</h3>
+                <h3 id="step-3-title" class="text-sm font-medium text-slate-800">¿Cómo recibo consuelo espiritual?</h3>
                 <p id="step-3-desc" class="text-xs font-light text-slate-600 leading-relaxed">Encuentra versículos personalizados, una plegaria íntima y programa un susurro de paz diario en tu teléfono a la hora que prefieras.</p>
               </div>
             </div>
 
             <!-- Video Demostrativo de Funcionalidad -->
             <div class="p-5 rounded-2xl bg-white/50 border border-white/70 shadow-sm flex flex-col items-center gap-3">
-              <h3 id="video-demo-title" class="text-xs uppercase tracking-widest text-indigo-700 font-semibold">Mira Alivio en Acción</h3>
+              <h3 id="video-demo-title" class="text-xs uppercase tracking-widest text-indigo-700 font-semibold">¿Cómo luce Alivio en mi celular?</h3>
               <div class="relative w-full max-w-[260px] aspect-[9/16] rounded-2xl overflow-hidden border-4 border-slate-300 bg-black shadow-lg">
                 <video src="/Video Funcionalidad Alivio.mp4" controls preload="metadata" playsinline class="w-full h-full object-cover"></video>
               </div>
@@ -419,12 +451,12 @@
 
       <!-- BLOQUE B: Mockup de Celular interactivo y explicaciones (Columna Derecha en PC / Segundo en móvil - debajo de los 3 pasos) -->
       <div class="flex flex-col items-center gap-6 md:col-start-2 md:row-start-1 md:row-span-2 justify-self-center">
-        <h2 id="title-screenshots" class="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold md:hidden">capturas de la aplicación</h2>
+        <h2 id="title-screenshots" class="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold md:hidden">¿Cómo se ve la aplicación?</h2>
         
         <div class="w-[280px] bg-slate-900/5 backdrop-blur-md border border-white/40 rounded-[2.5rem] p-4 shadow-xl flex flex-col items-center relative">
           <!-- Marco de teléfono celular estético -->
           <div class="relative w-full aspect-[9/16] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-slate-300 bg-[#f8f6fc]">
-            <img id="marketing-screenshot" src="/SS1.png" alt="Captura de pantalla de Alivio" class="w-full h-full object-contain transition-opacity duration-300">
+            <img id="marketing-screenshot" src="/SS1.png" alt="Captura de pantalla de Alivio" width="240" height="427" class="w-full h-full object-contain transition-opacity duration-300">
           </div>
           
           <!-- Controles del carrusel -->
@@ -471,6 +503,67 @@
               <li>Desplázate hacia abajo y selecciona "Agregar a Inicio" (Add to Home Screen).</li>
               <li>Nombra la aplicación como Alivio y pulsa Agregar arriba a la derecha.</li>
             </ol>
+          </div>
+        </section>
+
+        <!-- Sección de Preguntas Frecuentes (FAQ / AEO) -->
+        <section class="space-y-4 p-6 rounded-3xl bg-white/45 border border-white/60 shadow-sm">
+          <h2 id="faq-section-title" class="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold text-center md:text-left">Preguntas Frecuentes</h2>
+          <div class="space-y-3">
+            <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
+              <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
+                <span>¿Cómo funciona Alivio?</span>
+                <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
+              </summary>
+              <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
+                Alivio te guía en 3 pasos: desahoga tus aflicciones de forma 100% anónima, realiza un ejercicio de respiración profunda de 12 segundos y recibe versículos bíblicos de consuelo y una oración personalizada según lo que escribiste.
+              </div>
+            </details>
+            <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
+              <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
+                <span>¿Es Alivio una aplicación gratuita?</span>
+                <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
+              </summary>
+              <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
+                Sí, Alivio es completamente gratuita. Puedes desahogarte, respirar y recibir oraciones y lecturas bíblicas sin costo. Ofrecemos una opción de apoyo voluntario para mantener el servicio activo para todos.
+              </div>
+            </details>
+            <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
+              <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
+                <span>¿Es segura mi información en Alivio?</span>
+                <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
+              </summary>
+              <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
+                Sí. Alivio procesa tu desahogo de forma 100% anónima. No almacenamos datos personales identificables. No usamos cookies de seguimiento. Tu privacidad es nuestra prioridad absoluta.
+              </div>
+            </details>
+            <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
+              <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
+                <span>¿Funciona Alivio sin conexión a internet?</span>
+                <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
+              </summary>
+              <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
+                Sí. Alivio es una PWA con tecnología de Service Worker. Una vez visitada, funciona en modo offline. Tus oraciones guardadas y el ejercicio de respiración estarán disponibles sin internet.
+              </div>
+            </details>
+            <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
+              <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
+                <span>¿Alivio es solo para católicos?</span>
+                <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
+              </summary>
+              <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
+                No. Aunque su base es bíblica católica, Alivio ofrece tres enfoques: Católico, Evangélico y Espiritual. Cualquier persona que busque paz interior y consuelo espiritual puede usarla.
+              </div>
+            </details>
+            <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
+              <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
+                <span>¿Cómo instalo Alivio en mi teléfono?</span>
+                <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
+              </summary>
+              <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
+                En Android/Chrome: toca el menú y selecciona 'Instalar app'. En iPhone/Safari: toca el ícono de Compartir y selecciona 'Agregar a Inicio'. No requiere App Store ni Google Play.
+              </div>
+            </details>
           </div>
         </section>
 

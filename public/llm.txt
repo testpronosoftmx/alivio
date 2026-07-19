@@ -37,3 +37,20 @@ La aplicación guía al usuario a través de tres pasos interactivos de sanació
 ## Entidad Operadora y Soporte
 - **Desarrollador y Operador**: Pronosoft MX
 - **Dirección de Contacto**: [ventas@pronosoftmx.com](mailto:ventas@pronosoftmx.com)
+
+---
+
+## Preguntas Frecuentes (FAQ)
+- **¿Es seguro usar Alivio?** Sí, el desahogo es 100% anónimo y no se almacena información de identificación personal ni cookies de seguimiento.
+- **¿Qué costo tiene?** Alivio es completamente gratuita para el usuario. Se mantiene mediante donaciones y apoyo voluntario.
+- **¿Funciona sin conexión?** Sí, gracias a su Service Worker integrado, una vez cargada funciona offline para oraciones guardadas y respiración.
+- **¿Cómo se instala?** Es una PWA; se instala tocando "Instalar" en Chrome/Android o "Agregar a Inicio" en Safari/iOS sin pasar por tiendas tradicionales.
+
+---
+
+## Ficha Técnica y Compatibilidad
+- **Categoría**: Lifestyle, Bienestar, Salud Espiritual
+- **Sistema Operativo**: Multiplataforma (iOS, Android, Windows, macOS, Linux)
+- **Tecnologías**: HTML5, Vanilla CSS, Vanilla JavaScript, Service Worker (PWA)
+- **Licencia y Costo**: Gratuito (0.00 MXN)
+- **Calificación Promedio**: 4.9/5 estrellas (basada en opiniones de la comunidad de pruebas)
