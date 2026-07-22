@@ -112,7 +112,7 @@ const FALLBACK_COMFORT_EN = {
 const TRANSLATIONS = {
   es: {
     landingTitle: "Un refugio de paz en tu bolsillo",
-    landingTagline: "Suelta tus cargas cotidianas, respira hondo y reconéctate con el Creador en un instante.",
+    landingTagline: "Alivio es tu <strong>espacio seguro</strong> de <strong>meditación</strong> y <strong>oración católica</strong> en formato <strong>PWA</strong>. Un <strong>refugio de paz</strong> en tu <strong>bolsillo</strong> para aliviar el estrés y reconectarte con Dios.",
     btnEnterApp: "comenzar a orar",
     titleHowWorks: "¿cómo funciona Alivio?",
     step1Title: "Desahoga tu corazón",
@@ -202,7 +202,7 @@ const TRANSLATIONS = {
   },
   en: {
     landingTitle: "A refuge of peace in your pocket",
-    landingTagline: "Release your daily burdens, take a deep breath and reconnect with the Creator in an instant.",
+    landingTagline: "Alivio is your <strong>safe space</strong> for <strong>meditation</strong> and <strong>Catholic prayer</strong> in <strong>PWA</strong> format. A <strong>refuge of peace</strong> in your <strong>pocket</strong> to relieve daily stress and reconnect with God.",
     btnEnterApp: "start praying",
     titleHowWorks: "how does Alivio work?",
     step1Title: "Vent your heart",
@@ -815,7 +815,7 @@ function applyTranslations() {
 
   // Textos de la Landing Page (Screen 0)
   document.getElementById('landing-title').innerText = dict.landingTitle;
-  document.getElementById('landing-tagline').innerText = dict.landingTagline;
+  document.getElementById('landing-tagline').innerHTML = dict.landingTagline;
   document.getElementById('btn-enter-app').innerText = dict.btnEnterApp;
   document.getElementById('title-how-works').innerText = dict.titleHowWorks;
   document.getElementById('step-1-title').innerText = dict.step1Title;
@@ -1629,3 +1629,35 @@ function closeDonateModal() {
     modal.classList.add('opacity-0', 'pointer-events-none');
   }
 }
+
+/**
+ * Compartir la aplicación (Web Share API con fallback a Clipboard)
+ */
+async function shareApp() {
+  const shareData = {
+    title: 'Alivio PWA',
+    text: currentLang === 'en' 
+      ? 'Alivio: A safe space for meditation and Catholic prayer in your pocket.' 
+      : 'Alivio: Un espacio seguro de meditación y oración católica en tu bolsillo.',
+    url: 'https://alivio.pronosoftmx.com'
+  };
+
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch (e) {
+      console.warn('Share cancelled or failed:', e);
+    }
+  } else {
+    // Fallback: copiar al portapapeles
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      showToast(currentLang === 'en' 
+        ? 'Link copied to clipboard. Share it with your loved ones!' 
+        : 'Enlace copiado al portapapeles. ¡Compártelo con tus seres queridos!');
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  }
+}
+

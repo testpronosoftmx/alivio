@@ -17,8 +17,7 @@
   
   <!-- SEO & Search Console Optimization -->
   <link rel="canonical" href="https://alivio.pronosoftmx.com">
-  <meta name="description" content="Alivio es una aplicación web y PWA católica diseñada para desahogar tus penas, realizar respiración profunda guiada y recibir versículos de consuelo y oraciones en español e inglés.">
-  <meta name="keywords" content="alivio, oracion catolica, biblia, desahogo espiritual, paz mental, meditar, estres, ansiedad, pwa catolica, pronosoft">
+  <meta name="description" content="Alivio es una PWA católica de meditación y oración guiada. Desahógate de forma anónima, respira hondo y recibe consuelo espiritual.">
   <meta name="robots" content="index, follow">
   
   <!-- OpenGraph -->
@@ -44,6 +43,9 @@
   <link rel="manifest" href="/manifest.json">
   <!-- Theme Color -->
   <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Alivio">
   <!-- Google Fonts: Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,46 +54,25 @@
   <!-- Tailwind CSS CDN Play -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- JSON-LD Estructurado para SEO Local, FAQ y AEO -->
+  <!-- JSON-LD Estructurado para SEO, FAQ y AEO -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "LocalBusiness",
-        "@id": "https://alivio.pronosoftmx.com/#organization",
-        "name": "Alivio - Oración y Meditación Católica",
+        "@type": "WebApplication",
+        "@id": "https://alivio.pronosoftmx.com/#webapp",
+        "name": "Alivio - Oración y Meditación Católica PWA",
         "url": "https://alivio.pronosoftmx.com",
         "logo": "https://alivio.pronosoftmx.com/icon-192.png",
-        "image": "https://alivio.pronosoftmx.com/screenshot3.png",
-        "description": "Espacio seguro católico y PWA para desahogo espiritual, ejercicios de respiración y oraciones de consuelo.",
-        "telephone": "",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Av. Eugenio Garza Sada",
-          "addressLocality": "Monterrey",
-          "addressRegion": "NL",
-          "postalCode": "64840",
-          "addressCountry": "MX"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": 25.6489,
-          "longitude": -100.2894
-        },
-        "openingHoursSpecification": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday"
-          ],
-          "opens": "00:00",
-          "closes": "23:59"
+        "image": "https://alivio.pronosoftmx.com/og-image.jpg",
+        "description": "Espacio seguro y PWA católica para desahogo espiritual anónimo, ejercicios de respiración guiada y oraciones de consuelo.",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "All",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "MXN"
         }
       },
       {
@@ -388,6 +369,10 @@
             <button id="header-donate-btn" onclick="openDonateModal()" class="flex items-center gap-1 text-[11.5px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 text-rose-600 hover:text-rose-700 active:scale-95 transition-all font-semibold cursor-pointer shadow-sm">
               <span>❤️</span> <span id="header-donate-text">Apoyar</span>
             </button>
+            <!-- Botón de Compartir -->
+            <button onclick="shareApp()" class="flex items-center gap-1 text-[11.5px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 text-indigo-600 hover:text-indigo-700 active:scale-95 transition-all font-semibold cursor-pointer shadow-sm">
+              <span>🔗</span> <span id="header-share-text">Compartir</span>
+            </button>
             <!-- Selector de idioma dual reubicado -->
             <div id="global-lang-selector" class="flex items-center gap-1 text-[11px] bg-white/45 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 shadow-sm">
               <button id="lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
@@ -396,7 +381,7 @@
             </div>
           </div>
           <h1 id="landing-title" class="text-4xl font-light tracking-tight text-slate-800 leading-tight">Un refugio de paz en tu bolsillo</h1>
-          <p id="landing-tagline" class="text-base font-light text-slate-500 leading-relaxed max-w-md mx-auto md:mx-0">Suelta tus cargas cotidianas, respira hondo y reconéctate con el Creador en un instante.</p>
+          <p id="landing-tagline" class="text-base font-light text-slate-500 leading-relaxed max-w-md mx-auto md:mx-0">Alivio es tu <strong>espacio seguro</strong> de <strong>meditación</strong> y <strong>oración católica</strong> en formato <strong>PWA</strong>. Un <strong>refugio de paz</strong> en tu <strong>bolsillo</strong> para aliviar el estrés y reconectarte con Dios.</p>
         </header>
 
         <!-- Botón de Acción Principal a la App (Grande, llamativo y corregido del SVG) -->
@@ -512,7 +497,7 @@
           <div class="space-y-3">
             <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
               <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
-                <span>¿Cómo funciona Alivio?</span>
+                <h3 class="text-xs font-semibold text-slate-700 hover:text-indigo-600 inline">¿Cómo funciona Alivio?</h3>
                 <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
               </summary>
               <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
@@ -521,7 +506,7 @@
             </details>
             <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
               <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
-                <span>¿Es Alivio una aplicación gratuita?</span>
+                <h3 class="text-xs font-semibold text-slate-700 hover:text-indigo-600 inline">¿Es Alivio una aplicación gratuita?</h3>
                 <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
               </summary>
               <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
@@ -530,25 +515,25 @@
             </details>
             <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
               <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
-                <span>¿Es segura mi información en Alivio?</span>
+                <h3 class="text-xs font-semibold text-slate-700 hover:text-indigo-600 inline">¿Es segura mi información en Alivio?</h3>
                 <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
               </summary>
               <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
-                Sí. Alivio procesa tu desahogo de forma 100% anónima. No almacenamos datos personales identificables. No usamos cookies de seguimiento. Tu privacidad es nuestra prioridad absoluta.
+                Sí. Alivio procesa tu desahogo de forma 100% anónima. No almacenamos datos personales identificables. Tu privacidad es nuestra prioridad absoluta. Puedes consultar más detalles en nuestra <a href="/privacidad" class="text-indigo-600 underline hover:text-indigo-800 font-medium">política de privacidad</a>.
               </div>
             </details>
             <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
               <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
-                <span>¿Funciona Alivio sin conexión a internet?</span>
+                <h3 class="text-xs font-semibold text-slate-700 hover:text-indigo-600 inline">¿Funciona Alivio sin conexión a internet?</h3>
                 <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
               </summary>
               <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
-                Sí. Alivio es una PWA con tecnología de Service Worker. Una vez visitada, funciona en modo offline. Tus oraciones guardadas y el ejercicio de respiración estarán disponibles sin internet.
+                Sí. Alivio es una PWA con tecnología de Service Worker. Una vez visitada, funciona en modo offline. Tus oraciones guardadas y el ejercicio de respiración estarán disponibles sin internet. Para más detalles sobre cookies y almacenamiento local revisa nuestra <a href="/cookies" class="text-indigo-600 underline hover:text-indigo-800 font-medium">política de cookies</a>.
               </div>
             </details>
             <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
               <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
-                <span>¿Alivio es solo para católicos?</span>
+                <h3 class="text-xs font-semibold text-slate-700 hover:text-indigo-600 inline">¿Alivio es solo para católicos?</h3>
                 <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
               </summary>
               <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
@@ -557,11 +542,11 @@
             </details>
             <details class="group bg-white/30 rounded-2xl border border-white/50 overflow-hidden transition-all duration-300">
               <summary class="flex justify-between items-center p-4 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-indigo-600">
-                <span>¿Cómo instalo Alivio en mi teléfono?</span>
+                <h3 class="text-xs font-semibold text-slate-700 hover:text-indigo-600 inline">¿Cómo instalo Alivio en mi teléfono?</h3>
                 <span class="transition-transform duration-300 group-open:rotate-180 text-indigo-500 text-[10px]">▼</span>
               </summary>
               <div class="px-4 pb-4 text-2xs text-slate-600 leading-relaxed font-light">
-                En Android/Chrome: toca el menú y selecciona 'Instalar app'. En iPhone/Safari: toca el ícono de Compartir y selecciona 'Agregar a Inicio'. No requiere App Store ni Google Play.
+                En Android/Chrome: toca el menú y selecciona 'Instalar app'. En iPhone/Safari: toca el ícono de Compartir y selecciona 'Agregar a Inicio'. No requiere App Store ni Google Play. Puedes ver una guía paso a paso en nuestra <a href="#title-install" class="text-indigo-600 underline hover:text-indigo-800 font-medium">sección de instalación de PWA</a>.
               </div>
             </details>
           </div>
@@ -574,11 +559,11 @@
             Desarrollado para proveer confort espiritual anónimo de forma privada.
           </p>
           <div class="flex justify-center md:justify-start gap-4 text-3xs uppercase tracking-wider text-slate-500 font-medium">
-            <a href="/privacidad.html" class="hover:text-indigo-600 transition-colors">Privacidad</a>
+            <a href="/privacidad" class="hover:text-indigo-600 transition-colors">Privacidad</a>
             <span>•</span>
-            <a href="/cookies.html" class="hover:text-indigo-600 transition-colors">Cookies</a>
+            <a href="/cookies" class="hover:text-indigo-600 transition-colors">Cookies</a>
             <span>•</span>
-            <a href="/aviso-legal.html" class="hover:text-indigo-600 transition-colors">Aviso Legal</a>
+            <a href="/aviso-legal" class="hover:text-indigo-600 transition-colors">Aviso Legal</a>
           </div>
         </footer>
       </div>
@@ -595,7 +580,7 @@
             <!-- Izquierda: Logo + Nombre -->
             <div onclick="changeScreen('screen-landing')" class="flex items-center gap-2 cursor-pointer group shrink-0">
               <img src="/icon-192.png" alt="Alivio Logo" class="w-[38px] h-[38px] rounded-full shadow-sm border border-white/20 group-hover:scale-105 transition-transform">
-              <h1 class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">alivio</h1>
+              <span class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">alivio</span>
             </div>
 
             <!-- Centro: Selector de idioma y favoritos integrados en la cabecera -->
