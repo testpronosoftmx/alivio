@@ -1,6 +1,33 @@
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /llm.txt
+
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Allow: /llm.txt
+
+User-agent: Google-Extended
+Allow: /
+Allow: /llms.txt
+Allow: /llm.txt
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Allow: /llm.txt
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Allow: /llm.txt
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /llms.txt
 Allow: /llm.txt
 
 Sitemap: https://alivio.pronosoftmx.com/sitemap.xml
+Link: https://alivio.pronosoftmx.com/llms.txt
 Link: https://alivio.pronosoftmx.com/llm.txt
