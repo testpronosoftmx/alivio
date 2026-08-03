@@ -165,6 +165,8 @@ const TRANSLATIONS = {
     headerDonate: "Apoyar",
     donateModalTitle: "Apoyar a Alivio",
     btnStripeModal: "Apoyar con Donación",
+    googlePlaySub: "Disponible en",
+    googlePlayTitle: "Google Play",
     defaultVerseText: '"El Señor es mi pastor, nada me falta. En verdes praderas me hace recostar..."',
     defaultComfort: "Te escucho. Es completamente normal sentir que el espacio se reduce cuando las tareas se acumulan en la mente. No tienes que resolver el día entero en este segundo.",
     defaultPrayer: "Señor, te entrego esta prisa y este cansancio. Concédeme la calma de saber que Tú caminas a mi lado y sostienes mi día. Amén.",
@@ -255,6 +257,8 @@ const TRANSLATIONS = {
     headerDonate: "Support",
     donateModalTitle: "Support Alivio",
     btnStripeModal: "Support with Donation",
+    googlePlaySub: "Get it on",
+    googlePlayTitle: "Google Play",
     defaultVerseText: '"The Lord is my shepherd, I lack nothing. He makes me lie down in green pastures..."',
     defaultComfort: "I hear you. It is completely normal to feel that space shrinks when tasks accumulate in the mind. You do not have to solve the whole day in this second.",
     defaultPrayer: "Lord, I hand over this rush and this weariness to You. Grant me the calm of knowing that You walk by my side and sustain my day. Amen.",
@@ -927,6 +931,12 @@ function applyTranslations() {
   const stripeBtnTextModal = document.getElementById('stripe-btn-text-modal');
   if (stripeBtnTextModal) stripeBtnTextModal.innerText = dict.btnStripeModal;
 
+  const googlePlaySub = document.getElementById('google-play-sub');
+  if (googlePlaySub) googlePlaySub.innerText = dict.googlePlaySub;
+
+  const googlePlayTitle = document.getElementById('google-play-title');
+  if (googlePlayTitle) googlePlayTitle.innerText = dict.googlePlayTitle;
+
   // Si no se ha realizado un desahogo aún, traducir los textos por defecto del ancla
   const anclaVerseText = document.getElementById('ancla-verse-text');
   const anclaComfort = document.getElementById('ancla-comfort');
@@ -1585,6 +1595,12 @@ window.addEventListener('DOMContentLoaded', () => {
     ventInput.addEventListener('input', () => {
       charCounter.innerText = `${ventInput.value.length} / 300`;
     });
+  }
+
+  // Si estamos en la App Nativa (Capacitor Android/iOS), ocultar botón de descarga de Google Play
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    const gpBtn = document.getElementById('google-play-btn-container');
+    if (gpBtn) gpBtn.classList.add('hidden');
   }
 
   // Si ya ha visitado la app antes, saltar landing page por comodidad del usuario
