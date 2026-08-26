@@ -1,0 +1,1219 @@
+<title>Auditoría de Alivio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --ground:      #FBFAFB;
+    --paper:       #FFFFFF;
+    --ink:         #1C1A22;
+    --ink-soft:    #4A4553;
+    --muted:       #736D80;
+    --rule:        #E4E1E8;
+    --rule-soft:   #EFEDF2;
+    --violet:      #5B3E96;
+    --violet-wash: #F2EEF9;
+    --rubric:      #B3261E;
+    --rubric-wash: #FBEEEC;
+    --green:       #4A6B4F;
+    --green-wash:  #EDF3EE;
+    --gold:        #8A6A1F;
+    --gold-wash:   #F8F2E2;
+
+    --serif: "EB Garamond", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --sans:  "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono:  "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #16151A;
+      --paper:       #1D1B23;
+      --ink:         #EDEAF2;
+      --ink-soft:    #C6C1D1;
+      --muted:       #918B9E;
+      --rule:        #302D3A;
+      --rule-soft:   #26232E;
+      --violet:      #B39BE6;
+      --violet-wash: #241F32;
+      --rubric:      #E58279;
+      --rubric-wash: #2E1E1E;
+      --green:       #8FB596;
+      --green-wash:  #1C2620;
+      --gold:        #D3B064;
+      --gold-wash:   #2A2318;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #16151A;
+    --paper:       #1D1B23;
+    --ink:         #EDEAF2;
+    --ink-soft:    #C6C1D1;
+    --muted:       #918B9E;
+    --rule:        #302D3A;
+    --rule-soft:   #26232E;
+    --violet:      #B39BE6;
+    --violet-wash: #241F32;
+    --rubric:      #E58279;
+    --rubric-wash: #2E1E1E;
+    --green:       #8FB596;
+    --green-wash:  #1C2620;
+    --gold:        #D3B064;
+    --gold-wash:   #2A2318;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0 20px 96px;
+  }
+
+  .wrap { max-width: 940px; margin: 0 auto; }
+
+  /* ── Cabecera ─────────────────────────────────────── */
+  header.top {
+    padding: 72px 0 40px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--rubric);
+    margin: 0 0 20px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(2.6rem, 6.5vw, 4.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0 0 20px;
+  }
+  .standfirst {
+    font-family: var(--serif);
+    font-size: clamp(1.12rem, 2.3vw, 1.35rem);
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 34em;
+    margin: 0;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin-top: 32px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .meta b { color: var(--ink-soft); font-weight: 500; }
+
+  /* ── Tablero de veredicto ─────────────────────────── */
+  .verdict {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 48px 0 0;
+  }
+  .vcell { background: var(--paper); padding: 22px 20px 20px; }
+  .vcell .n {
+    font-family: var(--serif);
+    font-size: 2.5rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .vcell .k {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .vcell .d { font-size: 13px; line-height: 1.45; color: var(--ink-soft); }
+  .n.crit { color: var(--rubric); }
+  .n.warn { color: var(--gold); }
+  .n.ok   { color: var(--green); }
+  .n.vio  { color: var(--violet); }
+
+  /* ── Secciones ────────────────────────────────────── */
+  section { padding-top: 76px; }
+  .sechead { border-top: 1px solid var(--ink); padding-top: 14px; margin-bottom: 34px; }
+  .sechead .num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--rubric);
+    display: block;
+    margin-bottom: 2px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .sechead p {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+    max-width: 44em;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.005em;
+    margin: 40px 0 12px;
+    color: var(--ink);
+  }
+  h3:first-child { margin-top: 0; }
+  p { margin: 0 0 16px; max-width: 66ch; }
+  .lede { font-family: var(--serif); font-size: 1.16rem; line-height: 1.6; color: var(--ink-soft); }
+  a { color: var(--violet); text-decoration-thickness: 1px; text-underline-offset: 2.5px; }
+  a:hover { color: var(--rubric); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.855em;
+    background: var(--rule-soft);
+    padding: 1.5px 5px;
+    border-radius: 2px;
+    color: var(--ink-soft);
+    word-break: break-word;
+  }
+  strong { font-weight: 600; color: var(--ink); }
+  em { font-style: italic; }
+  ul, ol { margin: 0 0 16px; padding-left: 20px; max-width: 66ch; }
+  li { margin-bottom: 7px; }
+  li::marker { color: var(--muted); }
+
+  /* ── Hallazgos ────────────────────────────────────── */
+  .finding {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 0 32px;
+    padding: 26px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .finding:last-child { border-bottom: 1px solid var(--rule); }
+  .sev {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-top: 4px;
+    text-align: right;
+  }
+  .sev .tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .sev-crit .tag { background: var(--rubric-wash); color: var(--rubric); }
+  .sev-alto .tag { background: var(--gold-wash);   color: var(--gold); }
+  .sev-med  .tag { background: var(--violet-wash); color: var(--violet); }
+  .sev-bajo .tag { background: var(--rule-soft);   color: var(--muted); }
+  .finding h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 15.5px;
+    margin: 0 0 8px;
+    line-height: 1.4;
+  }
+  .finding p { font-size: 14.5px; color: var(--ink-soft); margin-bottom: 0; }
+  .finding p + p { margin-top: 10px; }
+  .where {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    display: block;
+    margin-top: 10px;
+  }
+  .fix {
+    display: block;
+    margin-top: 10px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--green);
+    padding-left: 12px;
+  }
+  .fix b {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+  @media (max-width: 720px) {
+    .finding { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .sev { text-align: left; padding: 0 0 10px; }
+  }
+
+  /* ── Fichas de funcionalidad ──────────────────────── */
+  .feature { border: 1px solid var(--rule); background: var(--paper); margin-bottom: 28px; }
+  .feature > .fhead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px 20px;
+    padding: 20px 26px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .feature h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 1.5rem; }
+  .stamp {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .stamp-go     { color: var(--green); }
+  .stamp-care   { color: var(--gold); }
+  .stamp-hold   { color: var(--rubric); }
+  .fbody { padding: 24px 26px 26px; }
+  .fbody > *:last-child { margin-bottom: 0; }
+  .specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 18px 26px;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--rule-soft);
+  }
+  .spec .k {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 3px;
+  }
+  .spec .v { font-size: 13.5px; font-weight: 500; line-height: 1.4; }
+
+  /* ── Tabla ────────────────────────────────────────── */
+  .tablewrap { overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--rule); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; background: var(--paper); }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    background: var(--rule-soft);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { background: none; padding: 0; color: var(--violet); }
+  .num-col { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ── Ruta ─────────────────────────────────────────── */
+  .phase {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 0 32px;
+    padding: 24px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .phase:last-of-type { border-bottom: 1px solid var(--rule); }
+  .phase .when {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: right;
+    padding-top: 4px;
+    color: var(--muted);
+  }
+  .phase .when b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 1.7rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--violet);
+    line-height: 1;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .phase h3 { margin: 0 0 8px; font-size: 16px; }
+  .phase p { font-size: 14.5px; color: var(--ink-soft); margin-bottom: 0; }
+  .phase ul { font-size: 14px; color: var(--ink-soft); margin: 10px 0 0; }
+  @media (max-width: 720px) {
+    .phase { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .phase .when { text-align: left; padding: 0 0 10px; }
+    .phase .when b { display: inline-block; margin-right: 10px; margin-bottom: 0; vertical-align: -2px; }
+  }
+
+  /* ── Nota al margen ───────────────────────────────── */
+  .aside {
+    border-left: 3px solid var(--rubric);
+    background: var(--rubric-wash);
+    padding: 18px 22px;
+    margin: 28px 0;
+    max-width: 66ch;
+  }
+  .aside p { margin-bottom: 10px; font-size: 14.5px; }
+  .aside p:last-child { margin-bottom: 0; }
+  .aside .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--rubric);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .aside-vio { border-left-color: var(--violet); background: var(--violet-wash); }
+  .aside-vio .label { color: var(--violet); }
+  .aside-green { border-left-color: var(--green); background: var(--green-wash); }
+  .aside-green .label { color: var(--green); }
+
+  /* ── Preguntas ────────────────────────────────────── */
+  .qs { counter-reset: q; }
+  .q {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 0 20px;
+    padding: 20px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .q:last-child { border-bottom: 1px solid var(--rule); }
+  .q::before {
+    counter-increment: q;
+    content: counter(q);
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    color: var(--rubric);
+    line-height: 1;
+    padding-top: 2px;
+  }
+  .q h4 { font-family: var(--sans); font-weight: 600; font-size: 15px; margin: 0 0 6px; }
+  .q p { font-size: 14px; color: var(--ink-soft); margin: 0; }
+  .q .rec { color: var(--green); font-weight: 500; }
+
+  footer.end {
+    margin-top: 76px;
+    padding-top: 22px;
+    border-top: 2px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    justify-content: space-between;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Revisión completa · PWA + Android · rev. 6</p>
+    <h1>Auditoría de Alivio</h1>
+    <p class="standfirst">Qué está sólido, qué está sangrando ahora mismo en producción, y qué costaría de verdad cada una de las tres funcionalidades que quieres añadir. Dos entran, sin bifurcarse por denominación. Una no entra.</p>
+    <div class="meta">
+      <span><b>25 agosto 2026</b></span>
+      <span>rama <b>master</b> · <b>7a9fbb7</b></span>
+      <span><b>2 797</b> líneas de front + <b>3</b> funciones serverless</span>
+    </div>
+  </header>
+
+  <div class="verdict">
+    <div class="vcell">
+      <span class="n ok">0</span>
+      <span class="k">Críticos abiertos</span>
+      <span class="d">Los dos se cerraron en la fase 0. Falta desplegarlos.</span>
+    </div>
+    <div class="vcell">
+      <span class="n warn">5</span>
+      <span class="k">Commits sin llegar a Android</span>
+      <span class="d">El APK de Play Store está congelado en el 11 de julio. La web va cinco commits adelante.</span>
+    </div>
+    <div class="vcell">
+      <span class="n ok">1</span>
+      <span class="k">Función entregada</span>
+      <span class="d">Oraciones comunes, con Rosario guiado. Falta el Evangelio del Día.</span>
+    </div>
+    <div class="vcell">
+      <span class="n vio">1</span>
+      <span class="k">Descartada</span>
+      <span class="d">El muro de peticiones. Contradice la promesa de la app; hay alternativa mejor.</span>
+    </div>
+  </div>
+
+  <!-- ══════════════ i ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">i</span>
+      <h2>Lo que hay hoy</h2>
+      <p>Una PWA vanilla servida por Vercel, envuelta en Capacitor para Android, con Supabase usado sólo para recordatorios push.</p>
+    </div>
+
+    <p class="lede">La arquitectura es deliberadamente simple y eso ha sido una ventaja: sin build step, sin bundler, sin dependencias de front. Lo que escribes en <code>public/</code> es exactamente lo que se sirve. Ese acierto tiene su factura, y la vas a pagar justo ahora que quieres añadir módulos nuevos.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Pieza</th><th>Qué hace</th><th class="num-col">Tamaño</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>public/index.html</code></td><td>Todo el markup, CSS inline, JSON-LD, Tailwind por CDN</td><td class="num-col">990 líneas</td></tr>
+          <tr><td><code>public/app.js</code></td><td>Toda la lógica en scope global, sin módulos</td><td class="num-col">1 679 líneas</td></tr>
+          <tr><td><code>public/sw.js</code></td><td>Service Worker, network-first con fallback a cache</td><td class="num-col">128 líneas</td></tr>
+          <tr><td><code>api/comfort.ts</code></td><td>Claude Sonnet → consuelo JSON + URL de imagen Pollinations</td><td class="num-col">—</td></tr>
+          <tr><td><code>api/subscribe.ts</code></td><td>Alta y baja de recordatorios (VAPID web + FCM nativo)</td><td class="num-col">—</td></tr>
+          <tr><td><code>api/cron-push.ts</code></td><td>Envío programado de notificaciones</td><td class="num-col">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>El techo que ya tocaste</h3>
+    <p>La navegación es un array literal dentro de <code>changeScreen()</code> con cuatro pantallas: <code>landing</code>, <code>desahogo</code>, <code>suspiro</code>, <code>ancla</code>. Es un flujo lineal de un solo camino. Las funcionalidades que pides no son pasos de ese flujo — son <strong>destinos paralelos</strong>, y no hay dónde ponerlos: no existe un menú, ni una barra inferior, ni un home.</p>
+    <p>Añadir pantallas a un archivo de 1 679 líneas en scope global, con un array editado a mano y una <code>applyTranslations()</code> de 150 líneas de <code>getElementById</code> encadenados, es exactamente el punto donde este código deja de ser mantenible. No propongo reescribirlo — propongo <strong>media jornada de estructura antes de la primera función</strong>: un hub de inicio con navegación y un registro de pantallas en vez del array literal.</p>
+
+    <div class="aside aside-green">
+      <span class="label">Resuelto · se reescribe el documento</span>
+      <p><code>docs/ethical_ai.md</code> declaraba <em>«NO Generación de Imágenes Sagradas: absoluta prohibición»</em> y <em>«NO Oraciones Generadas por IA»</em>, mientras la app hace exactamente las dos cosas. Era un borrador heredado de «Ecclesia OS», otro producto.</p>
+      <p><strong>Decisión: se redacta la política real de Alivio</strong> — uso ético y asistido de IA para consuelo espiritual y arte sacro atmosférico, con prompts no narrativos, etiquetado visible de IA, primacía de los textos sagrados canónicos y salvaguarda de crisis humana. Los cinco principios quedan abajo, en §vii.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ ii ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">ii</span>
+      <h2>Cómo llega cada cambio a cada plataforma</h2>
+      <p>Esto condiciona todo el orden de trabajo, así que va antes que los hallazgos.</p>
+    </div>
+
+    <p><code>capacitor.config.ts</code> <strong>no</strong> define <code>server.url</code> — sólo <code>androidScheme: 'https'</code>, y su propio comentario lo dice: <em>«cargar la app desde los assets locales (sin servidor externo)»</em>. Capacitor copió <code>public/</code> dentro del APK y ahí quedó congelado, en <code>android/app/src/main/assets/public/</code>.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Cambio</th><th>¿Llega a un Android ya instalado?</th><th>Qué hace falta</th></tr></thead>
+        <tbody>
+          <tr><td><code>api/*.ts</code></td><td><strong>Sí, al instante</strong></td><td>Deploy a Vercel y ya</td></tr>
+          <tr><td><code>public/*</code></td><td><strong>No</strong></td><td><code>cap sync</code> + rebuild + versionCode + Play Store</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Lo confirmé en el bundle que corre hoy en producción: <code>API_BASE</code> apunta a <code>https://alivio.pronosoftmx.com</code>, así que la app nativa consume tus endpoints en vivo aunque su front esté viejo.</p>
+
+    <div class="aside">
+      <span class="label">Tu app de Play Store ya está desactualizada</span>
+      <p>El bundle empaquetado es del <strong>11 de julio</strong>. Desde entonces hay <strong>cinco commits</strong> que sólo ven los usuarios de web: SEO/AEO avanzado, JSON-LD de WebApplication, compartir nativo, los archivos <code>llms.txt</code> y el badge de Google Play. <code>app.js</code> va 1 327 bytes atrás; <code>index.html</code>, 6 288.</p>
+    </div>
+
+    <h3>Consecuencia práctica</h3>
+    <p>Los dos hallazgos <strong>críticos</strong> son de <code>api/</code>: se arreglan con un deploy y protegen a todos —web y Android— de inmediato. Los demás arreglos y las dos funcionalidades nuevas son de <code>public/</code>, así que sólo llegan publicando en Play Store.</p>
+    <p><strong>No hagas una release de Android por funcionalidad.</strong> Construye todo en web, donde iteras sin fricción, y haz <strong>una sola release</strong> que se ponga al día con los cinco commits pendientes más los arreglos más los módulos nuevos.</p>
+    <p>Un detalle que se agrava en Android: Tailwind y Google Fonts vienen de CDN externo. Los assets son locales pero los estilos no, así que <strong>la app instalada necesita internet en el primer arranque para verse bien</strong>. En web es molesto; en una app nativa es desconcertante.</p>
+
+    <h3>Las alternativas, con su costo real</h3>
+    <ul>
+      <li><strong>Poner <code>server.url</code></strong> apuntando a tu dominio → actualizaciones instantáneas para siempre. Pero pierdes el offline, arrancas más lento, y Google Play escruta las apps que son un WebView remoto bajo su política de funcionalidad mínima. <strong>No lo recomiendo.</strong></li>
+      <li><strong>Capacitor Live Updates (Appflow)</strong> → OTA de bundles web sin pasar por la store. Es la solución real al problema, pero es de pago.</li>
+      <li><strong>Quedarte como estás y agrupar releases.</strong> Es lo que recomiendo hoy.</li>
+    </ul>
+  </section>
+
+  <!-- ══════════════ iii ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">iii</span>
+      <h2>Hallazgos</h2>
+      <p>Ordenados por severidad. Los dos primeros están abiertos en producción en este momento.</p>
+    </div>
+
+    <div class="finding sev-crit">
+      <div class="sev"><span class="tag">Crítico</span></div>
+      <div>
+        <h4><code>/api/cron-push</code> no tiene ninguna autenticación</h4>
+        <p>Es un endpoint público sin secreto, sin cabecera, sin verificación. Cualquiera que descubra la URL puede dispararlo y mandar una notificación push a <strong>todos</strong> tus suscriptores. Y como el filtro compara sólo la hora (<code>userLocalHour === alertHour</code>), quien lo llame en bucle dentro de esa hora reenvía a la misma gente una y otra vez. Para una app cuya promesa es «un susurro de paz», ser el vector de un bombardeo de notificaciones es un daño de marca difícil de deshacer, y desinstalaciones garantizadas.</p>
+        <span class="where">api/cron-push.ts:53 — el handler entra directo al try sin validar nada</span>
+        <span class="fix"><b>Arreglo</b>Validar <code>Authorization: Bearer</code> contra <code>CRON_SECRET</code> y responder 401 si no coincide. Añadir columna <code>last_sent_at</code> y saltar suscripciones ya notificadas hoy, para que una doble ejecución no duplique el envío. Media hora. <strong>Llega a Android sin release.</strong></span>
+      </div>
+    </div>
+
+    <div class="finding sev-alto">
+      <div class="sev"><span class="tag">Ojo</span></div>
+      <div>
+        <h4>La cadencia horaria del cron no existe en el plan Hobby de Vercel</h4>
+        <p>Hoy no hay bloque <code>crons</code> en <code>vercel.json</code>: algo externo dispara el endpoint. Al migrarlo a cron nativo, la documentación de Vercel es tajante — <em>«Hobby users… cron jobs can only run once per day. <strong>Expressions that run more frequently will fail deployment.</strong>»</em></p>
+        <p>Y la lógica necesita cadencia horaria: el usuario elige cualquier hora y el filtro compara <code>userLocalHour === alertHour</code>. Con un cron diario solo se dispararía una hora al día. <strong>Comprueba el plan antes de tocar nada</strong> — Settings → Cron Jobs en el dashboard. El <code>orgId: team_…</code> del proyecto ya no distingue plan; las cuentas personales también lo traen.</p>
+        <span class="where">vercel.json — sin bloque crons · .vercel/project.json — orgId team_ROdJ1bHZ…</span>
+        <span class="fix"><b>Según el plan</b><strong>Pro:</strong> bloque <code>crons</code> nativo con <code>"schedule": "0 * * * *"</code>; Vercel inyecta el header solo. <strong>Hobby:</strong> NO agregues el bloque —rompe el deploy—; cron-job.org sigue siendo el disparador y le pones el <code>Authorization: Bearer</code> a mano. El endpoint valida igual venga de donde venga. El cron de lecturas es diario, así que ese sí corre nativo en Hobby.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-med">
+      <div class="sev"><span class="tag">Medio</span></div>
+      <div>
+        <h4>Tres reglas de Vercel Cron que condicionan el diseño</h4>
+        <p><strong>1. Las invocaciones se duplican.</strong> <em>«Cron delivery can occasionally invoke the same scheduled run more than once… Design your operations to be idempotent.»</em> La propia documentación usa este caso como ejemplo de lo que está mal: <em>«Bad: Increment user credit by 10 (running twice doubles the credit)»</em>. Mandar un push dos veces es esa misma forma. <strong><code>last_sent_at</code> no es opcional</strong> — y si dejas dos disparadores activos, el duplicado pasa de probable a seguro.</p>
+        <p><strong>2. No hay reintentos.</strong> <em>«Vercel will not retry an invocation if a cron job fails.»</em> Refuerza el fallback perezoso de las lecturas: el cron es optimización, no garantía.</p>
+        <p><strong>3. Los crons no siguen redirects.</strong> Con <code>cleanUrls: true</code> activo, si la ruta no coincide exacto el 3xx cuenta como invocación completada y no aparece en logs. Usa <code>/api/cron-push</code> literal y verifica el 200 en Settings → Cron Jobs → View Logs.</p>
+        <p>Además, <code>vercel dev</code> no soporta crons: para probar en local hay que pegarle al endpoint con <code>curl</code> mandando el header a mano.</p>
+      </div>
+    </div>
+
+    <div class="finding sev-crit">
+      <div class="sev"><span class="tag">Crítico</span></div>
+      <div>
+        <h4><code>/api/comfort</code> no tiene límite de peticiones ni tope de entrada</h4>
+        <p>Endpoint público con CORS <code>*</code> que en cada llamada gasta una petición a Claude Sonnet con <code>max_tokens: 1024</code>. No hay rate limiting, ni por IP ni por dispositivo. El <code>maxlength="300"</code> del textarea es cosmético: el servidor acepta el <code>text</code> que le manden, del largo que sea. Un script trivial en bucle te vacía la cuenta de Anthropic en una tarde, y no te enteras hasta la factura.</p>
+        <p>Añadido: el texto del usuario se interpola directo en el prompt sin ninguna barrera, y el <code>imagePrompt</code> que devuelve el modelo se mete <strong>sin validar</strong> en una URL pública de Pollinations. En una app devocional, una imagen inapropiada generada por un prompt manipulado es un incidente serio.</p>
+        <span class="where">api/comfort.ts:28 — <code>const { text, lang, denomination } = req.body</code> sin validación de longitud</span>
+        <span class="fix"><b>Arreglo</b>Tope duro de 500 caracteres en servidor. Rate limit por IP (Vercel KV o incluso un Map en memoria como primer paso). Lista de bloqueo sobre el <code>imagePrompt</code> antes de construir la URL. Media jornada. <strong>Llega a Android sin release.</strong></span>
+      </div>
+    </div>
+
+    <div class="finding sev-alto">
+      <div class="sev"><span class="tag">Alto</span></div>
+      <div>
+        <h4>En Android nativo no se puede desactivar el recordatorio</h4>
+        <p><code>activatePush()</code> ramifica correctamente entre FCM nativo y VAPID web. <code>cancelPush()</code> y <code>checkActiveSubscription()</code> no lo hacen: llaman <code>navigator.serviceWorker.ready</code> y <code>pushManager.getSubscription()</code> sin condicionar. En la app nativa no existe suscripción push del navegador, así que la función entra por la rama de error y el usuario se queda con el recordatorio activo para siempre. El token FCM se guarda en <code>alivio_fcm_token</code> pero nunca se usa para dar de baja.</p>
+        <span class="where">public/app.js:1454 (cancelPush) y public/app.js:1511 (checkActiveSubscription)</span>
+        <span class="fix"><b>Arreglo</b>Misma ramificación <code>window.Capacitor.isNativePlatform()</code> que ya usa <code>activatePush()</code>, mandando el <code>fcmToken</code> guardado al <code>DELETE</code>. El backend ya lo soporta. Una hora — pero es un bug exclusivo de Android que <strong>sólo se arregla publicando en Play Store</strong>.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-alto">
+      <div class="sev"><span class="tag">Alto</span></div>
+      <div>
+        <h4>~50 MB de material de marketing viajan dentro del APK</h4>
+        <p><code>capacitor.config.ts</code> declara <code>webDir: 'public'</code>, lo que significa que <strong>todo</strong> lo que hay en <code>public/</code> se empaqueta en la app de Android. Ahí viven <code>Publicidad FB.png</code> (8,7 MB), <code>Publicidad Google Pplay.png</code> (9,4 MB), <code>Publicidad YT.png</code> (9,2 MB), dos vídeos MP4 de 13,7 y 8,4 MB, y ocho capturas de las que la app sólo usa cuatro. Nada de eso lo consume la aplicación.</p>
+        <p>Es a la vez el peso de descarga en Google Play, el espacio ocupado en el teléfono del usuario, y el tamaño del deploy en Vercel. También son públicamente accesibles desde tu dominio.</p>
+        <span class="where">public/ — contrastado contra los assets que app.js referencia realmente</span>
+        <span class="fix"><b>Arreglo</b>Mover marketing a una carpeta <code>marketing/</code> fuera del <code>webDir</code>. Comprimir las cuatro capturas que sí se usan. Es la mejora más grande por menos esfuerzo de toda la lista: una hora, y el APK adelgaza en un orden de magnitud.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-alto">
+      <div class="sev"><span class="tag">Alto</span></div>
+      <div>
+        <h4>Los errores del servidor devuelven el stack trace al cliente</h4>
+        <p>La respuesta 500 de <code>/api/comfort</code> incluye <code>details</code> y <code>stack</code> completos. Eso expone rutas internas, versiones de dependencias y forma del código a cualquiera que provoque un error — que es fácil, porque basta con mandar un cuerpo malformado.</p>
+        <span class="where">api/comfort.ts:131</span>
+        <span class="fix"><b>Arreglo</b>Registrar el detalle en el log del servidor, devolver un mensaje genérico. Cinco minutos.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-med">
+      <div class="sev"><span class="tag">Medio</span></div>
+      <div>
+        <h4><code>database_schema.sql</code> no corresponde con el código</h4>
+        <p>El esquema no crea la columna <code>fcm_token</code>, pero <code>subscribe.ts</code> y <code>cron-push.ts</code> leen y escriben en ella. Quien reconstruya la base desde ese archivo obtiene un despliegue roto en Android. Además concede <code>INSERT, SELECT, UPDATE</code> al rol <code>anon</code> sobre la tabla de suscripciones cuando la API sólo usa el service role: <code>anon</code> no debería tener ningún permiso ahí.</p>
+        <span class="where">database_schema.sql:9-26</span>
+        <span class="fix"><b>Arreglo</b>Regenerar el esquema desde el estado real y retirar los grants de <code>anon</code>. Se vuelve necesario de todas formas al añadir la tabla de lecturas diarias.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-med">
+      <div class="sev"><span class="tag">Medio</span></div>
+      <div>
+        <h4>Favoritos se pintan con <code>innerHTML</code> sin escapar</h4>
+        <p><code>renderFavoritesList()</code> interpola <code>fav.prayer</code> y <code>fav.verse</code> directamente en HTML. Ese contenido viene de la API, que a su vez refleja lo que el usuario escribió a través del modelo. El alcance está acotado a <code>localStorage</code> del propio dispositivo, así que la severidad real es baja — pero es un patrón que no debe repetirse cuando empieces a pintar texto litúrgico traído de fuentes externas.</p>
+        <span class="where">public/app.js:645-670</span>
+        <span class="fix"><b>Arreglo</b>Construir los nodos con <code>textContent</code>. Quince minutos, y establece el patrón correcto antes de que llegue contenido de terceros.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-med">
+      <div class="sev"><span class="tag">Medio</span></div>
+      <div>
+        <h4>Tailwind por CDN en producción</h4>
+        <p><code>cdn.tailwindcss.com</code> es una herramienta de desarrollo; su propia documentación desaconseja usarla en producción. Son ~400 KB de JavaScript que compilan CSS en el navegador, bloqueando el render, en cada carga. Contradice frontalmente el trabajo de Core Web Vitals que se ve en tus últimos cinco commits.</p>
+        <p>Consecuencia adicional: ni Tailwind ni Google Fonts están en <code>ASSETS_TO_CACHE</code>, así que un arranque en frío sin conexión renderiza la app <strong>sin estilos</strong> — y en la app nativa, donde todo lo demás es local, eso se nota todavía más.</p>
+        <span class="where">public/index.html:55 y public/sw.js:2-14</span>
+        <span class="fix"><b>Arreglo</b>Generar el CSS una vez con la CLI de Tailwind y servirlo como archivo estático cacheado. Sigue sin haber build step en el flujo diario: es un comando que corres cuando cambias clases.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-med">
+      <div class="sev"><span class="tag">Medio</span></div>
+      <div>
+        <h4>El desfase horario se congela en el momento de suscribirse</h4>
+        <p>Se guarda <code>timezone_offset</code> en minutos, una sola vez. Cuando entra o sale el horario de verano, el recordatorio de todos los usuarios afectados se desplaza una hora en silencio. Nadie reporta esto: simplemente empieza a llegar a deshora y la gente lo desactiva.</p>
+        <span class="where">api/subscribe.ts:87 y api/cron-push.ts:75</span>
+        <span class="fix"><b>Arreglo</b>Guardar la zona IANA (<code>Intl.DateTimeFormat().resolvedOptions().timeZone</code>, p. ej. <code>America/Mexico_City</code>) y calcular la hora local en el envío.</span>
+      </div>
+    </div>
+
+    <div class="finding sev-bajo">
+      <div class="sev"><span class="tag">Bajo</span></div>
+      <div>
+        <h4>Detalles menores acumulados</h4>
+        <p><strong>La racha usa fecha UTC.</strong> <code>updateStreak()</code> hace <code>toISOString().slice(0,10)</code>; para usuarios al oeste de UTC, entrar de noche cuenta como el día siguiente y la racha se rompe o se duplica.</p>
+        <p><strong>Dos cadenas en inglés dentro de la rama en español.</strong> <code>app.js:1416</code> muestra «Saving alert...» a usuarios hispanohablantes. Y <code>nextStepReflect</code> dice «Guardar oracíón» — acento mal colocado, visible en el botón.</p>
+        <p><strong><code>llm.txt</code> y <code>llms.txt</code> son idénticos.</strong> El nombre de la especificación es <code>llms.txt</code>; el otro es peso muerto que además duplica señal para los crawlers.</p>
+        <p><strong>Lo que sí está bien resuelto:</strong> la clave de servicio de Firebase nunca se ha commiteado (verificado contra todo el historial), el <code>.gitignore</code> es correcto, el Service Worker ya evita cachear respuestas 206 y <code>/api/</code>, y la detección de PWA instalada en cuatro capas está bien pensada.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ iv ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">iv</span>
+      <h2>Las funcionalidades</h2>
+      <p>Dos entran. La tercera no, y la razón no es técnica.</p>
+    </div>
+
+    <div class="feature">
+      <div class="fhead">
+        <h3>Oraciones comunes</h3>
+        <span class="stamp stamp-go">Empieza por aquí</span>
+      </div>
+      <div class="specs">
+        <div class="spec"><span class="k">Esfuerzo</span><span class="v">1 día</span></div>
+        <div class="spec"><span class="k">Costo mensual</span><span class="v">$0 · cero llamadas</span></div>
+        <div class="spec"><span class="k">Dependencias</span><span class="v">Ninguna</span></div>
+        <div class="spec"><span class="k">Riesgo</span><span class="v">Prácticamente nulo</span></div>
+      </div>
+      <div class="fbody">
+        <p class="lede">De las tres, la de mejor relación valor/riesgo con diferencia, y la que menos atención le habías dedicado. Sin API, sin base de datos, sin moderación, sin costo recurrente, sin nada que se pueda caer. Es un JSON estático que viaja con la app y funciona offline desde el primer segundo.</p>
+
+        <p><strong>Regla innegociable: estos textos se escriben a mano, nunca se generan.</strong> El Padre Nuestro tiene una forma fija. Si el modelo alucina una palabra, el usuario <em>no puede detectarlo</em> —está rezando, no revisando— y es un error doctrinal, no un bug cosmético. Texto fijo, revisado, y ya. Son de dominio público, así que aquí no hay problema de derechos.</p>
+
+        <h3>Conjunto sugerido, por denominación</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Modo</th><th>Oraciones</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Católico</strong></td><td>Señal de la Cruz · Padre Nuestro · Ave María · Gloria · Credo Apostólico · Credo Niceno · Salve · Acto de Contrición · Ángel de la Guarda · Oración a San Miguel · Ven Espíritu Santo · Magníficat · Ángelus · Misterios del Rosario por día · Bendición de la mesa</td></tr>
+              <tr><td><strong>Evangélico</strong></td><td>Padre Nuestro · Salmo 23 · Salmo 91 · Oración de fe · Oración por sabiduría · Bendición aarónica · Oración de gratitud</td></tr>
+              <tr><td><strong>Espiritual</strong></td><td>Meditación de autocompasión · Intención de paz · Oración de la serenidad · Práctica de gratitud</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Detalles que la vuelven buena en vez de correcta</h3>
+        <ul>
+          <li><strong>Modo oración:</strong> tipografía grande, contraste alto, y mantener la pantalla encendida con la Wake Lock API. Nadie quiere que se apague el teléfono a mitad del Credo.</li>
+          <li><strong>Integración con favoritos:</strong> ya tienes <code>alivio_favorites</code> funcionando. Reutilízalo, no crees un segundo sistema.</li>
+          <li><strong>Rosario guiado</strong> con los misterios correctos según el día de la semana. Es lo que más se busca y ya tienes el motor de respiración con temporizador para apoyarlo.</li>
+          <li><strong>Búsqueda</strong> en cuanto pases de unas quince oraciones.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead">
+        <h3>Evangelio del Día</h3>
+        <span class="stamp stamp-go">Adelante</span>
+      </div>
+      <div class="specs">
+        <div class="spec"><span class="k">Esfuerzo</span><span class="v">2½ días</span></div>
+        <div class="spec"><span class="k">Costo mensual</span><span class="v">$0 · cero llamadas IA</span></div>
+        <div class="spec"><span class="k">Fuentes</span><span class="v">Vatican News + Evangelizo</span></div>
+        <div class="spec"><span class="k">Riesgo</span><span class="v">Derechos del texto bíblico</span></div>
+      </div>
+      <div class="fbody">
+        <p>Probé las dos fuentes contra fechas reales. La página de Vatican News que propusiste <strong>no sirve para consumir</strong> —su HTML no trae las lecturas, se renderizan por JavaScript— <strong>pero tiene un RSS que sí</strong>: <code>vaticannews.va/es/evangelio-de-hoy.rss.xml</code>.</p>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th></th><th>Vatican News RSS</th><th>Evangelizo XML</th></tr></thead>
+            <tbody>
+              <tr><td>Traducción</td><td><strong>Leccionario mexicano</strong></td><td>Libro del Pueblo de Dios (argentino)</td></tr>
+              <tr><td>Comentario</td><td><strong>Homilía / Ángelus del Papa</strong></td><td>Comentario patrístico</td></tr>
+              <tr><td>Primera lectura</td><td>Sí</td><td>Sí — <code>reading_text1</code></td></tr>
+              <tr><td>Salmo responsorial</td><td><strong>Nunca. 0 de 15 días</strong></td><td>Sí — <code>reading_text2</code></td></tr>
+              <tr><td>Segunda lectura</td><td>Sí, domingos</td><td>Sí, domingos — <code>reading_text3</code></td></tr>
+              <tr><td>Evangelio</td><td>Sí</td><td>Sí — <code>reading_gospel</code></td></tr>
+              <tr><td>Título litúrgico y santo</td><td>No</td><td>Sí — <code>litugic_t</code>, <code>saint</code></td></tr>
+              <tr><td>Idiomas</td><td>Un feed por idioma</td><td><code>SP</code>, <code>AM</code> + ~15</td></tr>
+              <tr><td>Estructura</td><td>Un blob CDATA de <code>&lt;p&gt;</code></td><td>Campos separados</td></tr>
+              <tr><td>Rango</td><td>14 días atrás + mañana</td><td>±30 días</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>Lo que gana Vatican News:</strong> la traducción es la del leccionario mexicano — literalmente las palabras que tu gente escucha en Misa. Y de regalo, un comentario del Papa cada día: te resuelve la reflexión diaria con una fuente autorizada, sin IA, que es justo lo que tu propio documento de ética pide.</p>
+        <p><strong>Lo que pierde:</strong> no trae salmo nunca, el parseo es heurístico (entre semana no marca «Primera lectura», los domingos sí), y su feed tiene defectos de codificación propios — encontré <code>Isa?as 22, 19-23</code> y comillas convertidas en <code>?</code> en su texto original.</p>
+
+        <div class="aside aside-green">
+          <span class="label">Arquitectura recomendada: las dos</span>
+          <p><strong>Evangelizo como columna vertebral</strong> — estructura determinista, salmo, inglés, santo, título litúrgico. <strong>Vatican News encima, sólo para español</strong>, sustituyendo el texto por la versión mexicana y añadiendo el comentario papal. Si el parseo de VN falla, degradas a Evangelizo automáticamente.</p>
+          <p>Son dos fetches dentro de la misma petición perezosa. No cuesta nada y te da resiliencia: si una fuente se cae, la otra responde.</p>
+        </div>
+
+        <p><strong>Corrección a tu planteamiento inicial:</strong> entre semana <em>no hay segunda lectura</em> — sólo primera, salmo y Evangelio. La UI tiene que manejar ese caso, que es el 85 % de los días, sin mostrar una sección vacía. Lo que sí hay siempre y no mencionaste es el <strong>salmo responsorial</strong>, que encaja perfectamente con el tono de la app.</p>
+
+        <h3>La imagen: un lote anual, no un cron diario</h3>
+        <p class="lede">Pediste generar hoy todas las imágenes hasta el 31 de diciembre de 2026, y al arrancar cada año las del siguiente. <strong>Se puede, y sale mejor que el cron diario — pero no por donde estaba planteado.</strong></p>
+        <p>Probé las seis fuentes contra fechas reales hoy, 26 de agosto. <strong>Ninguna entrega el <em>texto</em> del Evangelio con meses de anticipación.</strong> El límite no es de diseño, es de las fuentes:</p>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Fuente</th><th>Alcance futuro, verificado hoy</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Evangelizo XML</strong></td><td>Límite duro de <strong>30 días</strong>. Responde textualmente <code>Error : wrong param «date» !! Must be less than 30 days from today</code> para octubre, diciembre y 2027.</td></tr>
+              <tr><td><strong>Vatican News RSS</strong></td><td>Hoy y mañana, 14 días hacia atrás. Reconfirmado: el ítem más reciente del feed es del 26 de agosto. Tu lectura del <code>.html</code> es correcta y coincide con lo que ya teníamos cerrado — se inyecta por JS y no sirve; el <code>.rss.xml</code> sí, y sigue funcionando.</td></tr>
+              <tr><td><strong>evangeli.net</strong></td><td>Devuelve 200 para <code>2026-12-25</code>, pero el HTML llega vacío: título genérico «Día» y <strong>cero referencias bíblicas</strong>. Se renderiza por JS igual que Vatican News.</td></tr>
+              <tr><td><strong>USCCB <code>/es/</code></strong></td><td><strong>403</strong> — bloquea peticiones automáticas. El <code>/en/</code> sí responde a diciembre de 2026, pero su propia página lleva el aviso de que ninguna parte puede reproducirse ni mostrarse en medio digital sin permiso escrito.</td></tr>
+              <tr><td><strong>romcal</strong> (npm)</td><td>Calendario litúrgico, <strong>sin lecturas</strong>. Sus propios keywords lo dicen: <code>calendar, seasons</code>. Te da el ciclo A/B/C y I/II, que es real y útil, pero no la cita del día.</td></tr>
+              <tr><td><strong>calapi.inadiutorium.cz</strong></td><td><strong>Cualquier fecha, sin límite.</strong> Verificado en <code>2026-12-01</code>, <code>2026-12-25</code> y <code>2027-01-05</code>. Devuelve tiempo litúrgico, semana, celebración, color y rango. Gratis y sin API key.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Tienes razón en que el ciclo es determinista y calculable — tal como lo describes, con el trienio A/B/C los domingos y el bienio I/II entre semana. Pero <strong>el ciclo no es la cita</strong>: para pasar de «martes de la 1.ª semana de Adviento» a <em>«Lc 10, 21-24»</em> hace falta la tabla del leccionario, que es un conjunto de datos, no una fórmula. Ninguna fuente gratuita y estable en español la sirve para fechas lejanas, y romcal explícitamente no la trae.</p>
+
+        <p class="lede"><strong>El giro que lo resuelve:</strong> la imagen no se siembra con el texto del Evangelio, sino con el <strong>día litúrgico</strong>.</p>
+
+        <p>Y eso no es un premio de consolación: es lo que este mismo plan ya exigía. La regla cerrada dice que la imagen es <em>atmosférica y nunca narrativa</em>, que nace del consuelo del pasaje y jamás de su escena. Si la imagen tenía prohibido representar la escena, entonces el texto del Evangelio nunca fue el insumo correcto para el prompt. Lo que sí manda el registro visual es el día: Adviento es penumbra en espera y violeta; Navidad, luz cálida en lo oscuro; Cuaresma, desierto y ceniza; Pascua, amanecer y blanco; el Tiempo Ordinario, verde y gracia cotidiana; la memoria de un mártir, rojo. Todo eso lo devuelve calapi para cualquier fecha, hoy y en 2030.</p>
+
+        <div class="aside aside-vio">
+          <span class="label">Decisión: el lote es 100 % automático, sin revisión humana</span>
+          <p>Lo pediste explícito y así queda. Pero eso mueve dónde vive la garantía: <strong>sin nadie mirando la salida, la seguridad tiene que estar en la entrada.</strong> Con revisión humana bastaba con constreñir el prompt a medias; sin ella, el prompt tiene que ser incapaz de producir algo inapropiado. Dos consecuencias de diseño, y las dos van a favor de lo que quieres:</p>
+          <p><strong>a. Claude sale del bucle de generación.</strong> Ya no pide prompts a un modelo: los arma un <strong>banco de plantillas escrito a mano</strong>. Es el mismo principio que ya rige las oraciones tradicionales — lo que debe ser fijo, se escribe, no se genera. De paso, las siete llamadas del lote bajan a <strong>cero</strong>.<br>
+          <strong>b. La validación pasa de ojo humano a puertas automáticas.</strong> Detalladas abajo.</p>
+          <p>El residuo honesto: Pollinations es un modelo de terceros y un prompt impecable puede, muy de vez en cuando, devolver algo raro. Lo cubren el interruptor por fecha y la escalera de respaldo — no una promesa de perfección.</p>
+        </div>
+
+        <div class="aside">
+          <span class="label">Lo que gana el lote anual sobre el cron diario</span>
+          <p><strong>1. El riesgo macabro desaparece por completo.</strong> «Sepulcros blanqueados» ya nunca llega a un modelo de imagen, porque el texto del pasaje deja de ser el insumo. Lo que llega es «feria, Tiempo Ordinario, verde».<br>
+          <strong>2. Cero cron diario y cero llamadas de IA.</strong> Ni las 365 anuales del cron, ni las siete por lote. El prompt se calcula, no se pide.<br>
+          <strong>3. Es determinista y reproducible.</strong> El <code>seed</code> de Pollinations se deriva de la fecha, así que relanzar el lote devuelve <em>exactamente</em> la misma imagen. El lote es una función pura de la fecha: auditable, y sin sorpresas al repetirlo.<br>
+          <strong>4. Se corrige una fecha sin tocar nada más.</strong> Marcas esa fila y la escalera de respaldo la cubre al instante, sin redeploy.</p>
+        </div>
+
+        <h3>El lote: cómo corre, sin nadie mirando</h3>
+        <ol>
+          <li><code>/api/generate-batch</code>, protegido con <code>CRON_SECRET</code>, recibe un rango de fechas.</li>
+          <li>Por cada fecha, calapi → tiempo litúrgico, semana, día, celebración, color y rango.</li>
+          <li><strong>El prompt se calcula, no se pide.</strong> Un banco de plantillas escrito a mano, con ranuras combinatorias resueltas por un <code>seed</code> derivado de la fecha.</li>
+          <li>Pollinations con ese mismo <code>seed</code> → <strong>las cuatro puertas de validación</strong> → Supabase Storage → fila en <code>daily_images</code>.</li>
+          <li>Si una puerta rechaza, reintenta con <code>seed+1</code> hasta tres veces. Si las tres fallan, <strong>no escribe fila</strong> y el día cae solo al escalón 2 de la escalera. Un fallo nunca deja pantalla rota.</li>
+          <li><strong>Idempotente y reanudable:</strong> salta las fechas que ya tienen imagen y procesa ~20 por invocación, para no chocar con el límite de tiempo de la función. Volver a lanzarlo nunca duplica ni regenera.</li>
+        </ol>
+
+        <div class="aside aside-green">
+          <span class="label">Cómo se arma el prompt sin IA</span>
+          <p>El día litúrgico es un conjunto cerrado: cinco tiempos por cinco colores por dos rangos. Eso no necesita un modelo de lenguaje, necesita una tabla. La plantilla tiene cuatro piezas y sólo una de ellas varía libremente:</p>
+          <ol>
+            <li><strong>Prefijo de estilo, fijo e inamovible.</strong> Pintura sacra atmosférica, sin personas, sin figuras, sin rostros, sin texto, sin logos. Va del lado del servidor y no se puede sobrescribir.</li>
+            <li><strong>Arquetipo de escena</strong>, elegido del banco de esa temporada — ventana con luz, sendero al amanecer, interior en silencio, agua en calma, campo abierto. Escritos a mano, unos diez por tiempo litúrgico.</li>
+            <li><strong>Cualidad de luz y paleta</strong>, ancladas al color litúrgico del día.</li>
+            <li><strong>Sufijo negativo</strong>, también fijo: nada de figuras humanas, rostros, texto, sangre, símbolos ajenos.</li>
+          </ol>
+          <p>Diez arquetipos × varias luces × cinco paletas dan de sobra para que 128 días no se repitan, <strong>y el espacio de prompts posibles es finito y está escrito por ti.</strong> Ningún modelo puede sacarlo de ahí, que es justo lo que hace innecesaria la revisión.</p>
+        </div>
+
+        <h3>Las cuatro puertas de validación</h3>
+        <p>Esto es lo que sustituye al ojo humano. Todas son baratas y corren dentro del mismo lote:</p>
+        <ol>
+          <li><strong>Respuesta.</strong> HTTP 200 y <code>content-type</code> de imagen. Pollinations a veces devuelve error con cuerpo de texto.</li>
+          <li><strong>Peso.</strong> Entre 5 KB y 2 MB. Por debajo suele ser un placeholder de error; por encima, algo que no es lo pedido.</li>
+          <li><strong>Decodificación.</strong> Cabecera PNG/JPEG válida y dimensiones exactamente las solicitadas.</li>
+          <li><strong>Contenido mínimo.</strong> Luminancia media entre el 8 % y el 92 % y varianza por encima de un umbral. Descarta los negros, los blancos y los planos, que es la forma que toman casi todas las generaciones fallidas.</li>
+        </ol>
+        <p>Ninguna de las cuatro juzga si la imagen es <em>bonita</em> — juzgan si es una imagen válida. Lo apropiado del contenido ya quedó garantizado antes, en el prompt.</p>
+
+        <p><strong>El interruptor por fecha.</strong> <code>daily_images</code> lleva una columna <code>blocked</code>. Si alguna vez alguien reporta una imagen, marcas esa fila y <code>/api/readings</code> la ignora: el día cae al escalón 2 al instante, sin redeploy, sin release de Android y sin tocar el resto del lote. Es la válvula que hace tolerable no revisar.</p>
+
+        <p><strong>Cadencia.</strong> Hoy, a mano, las 128 fechas del 26 de agosto al 31 de diciembre de 2026. Después, un <strong>cron anual el 1 de noviembre</strong> que genere el año entrante completo: te deja dos meses de colchón antes de que haga falta y no depende de que te acuerdes. Un cron anual es menos frecuente que diario, así que la restricción de Hobby no lo bloquea — pero Hobby sí limita <em>cuántos</em> crons tienes, y conviene comprobarlo en Settings → Cron Jobs antes de añadirlo.</p>
+
+        <p><strong>Costo.</strong> 128 imágenes × ~25 KB medidos = 3,2 MB. El 2027 completo, 365 × 25 KB = 9 MB. Los dos juntos no llegan a 15 MB contra 1 GB del plan gratis de Storage.</p>
+
+        <div class="aside">
+          <span class="label">La escalera de respaldo — tu caso de enero de 2027</span>
+          <p>Preguntaste qué pasa si una imagen no carga, o si llegan los primeros días de 2027 sin lote generado. Tres escalones, y ninguno deja un hueco:</p>
+          <p><strong>1. Fila del día en <code>daily_images</code></strong> → su imagen en Storage. El caso normal.<br>
+          <strong>2. Sin fila: imagen fija por tiempo litúrgico.</strong> Seis archivos en <code>public/</code> — Adviento, Navidad, Cuaresma, Pascua, Ordinario y mártir/rojo — servidos localmente, así que funcionan sin conexión y dentro del APK. El tiempo lo resuelve calapi; si calapi tampoco responde, una tabla mínima local de fechas de temporada.<br>
+          <strong>3. Sin nada: <code>fallback-misericordia.png</code></strong>, que ya existe en el repo. Hoy pesa 891 KB — comprimir a WebP por debajo de 200 KB, que es el presupuesto que fija el skill de arquitectura.</p>
+          <p><strong>El escalón 2 es el que resuelve tu ejemplo:</strong> el 3 de enero de 2027 sin lote muestra la imagen blanca de Navidad, que es litúrgicamente correcta para ese día. No un hueco, no un icono roto, y no una imagen fuera de tiempo.</p>
+        </div>
+
+        <h3>Qué sigue necesitando el día a día</h3>
+        <p>El lote resuelve la imagen, no el texto. <strong>Las lecturas siguen llegando de Evangelizo y Vatican News dentro de su ventana</strong>, y eso no se puede adelantar por más vueltas que le demos. Pero ya no importa: es un fetch de unos 300 ms, sin IA y sin costo.</p>
+
+        <p>Se resuelve <strong>perezosamente</strong>. La primera petición del día trae las lecturas, las guarda en <code>daily_readings</code> y responde; las demás salen del CDN con <code>s-maxage</code> alto. Sin cron, sin lock, y sin el problema de las cincuenta generaciones en paralelo — ese problema existía porque generar costaba 3-8 segundos, y ahora la generación ya viene hecha del lote.</p>
+
+        <p>Si prefieres no depender del primer usuario, un <strong>cron mensual</strong> que ingiera los próximos 30 días cubre exactamente la ventana de Evangelizo con doce ejecuciones al año. Es opcional. Lo que no se puede adelantar en ningún escenario es el comentario papal de Vatican News, que sólo publica D+1: ese se superpone el mismo día, perezosamente, y si falla degradas a Evangelizo como ya estaba decidido.</p>
+
+        <div class="aside">
+          <span class="label">Sobre la imagen: sí, pero una sola y nunca narrativa</span>
+          <p>El Evangelio del 26 de agosto dice: <em>«¡Ay de ustedes… que parecen sepulcros blanqueados: hermosos por fuera, pero por dentro llenos de huesos de muertos y de podredumbre!»</em></p>
+          <p>Entregado a un modelo de imagen sin criterio, eso produce algo macabro en la pantalla de una app de consuelo. La Escritura contiene violencia, cuerpos, juicio y muerte: <strong>ilustrar literalmente la escena del día es una mala idea sostenida en el tiempo.</strong></p>
+          <p>Las condiciones bajo las que sí vale la pena:</p>
+          <p><strong>1. Sólo una imagen, la del Evangelio.</strong> No una por lectura. Reduce la superficie de riesgo cuatro veces y evita convertir la pantalla en un álbum.<br>
+          <strong>2. Atmosférica, no narrativa.</strong> El prompt nace del día litúrgico y del <em>consuelo</em>, no del relato: luz, paisaje, un interior en silencio. Nunca la escena literal, nunca rostros de Jesús o de santos.<br>
+          <strong>3. Generación por lote anual, automática y determinista.</strong> El prompt sale de un banco de plantillas escrito a mano, no de un modelo, y pasa cuatro puertas de validación antes de guardarse.<br>
+          <strong>4. Etiquetada como generada con IA</strong>, con la escalera de respaldo de arriba si algo falla.</p>
+          <p>Sin las cuatro, mi recomendación sería no ponerla.</p>
+        </div>
+
+        <div class="aside">
+          <span class="label">La parte incómoda: derechos</span>
+          <p><strong>Casi ninguna traducción bíblica moderna es de dominio público.</strong> Reina-Valera 1960, Biblia de Jerusalén, Nácar-Colunga, el Libro del Pueblo de Dios y el leccionario mexicano están todas con derechos.</p>
+          <p>Mostrar el contenido con atribución visible y enlace a la fuente es lo mínimo, y es lo que ambos esperan. Pero en el momento en que monetices la app alrededor de este contenido —o lo empaquetes offline dentro del APK— entras en terreno que requiere licencia. No es un bloqueador para lanzar; es algo que debes saber antes de construir un modelo de negocio encima.</p>
+        </div>
+
+        <h3>Una sola identidad, sin bifurcar por denominación</h3>
+        <p class="lede">Este módulo <strong>no se adapta a las tres vertientes.</strong> Se presenta con su identidad real: el Evangelio del día de la Iglesia, con su primera lectura, su salmo, su tiempo litúrgico y su santo. Sin maquillaje y sin ramificar el código.</p>
+
+        <p>La versión anterior de este plan proponía tres presentaciones. Estaba mal, por dos razones de autenticidad:</p>
+        <ul>
+          <li><strong>Las iglesias evangélicas no siguen un leccionario diario universal.</strong> Vestir el misal romano con otra traducción y quitarle los santos no lo vuelve evangélico: sigue siendo el calendario romano, y se nota en tres días.</li>
+          <li><strong>Reempaquetar un salmo como «poema de sabiduría»</strong> para que encaje en un modo no religioso es camuflaje. Le resta seriedad a la app justo ante el usuario que más valora que no le hablen con condescendencia.</li>
+        </ul>
+
+        <h3>Por qué funciona para los tres</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Usuario</th><th>Qué encuentra</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Católico</strong></td><td>Su liturgia oficial, con rigor y completa.</td></tr>
+              <tr><td><strong>Evangélico</strong></td><td>El Santo Evangelio y los Salmos son Palabra de Dios amada y leída por cualquier cristiano. No necesita que se los disfracen: si decide leerlos, los lee tal cual son.</td></tr>
+              <tr><td><strong>Espiritual</strong></td><td>El texto en su contexto sagrado, sin adaptaciones condescendientes. Puede entrar o no, pero lo que ve es verdad.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="aside aside-green">
+          <span class="label">El principio: adapta lo personal, no adaptes lo compartido</span>
+          <p>Las tres vertientes <strong>sí se mantienen donde nacieron</strong>: en el desahogo. Ahí tienen sentido pleno, porque cuando alguien escribe su dolor, el tono del consuelo y el estilo de la plegaria deben hablarle a <em>su</em> fe.</p>
+          <p>El leccionario es lo contrario: es de toda la Iglesia ese día, idéntico para todos por diseño. Adaptarlo lo destruye. Esa línea —lo personal se adapta, lo compartido se respeta— sirve para decidir los módulos que vengan sin volver a discutirlo.</p>
+        </div>
+
+        <h3>No adaptar no es esconder</h3>
+        <p>Hay tres caminos posibles y conviene no confundirlos, porque dos de ellos son condescendientes:</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th class="num-col"></th><th>Qué es</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td class="num-col"><strong>A</strong></td><td>Tres versiones distintas, una por vertiente</td><td>Descartado — camuflaje</td></tr>
+              <tr><td class="num-col"><strong>B</strong></td><td><strong>Una sola versión, la real, accesible desde los tres modos</strong></td><td><strong>Elegido</strong></td></tr>
+              <tr><td class="num-col"><strong>C</strong></td><td>Una sola versión, oculta para los modos no católicos</td><td>Descartado</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>Por qué C tampoco:</strong> esconderle el Evangelio al usuario evangélico es decidir por él que la Palabra de Dios no es suya. Es el mismo argumento que descarta A, aplicado al revés — cambiar un tipo de condescendencia por otro. El módulo <strong>existe y es accesible desde los tres modos</strong>, con contenido idéntico. Si alguien nunca lo abre, es su decisión, no nuestra política.</p>
+
+        <h3>Jerarquía dentro de la pantalla</h3>
+        <p>No adaptar no significa aplanar. El santo del día es el elemento más marcadamente católico: va como <strong>contexto secundario, no como encabezado</strong>. La sección abre con la Escritura y corona con el Evangelio — la misma jerarquía que ya rige para la imagen. Eso no es camuflaje, es la jerarquía que la Iglesia misma le da al día.</p>
+        <p>Si quieres diferenciar por vertiente sin tocar el contenido, hazlo en el <strong>hub de inicio</strong>: mismo módulo, distinta prominencia según el modo. Contenido idéntico, presentación honesta.</p>
+
+        <div class="aside aside-green">
+          <span class="label">Efecto colateral: el bloqueo de la RVR1960 desaparece</span>
+          <p>La versión anterior necesitaba Reina-Valera 1960 para el modo evangélico, y eso era imposible: texto propiedad de Sociedades Bíblicas Unidas, marca registrada licenciable sólo por contrato vía <code>licensing@americanbible.org</code>, y sin ninguna fuente gratuita que la sirva — <code>bible-api.com</code> no tiene ni una traducción en español.</p>
+          <p>Con una sola identidad, el problema no se resuelve: <strong>deja de existir.</strong> También desaparece el parseo de referencias del leccionario a otra Biblia, que era el trabajo real escondido ahí (<code>Ps 96(95),10.11-12a.12b-13.</code> — doble numeración y partes de versículo con letra).</p>
+          <p>La solución honesta resultó ser además la legalmente limpia y la más barata de programar. Suele ser buena señal.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead">
+        <h3>Muro de peticiones</h3>
+        <span class="stamp stamp-hold">No por ahora</span>
+      </div>
+      <div class="specs">
+        <div class="spec"><span class="k">Esfuerzo evitado</span><span class="v">4–6 días</span></div>
+        <div class="spec"><span class="k">Costo evitado</span><span class="v">Moderación diaria, para siempre</span></div>
+        <div class="spec"><span class="k">Alternativa</span><span class="v">Contador anónimo · 1 día</span></div>
+        <div class="spec"><span class="k">Revisar</span><span class="v">En 3–6 meses, con tráfico</span></div>
+      </div>
+      <div class="fbody">
+        <p class="lede">Preguntaste si valía la pena y si convenía en esta app. La respuesta a la segunda es la que manda: <strong>no, y la razón no es técnica.</strong></p>
+
+        <h3>Contradice la promesa central</h3>
+        <p>Todo el pitch de Alivio es <em>espacio seguro, anónimo, privado</em>. Un muro público mete dos modos contradictorios en la misma app, y el modo de fallo es que alguien publique por accidente su momento más vulnerable. No es hipotético: la caja del desahogo y la caja de una petición se verían casi idénticas.</p>
+
+        <h3>El arranque en frío es brutal</h3>
+        <p>El valor de un muro es proporcional a cuánta gente hay en él. El día uno tienes un muro vacío, y un muro de oración vacío hace que la app parezca abandonada. No puedes sembrarlo con peticiones falsas: en este contexto sería una traición de fondo, no una táctica de crecimiento.</p>
+
+        <h3>Compites en el terreno de ellos</h3>
+        <p>Lo dijiste tú: varias apps ya lo tienen. Hallow, Amen y Pray.com tienen muros con miles de peticiones y equipos de moderación. Tu diferenciador es el flujo <em>desahogo → respiración → consuelo</em>, que sí es distintivo. Añadir una funcionalidad genérica no añade diferenciación: añade una superficie donde pierdes por efectos de red.</p>
+
+        <h3>Y el costo permanente</h3>
+        <p>Contenido generado por usuarios trae términos de servicio, mecanismo de reporte, proceso de retirada, verificación de edad, actualización de <code>privacidad.html</code>, y obligaciones de notificación y acción bajo la DSA en la UE. El dato religioso combinado con el de salud es categoría especial bajo el RGPD. Y alguien tiene que revisar la cola todos los días, para siempre.</p>
+
+        <div class="aside aside-green">
+          <span class="label">La alternativa que sí encaja</span>
+          <p>Lo que un muro entrega de verdad es <strong>«no estás solo»</strong>. Eso se puede dar sin contenido de terceros: un <strong>contador anónimo y agregado</strong>. <em>«Hoy 47 personas soltaron su carga aquí»</em>, o cuánta gente está respirando contigo en este momento.</p>
+          <p>Sin texto de usuarios, sin moderación, sin arranque en frío, sin obligaciones legales. Un día de trabajo, cero mantenimiento permanente, y <strong>refuerza</strong> la identidad de la app en vez de contradecirla.</p>
+        </div>
+
+        <p>Si en 3–6 meses tienes tráfico real y el contador se queda corto, ahí revisas el muro — con volumen suficiente para que no nazca muerto, y con la decisión de moderarlo tomada conscientemente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ estado ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">iv bis</span>
+      <h2>Estado de ejecución</h2>
+      <p>Lo que ya está construido y verificado en el árbol de trabajo, al 26 de agosto. Nada desplegado todavía.</p>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Fase</th><th>Estado</th><th>Qué quedó dentro</th></tr></thead>
+        <tbody>
+          <tr><td><strong>0 · Cerrar lo que sangra</strong></td><td><strong>Hecho</strong></td><td>Secreto y deduplicación en <code>cron-push</code>; rate limit, tope de entrada y saneado del <code>imagePrompt</code> en <code>comfort</code>; stack traces fuera de las respuestas; rama nativa en <code>cancelPush</code>; 41 MB de marketing fuera del <code>webDir</code>; esquema regenerado; <code>ethical_ai.md</code> reescrito.</td></tr>
+          <tr><td><strong>1 · Navegación</strong></td><td><strong>Hecho</strong></td><td>Registro de pantallas en vez del array literal; hub de inicio; barra inferior de tres destinos con <code>safe-area-inset</code>; orden de tarjetas por vertiente.</td></tr>
+          <tr><td><strong>2 · Oraciones comunes</strong></td><td><strong>Hecho</strong></td><td>26 oraciones estáticas y offline; Rosario guiado con los misterios del día; modo lectura con Wake Lock; favoritos compartidos con el desahogo.</td></tr>
+          <tr><td><strong>M2 · Flujo</strong></td><td><strong>Hecho</strong></td><td>Logo → hub; barra visible en <code>screen-ancla</code>, oculta solo en la respiración.</td></tr>
+          <tr><td><strong>M3 · Pantalla premium</strong></td><td><strong>Hecho</strong></td><td>Tarjeta devocional; vitral de cabecera en cuatro familias; A− / A+ persistido; compartir nativo.</td></tr>
+          <tr><td><strong>M4 · Bugs PWA</strong></td><td><strong>Hecho</strong></td><td>Descarte del banner en <code>localStorage</code>. La detección standalone ya existía.</td></tr>
+          <tr><td><strong>3 · Evangelio del Día</strong></td><td>Pendiente</td><td>Lo siguiente. 2½ días.</td></tr>
+          <tr><td><strong>M1 · Home vivo</strong></td><td>Pendiente</td><td>Después de la fase 3: la tarjeta viva del Evangelio depende de ella.</td></tr>
+          <tr><td><strong>4 · Release de Android</strong></td><td>Pendiente</td><td>Al final, una sola.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="aside">
+      <span class="label">Dos hallazgos nuevos, encontrados al ejecutar</span>
+      <p><strong>1. El push de Android nunca ha funcionado.</strong> <code>firebase-admin</code> v14 eliminó el namespace: <code>admin.apps</code>, <code>admin.credential</code> y <code>admin.messaging</code> son <code>undefined</code> en runtime, no solo en tipos. La inicialización reventaba dentro de su propio <code>try/catch</code>, <code>firebaseApp</code> quedaba en <code>null</code> y la rama FCM no disparaba jamás. Como las suscripciones nativas guardan <code>subscription: {}</code>, la rama VAPID tampoco entraba. Fallaba en silencio. Migrado a imports modulares.</p>
+      <p>Esto corrige el diagnóstico de la rev. 2: la auditoría culpaba a <code>cancelPush</code> de que no se pudiera desactivar el recordatorio. El motivo real es que no había nada que desactivar.</p>
+      <p><strong>2. <code>.env.example</code> contenía la <code>PRIVATE_VAPID_KEY</code> real</strong>, idéntica a la de <code>.env</code>. Verificado que nunca entró en el historial de git —<code>.gitignore</code> tiene <code>.env*</code>— pero un archivo de plantilla con una llave privada es una mina esperando un <code>git add -f</code>. Sustituida por placeholders.</p>
+    </div>
+
+    <div class="aside aside-green">
+      <span class="label">Verificación</span>
+      <p><strong>107 pruebas</strong> ejercitando el <code>app.js</code> real —cargado con <code>vm</code> sobre un DOM mínimo, sin instalar dependencias en un proyecto que deliberadamente no tiene tests— más <strong>23</strong> sobre la lógica de los endpoints y una verificación estática que cruza el registro de pantallas con el HTML y la paridad <code>es</code>/<code>en</code> de las 106 claves. <code>npx tsc --noEmit</code> sale limpio: antes tenía seis errores.</p>
+      <p>Las pruebas viven en el scratchpad, no en el repositorio: el proyecto no tiene infraestructura de tests y no se le impone una sin acuerdo.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ v ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">v</span>
+      <h2>Orden recomendado</h2>
+      <p>Esto sí es una secuencia: cada fase depende de que la anterior esté hecha.</p>
+    </div>
+
+    <div class="phase">
+      <div class="when"><b>0</b>1 día</div>
+      <div>
+        <h3>Cerrar lo que sangra</h3>
+        <p>Antes de una sola línea de funcionalidad nueva. Las dos primeras son de <code>api/</code>: se despliegan y protegen a todos, web y Android, de inmediato.</p>
+        <ul>
+          <li>Secreto en <code>cron-push</code> y deduplicación de envíos</li>
+          <li>Rate limit y tope de entrada en <code>comfort</code>; quitar el stack trace</li>
+          <li>Ramificación nativa en <code>cancelPush</code></li>
+          <li>Sacar los 50 MB de marketing del <code>webDir</code></li>
+          <li>Reescribir <code>docs/ethical_ai.md</code> con la política real de Alivio</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when"><b>1</b>1 día</div>
+      <div>
+        <h3>Estructura de navegación</h3>
+        <p>Hub de inicio con tres accesos y barra inferior de tres destinos, más un registro de pantallas que sustituya el array literal de <code>changeScreen()</code>. Sin esto, las funcionalidades no tienen dónde vivir y <code>app.js</code> se vuelve inmanejable.</p>
+        <ul>
+          <li>Registro de pantallas en vez de <code>['screen-landing', 'screen-desahogo', 'screen-suspiro', 'screen-ancla']</code> (<code>app.js:39</code>)</li>
+          <li>Hub con las tres tarjetas; barra inferior <strong>Evangelio · Desahogo · Oraciones</strong></li>
+          <li>Ocultar la barra en <code>screen-suspiro</code> y <code>screen-ancla</code></li>
+          <li><code>env(safe-area-inset-bottom)</code> en la barra — hoy no existe en el proyecto</li>
+          <li>Los ~8 strings nuevos, en <code>es</code> y <code>en</code>, con guarda de <code>id</code> ausente</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when"><b>2</b>1 día</div>
+      <div>
+        <h3>Oraciones comunes</h3>
+        <p>Cero riesgo, cero costo, funciona offline. Entrega valor visible el mismo día y valida la nueva navegación con el módulo más simple, antes de meterle uno con dependencias externas.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when"><b>3</b>2½ días</div>
+      <div>
+        <h3>Evangelio del Día</h3>
+        <p>Endpoint <code>api/readings.ts</code> con caché de CDN e ingesta perezosa, doble fuente con degradación automática, tabla <code>daily_readings</code>. Aparte, <code>api/generate-batch.ts</code>: el lote de las 128 imágenes del 26 ago al 31 dic de 2026, sembradas con el día litúrgico de calapi, subidas a Storage y revisadas antes de publicar. Escalera de respaldo de tres escalones. Una sola presentación, sin bifurcar por denominación. Atribución visible y etiquetado de IA.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when"><b>4</b>½ día</div>
+      <div>
+        <h3>Una sola release de Android</h3>
+        <p>Que se ponga al día con todo de golpe: los cinco commits pendientes desde julio, los arreglos de <code>public/</code> y los dos módulos nuevos. <code>cap sync</code>, subir <code>versionCode</code>, verificar push y donación en dispositivo real, publicar.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:28px"><strong>Seis días en total</strong> para tener las dos funcionalidades en producción en web y Android, la app segura, la arquitectura preparada y el APK adelgazado. El contador anónimo queda como candidato para después, cuando haya tráfico que lo haga significativo.</p>
+  </section>
+
+  <!-- ══════════════ vi ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">vi</span>
+      <h2>Agent skills</h2>
+      <p>Revisé lo que había. El proyecto no tenía ninguno.</p>
+    </div>
+
+    <p>Los dos skills que tienes —<code>seo-technical-geo-local</code> y <code>google-search-advocate-gsc</code>— son globales de tu usuario y ambos de SEO. Buenos, pero nada capturaba las reglas de este proyecto. Creé dos en <code>.claude/skills/</code>:</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Skill</th><th>Qué evita</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>alivio-arquitectura</code></td>
+            <td>Que se rompa la navegación al añadir pantallas sin registrarlas; strings que quedan congelados en español; contenido pintado con <code>innerHTML</code>; assets pesados en el <code>webDir</code>; endpoints nuevos sin caché ni rate limit; y el error clásico de olvidar la rama nativa de Capacitor. Incluye el checklist de release.</td>
+          </tr>
+          <tr>
+            <td><code>alivio-contenido-liturgico</code></td>
+            <td>Que la IA genere textos que deben ser fijos; imágenes sin etiquetar; contenido que ignora las tres denominaciones; y uso de fuentes ajenas sin atribución ni revisión de derechos. Documenta las fuentes con su mapeo de campos y sus límites, la tabla de tono por denominación, y la prioridad absoluta de la ruta de crisis. También deja registrada la contradicción con <code>docs/ethical_ai.md</code> para que nadie construya encima de un documento que no describe la realidad.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Un tercero, <code>alivio-moderacion</code>, quedaba condicionado al muro de peticiones. <strong>Al descartarse el muro, ya no hace falta.</strong></p>
+    <p><strong>Ya incorporado a <code>alivio-contenido-liturgico</code></strong> (rev. 5): el mapeo del RSS de Vatican News junto al de Evangelizo; la regla de imagen atmosférica y no narrativa; el principio de <strong>adaptar lo personal y no lo compartido</strong>, con la nota de que el Evangelio del Día no se bifurca por denominación; y la prohibición explícita de RVR1960 sin licencia, para que nadie la reintroduzca más adelante sin saber lo que cuesta.</p>
+    <p>Añadido además en esta revisión: <code>calapi</code> como fuente del día litúrgico con la advertencia de que <strong>ninguna fuente gratuita da la cita para fechas lejanas</strong>; el régimen completo del <strong>lote automático</strong> —banco de plantillas, cuatro puertas de validación, reintentos, interruptor por fecha— sustituyendo la regla de revisión humana que quedó derogada; y un <strong>§4b nuevo sobre teasers y tarjetas de portada</strong>, que era el hueco real: la regla de imagen protegía la imagen, pero nada impedía usar un extracto automático del pasaje como gancho.</p>
+  </section>
+
+  <!-- ══════════════ vii ══════════════ -->
+  <section>
+    <div class="sechead">
+      <span class="num">vii</span>
+      <h2>Decisiones tomadas</h2>
+      <p>Todo cerrado. No queda nada bloqueando el arranque.</p>
+    </div>
+
+    <h3>Producto</h3>
+    <ul>
+      <li><strong>El muro de peticiones no va.</strong> Se revisa en 3–6 meses; mientras tanto, el contador anónimo como alternativa.</li>
+      <li><strong>Doble fuente para las lecturas:</strong> Evangelizo como estructura, Vatican News para el español y el comentario papal.</li>
+      <li><strong>Una imagen al día, la del Evangelio</strong> — atmosférica y no narrativa, etiquetada como IA. Las lecturas y el salmo van sin imagen.</li>
+      <li><strong>Las imágenes se generan por lote, no por cron diario</strong> (rev. 3). Hoy, las 128 fechas hasta el 31 dic 2026; después, un cron anual el 1 de noviembre para el año entrante. Ninguna fuente sirve el texto del Evangelio a más de 30 días, así que <strong>el prompt se siembra con el día litúrgico</strong> (calapi), no con el pasaje — que es lo que la regla de imagen atmosférica ya exigía. Beneficio real: el texto del pasaje ya nunca llega a un modelo de imagen.</li>
+      <li><strong>El lote es 100 % automático, sin revisión humana</strong> (rev. 4, decisión tuya). Para que eso sea seguro, la garantía se mueve al prompt: <strong>Claude sale del bucle</strong> y los prompts los arma un banco de plantillas escrito a mano con ranuras resueltas por un <code>seed</code> derivado de la fecha. Cero llamadas de IA en el lote, y el espacio de prompts posibles es finito y propio.</li>
+      <li><strong>Cuatro puertas de validación automáticas</strong> en vez del ojo humano: respuesta, peso, decodificación y contenido mínimo. Tres reintentos con <code>seed+1</code>; si fallan, no se escribe fila y el día cae solo a la escalera de respaldo.</li>
+      <li><strong>Interruptor por fecha</strong> (<code>daily_images.blocked</code>): marcar una fila la retira al instante sin redeploy.</li>
+      <li><strong>Escalera de respaldo de tres escalones</strong> para que nunca falte imagen: fila del día → imagen fija por tiempo litúrgico servida desde <code>public/</code> → <code>fallback-misericordia.png</code>. Cubre el hueco de enero de 2027 antes del siguiente lote, y cualquier fallo de Storage o de red.</li>
+      <li><strong>El texto de las lecturas sigue siendo perezoso</strong>, dentro de la ventana de 30 días de Evangelizo, con el comentario papal de Vatican News superpuesto el mismo día. Cron mensual opcional.</li>
+      <li><strong>Una sola release de Android</strong> al final, no una por funcionalidad.</li>
+    </ul>
+
+    <h3>Política de IA — reemplaza <code>docs/ethical_ai.md</code></h3>
+    <p>El documento vigente es un borrador heredado de «Ecclesia OS» y se reescribe con la política real de Alivio: <strong>uso ético y asistido de IA para consuelo espiritual y arte sacro atmosférico.</strong> Cinco principios:</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th class="num-col">#</th><th>Principio</th><th>Qué significa en el código</th></tr></thead>
+        <tbody>
+          <tr><td class="num-col">1</td><td><strong>Primacía del texto canónico</strong></td><td>Oraciones tradicionales y lecturas litúrgicas van hardcodeadas o vienen de la fuente. La IA nunca las redacta ni las retoca.</td></tr>
+          <tr><td class="num-col">2</td><td><strong>Prompts no narrativos</strong></td><td>La imagen nace del consuelo del pasaje, nunca de su escena. Sin rostros de Jesús ni de santos, sin fotorrealismo de figuras sagradas, sin texto dentro de la imagen.</td></tr>
+          <tr><td class="num-col">3</td><td><strong>Etiquetado visible de IA</strong></td><td>Toda imagen generada lleva su etiqueta en pantalla. Lo generado nunca se presenta como texto de la tradición ni con aprobación eclesial.</td></tr>
+          <tr><td class="num-col">4</td><td><strong>Asistencia, no sustitución</strong></td><td>La IA acompaña el consuelo personal — el desahogo, la reflexión del día. No dictamina doctrina ni responde preguntas del Magisterio.</td></tr>
+          <tr><td class="num-col">5</td><td><strong>Salvaguarda de crisis humana</strong></td><td>Ante señales de riesgo, la respuesta espiritual no sustituye a la ayuda profesional: los recursos de crisis se muestran de forma prominente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Navegación — aprobada</h3>
+    <p><strong>Hub de inicio con tres accesos y barra inferior de tres destinos</strong> (Evangelio · Desahogo · Oraciones). Hoy la app es un túnel de un solo camino: <code>app.js:39</code> es un array literal de cuatro pantallas encadenadas, y no hay ni menú ni home.</p>
+
+    <p>Señalé que un hub y una barra con los mismos tres destinos podían solaparse. <strong>La decisión es mantener los dos</strong>, y la división de trabajo que lo justifica es esta: las tarjetas del hub <em>no son un menú duplicado, son superficies de contenido</em>. La tarjeta del Evangelio lleva la imagen atmosférica del día y su gancho; un icono de la barra no puede hacer eso. La barra es cómo te mueves una vez dentro; el hub es a lo que abre la app.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Regla</th><th>Por qué</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Tres pestañas, no cuatro</strong></td><td>Nada de una pestaña «Inicio» que sólo enlace a las otras. Se vuelve al hub tocando el logotipo de la cabecera.</td></tr>
+          <tr><td><strong>La barra se oculta en <code>screen-suspiro</code> y <code>screen-ancla</code></strong></td><td>Son pasos del flujo, no destinos. Una barra invitando a irse arruina una respiración guiada.</td></tr>
+          <tr><td><strong>Desahogo destacado al centro</strong></td><td>Es el diferenciador real: el flujo desahogo → respiración → consuelo. El Evangelio y las oraciones ya existen en Hallow y Magnificat; ese flujo no.</td></tr>
+          <tr><td><strong><code>padding-bottom: env(safe-area-inset-bottom)</code></strong></td><td>Hoy no hay <em>ni una</em> ocurrencia de <code>safe-area-inset</code> en <code>index.html</code> ni en <code>app.js</code>. Sin eso la barra nace debajo de la barra de gestos de Android — y eso sólo se corrige con release de Play Store.</td></tr>
+          <tr><td><strong>La vertiente cambia el orden de las tarjetas, nunca su contenido</strong></td><td>Católico y evangélico abren con Evangelio arriba; espiritual, con Desahogo. Es la aplicación literal de <em>adapta lo personal, no adaptes lo compartido</em>.</td></tr>
+          <tr><td><strong>El gancho de la tarjeta sale del comentario del Papa</strong></td><td>Nunca de un extracto automático del pasaje. Ver abajo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="aside">
+      <span class="label">El hueco que destapó la maqueta: los teasers</span>
+      <p>La maqueta proponía la tarjeta con <code>Mateo 23, 27-32 · «Sepulcros blanqueados…»</code> bajo el saludo <em>«La paz les dejo, mi paz les doy»</em>. Ese es exactamente el pasaje que esta auditoría marcó como macabro.</p>
+      <p><strong>La regla de imagen atmosférica protegía la imagen; nada protegía el texto del gancho.</strong> Un extracto automático del Evangelio saca juicio, violencia y muerte varias veces al mes en la pantalla de bienvenida.</p>
+      <p><strong>Queda cerrado así:</strong> el gancho sale del <strong>comentario del Papa</strong> de Vatican News —siempre pastoral, fuente autorizada, y ya se está trayendo—; si falta ese día, degrada a título litúrgico y santo. La cita (<code>Mt 23, 27-32</code>) sí puede ir: una referencia no es una imagen mental. Registrado como §4b del skill.</p>
+    </div>
+
+    <p><strong>Coste:</strong> la fase 1 pasa de ½ día a 1 día. <code>applyTranslations()</code> tiene 61 <code>getElementById</code> encadenados sin guardas y la barra añade unos ocho strings nuevos — razón de más para hacer el registro de pantallas antes que los módulos, como ya decía el plan.</p>
+
+    <h3>Oraciones comunes — decidido al construir</h3>
+    <ul>
+      <li><strong>La redacción viene de la Santa Sede.</strong> Padre Nuestro, Ave María, Gloria, Credo de los Apóstoles, Salve, Señal de la Cruz y Ángelus llevan el texto literal del Apéndice «Oraciones comunes» del Compendio del Catecismo, de <code>vatican.va</code>. Los pasajes bíblicos vienen verbatim de Reina-Valera 1909 y King James, ambas de dominio público. Ninguna palabra la redactó un modelo.</li>
+      <li><strong>Interruptor <code>verified</code></strong>: una oración en <code>false</code> no se lista, no se busca y no se abre. Entra en <code>false</code> y solo pasa a <code>true</code> tras cotejarla. Hoy las 26 están cotejadas y publicadas.</li>
+      <li><strong>El pie de la pantalla de rezo no es un aviso legal.</strong> Se muestra la referencia espiritual —«Salmo 23 · Reina-Valera 1909»— y nada más; las oraciones de la tradición no llevan nada. El registro jurídico rompe la atmósfera del rezo y se trasladó a <code>aviso-legal.html</code>. Única excepción: «Oración propia de Alivio», porque lo escrito por nosotros no puede pasar por texto de la tradición.</li>
+      <li><strong>Las oraciones de la vertiente espiritual nunca llevan iconografía religiosa.</strong> El vitral de cabecera las manda siempre a la familia «palabra» —luz y amanecer—: una cruz sobre una meditación de autocompasión rompe la promesa del selector de vertiente.</li>
+    </ul>
+
+    <h3>Navegación — cerrado al construir</h3>
+    <ul>
+      <li><strong>El logotipo va al hub</strong>, no a la landing de marketing. La landing es el argumento previo a instalar; el usuario recurrente no la necesita.</li>
+      <li><strong>La barra se oculta solo en <code>screen-suspiro</code>.</strong> En <code>screen-ancla</code> vuelve: es un destino, no un paso, y salir de ahí costaba dos toques.</li>
+    </ul>
+
+    <h3>Alcance de las denominaciones</h3>
+    <p><strong>El Evangelio del Día no se bifurca.</strong> Una sola identidad, la real, para los tres modos. Las tres vertientes se mantienen donde nacieron y donde tienen sentido: en el desahogo, porque el consuelo es personal.</p>
+    <p>El principio que lo gobierna, y que sirve para los módulos que vengan: <strong>adapta lo personal, no adaptes lo compartido.</strong> Consecuencia directa: la Reina-Valera 1960 deja de hacer falta, y con ella se va el problema de licencia y el parseo de referencias.</p>
+
+    <div class="aside aside-green">
+      <span class="label">No quedan preguntas abiertas</span>
+      <p>Todo lo que bloqueaba está decidido. La fase 0 puede arrancar cuando lo digas.</p>
+    </div>
+  </section>
+
+  <footer class="end">
+    <span>Auditoría de Alivio · rev. 6 · 26 agosto 2026</span>
+    <span>master · 7a9fbb7</span>
+  </footer>
+
+</div>

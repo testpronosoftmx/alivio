@@ -1,15 +1,125 @@
-# Política de Ética en IA y Privacidad de Datos
+# Política de IA y privacidad — Alivio
 
-## 1. Asistente Doctrinal IA (Chatbot)
-### Principios de Entrenamiento
-- **Cero Alucinaciones:** El chatbot está restringido ("grounded") de forma estricta a fuentes verificadas del Magisterio: *El Catecismo de la Iglesia Católica, Código de Derecho Canónico, Encíclicas Papales y Biblias con imprimátur.*
-- **No Respuestas Creativas:** Si la IA no encuentra una respuesta directa en las fuentes de enseñanza, responderá: *"El Magisterio no tiene una enseñanza dogmática explícita sobre este tema particular. Te recomiendo consultar a tu director espiritual."*
-- **Tono:** Pastoral, claro y firme en la verdad, pero sin ser condenatorio.
+> **Reemplaza por completo la versión anterior de este documento.** Aquella era un borrador
+> heredado de «Ecclesia OS», otro producto: describía un asistente doctrinal, cifrado E2E de
+> diarios de confesión y un modelo B2B con parroquias, nada de lo cual existe en Alivio.
+> Además prohibía la generación de imágenes sagradas y de oraciones por IA, que es
+> precisamente lo que Alivio hace — y hacía imposible construir encima sin contradecirlo.
+>
+> Vigente desde el 26 de agosto de 2026.
 
-### Prohibiciones Strictas (Autenticidad)
-- **NO Generación de Imágenes Sagradas:** Absoluta prohibición de usar IA (DALL-E, Midjourney, etc.) para crear arte sagrado sintético. Queremos mantener el arte humano tradicional y litúrgico como centro visual.
-- **NO Oraciones Generadas por IA:** No utilizamos IA para componer oraciones nuevas de la nada. Todo uso devocional proviene de la tradición sagrada (Liturgia de las Horas, Santos, Devocionario).
+Alivio es una PWA devocional que acompaña a alguien en un momento de dolor: escribe su
+desahogo, respira, y recibe consuelo. No hay cuentas, no hay chatbot doctrinal, no hay
+dirección espiritual. La postura es **uso ético y asistido de IA para consuelo espiritual y
+arte sacro atmosférico.**
 
-## 2. Privacidad de Datos y Cifrado (E2E)
-- **Diarios de Oración & Confesión:** Cualquier texto, memoria de voz (Voice Memos) o registro del examen de conciencia utilizado en el "Couch to 5 Decades" está cifrado de extremo a extremo. Ni siquiera los administradores de la base de datos (Supabase) pueden leer su contenido.
-- **Terceros (Brokers):** La información religiosa es un dato altamente sensible (Health/Religious data). Existe una prohibición absoluta por estatutos de la compañía de vender perfiles de usuario a data brokers. Las estadísticas hacia la parroquia B2B son exclusivamente de carácter agregado y anónimo, a menos que el usuario (Sustentador) decida visibilizar su perfil a su parroquia.
+---
+
+## Los cinco principios
+
+### 1. Primacía del texto canónico
+
+Las oraciones tradicionales y las lecturas litúrgicas **van hardcodeadas o vienen de la
+fuente. La IA nunca las redacta ni las retoca.**
+
+El Padre Nuestro tiene una forma fija. Si un modelo alucina una palabra, quien reza no puede
+detectarlo —está rezando, no revisando— y eso es un error doctrinal, no un fallo cosmético.
+Lo mismo vale para el Evangelio del día: se muestra íntegro, tal como lo entrega la fuente.
+
+### 2. Prompts no narrativos
+
+La imagen nace del **consuelo**, nunca de la escena del pasaje. Sin rostros de Jesús, de la
+Virgen ni de santos; sin fotorrealismo de figuras sagradas; sin texto dentro de la imagen.
+
+La Escritura contiene violencia, cuerpos, juicio y muerte. Ilustrar literalmente la escena
+del día, cientos de veces al año, produce imágenes macabras en una app de consuelo. El
+registro visual es atmosférico: luz, paisaje, un interior en silencio.
+
+Esto se hace cumplir en el código, no por convención:
+
+- El estilo y las restricciones se **prefijan del lado del servidor**. No se confía en que
+  el modelo las repita.
+- El prompt que devuelve el modelo pasa por una **lista de bloqueo** antes de construir la
+  URL de generación. Si no pasa, se cae a un prompt fijo nuestro.
+- Las imágenes del Evangelio del Día se generan **por lote y sin intervención humana**, con
+  el prompt sembrado en el **día litúrgico** (tiempo, color, celebración), nunca en el texto
+  del pasaje. Así el material sensible jamás llega a un modelo de imagen.
+- Toda imagen validada automáticamente antes de publicarse; si falla, hay imagen de respaldo.
+
+### 3. Etiquetado visible de IA
+
+Toda imagen generada lleva su etiqueta en pantalla: *«Ilustración generada con IA»*.
+
+Lo generado **nunca se presenta como texto de la tradición ni con aprobación eclesial**. Una
+oración creada para ese momento se presenta como reflexión personal. En una misma tarjeta no
+se mezclan, sin distinción visual, un texto tradicional y uno generado.
+
+**Los teasers y tarjetas de portada no llevan extractos automáticos de la Escritura.** El
+gancho sale del comentario papal o del título litúrgico del día. Un extracto automático saca
+juicio y muerte varias veces al mes en la pantalla de bienvenida.
+
+### 4. Asistencia, no sustitución
+
+La IA acompaña el consuelo **personal** — el desahogo, la reflexión del día. **No dictamina
+doctrina ni responde preguntas del Magisterio.** Alivio no tiene ni tendrá un asistente
+doctrinal: para eso está el párroco, el pastor o el director espiritual de cada quien.
+
+Las tres vertientes (`catholic`, `evangelical`, `spiritual`) modulan el **tono** del consuelo
+personal, porque el dolor es de una persona. Lo compartido —el leccionario del día— no se
+adapta: es de toda la Iglesia ese día, idéntico para todos por diseño. La regla que lo
+gobierna: **adapta lo personal, no adaptes lo compartido.**
+
+### 5. Salvaguarda de crisis humana
+
+Ante señales de ideación suicida, autolesión, violencia o abuso, **la respuesta espiritual no
+sustituye a la ayuda profesional.** Los recursos de crisis se muestran de forma prominente y
+nunca se responde solo con un versículo.
+
+Cualquier módulo nuevo donde el usuario escriba debe poder derivar a esos recursos. Esta
+prioridad está por encima de todas las demás de este documento.
+
+---
+
+## Privacidad de datos
+
+Descripción de lo que el sistema hace hoy, no de lo que nos gustaría que hiciera.
+
+### Lo que se queda en el dispositivo
+
+Todo el estado del usuario vive en `localStorage`, sin cuentas ni backend de usuario: idioma,
+denominación, favoritos, racha, hora de recordatorio, preferencia de audio. **Alivio no tiene
+registro, login ni perfil.** Nadie puede correlacionar el uso de la app con una persona.
+
+### Lo que sale del dispositivo
+
+| Dato | A dónde va | Se guarda |
+|---|---|---|
+| Texto del desahogo | API de Anthropic, para generar el consuelo | **No.** No se persiste en ninguna base de datos nuestra. |
+| Prompt de imagen | Servicio de generación de imágenes | No |
+| Suscripción a recordatorio | Supabase (esquema `alivio`) | Sí: endpoint push o token FCM, hora, zona horaria y el mensaje del recordatorio |
+
+La tabla de suscripciones es accesible **únicamente por el rol de servicio** de la API. Los
+roles anónimo y autenticado no tienen ningún permiso sobre ella.
+
+### Terceros
+
+El dato religioso combinado con el emocional es **categoría especial** bajo el RGPD.
+Prohibición absoluta de vender, ceder o compartir perfiles de usuario con data brokers o
+anunciantes. No hay analítica de terceros sobre el contenido de los desahogos.
+
+### Contenido litúrgico de terceros
+
+Las lecturas provienen de fuentes externas y se muestran **con atribución visible y enlace a
+la fuente**, que es lo mínimo que esperan y lo que corresponde. Casi ninguna traducción
+bíblica moderna es de dominio público: monetizar la app alrededor de ese contenido, o
+empaquetarlo offline dentro del APK, requiere licencia previa. No se introduce ninguna
+traducción con derechos sin contrato firmado.
+
+---
+
+## Qué NO es este documento
+
+No es una declaración de intenciones. Cada principio de arriba corresponde a una regla
+verificable en el código, recogida en el skill `alivio-contenido-liturgico`. Si el código y
+este documento se contradicen, **uno de los dos está mal y hay que arreglarlo** — que es
+exactamente lo que pasó con la versión anterior y por lo que se reescribió.
