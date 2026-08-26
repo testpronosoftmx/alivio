@@ -13,14 +13,16 @@ const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
 // El maxlength="300" del textarea es cosmético: el cliente no es frontera de confianza.
 const MAX_TEXT_LENGTH = 500;
 
-// ── Rate limiting por IP ───────────────────────────────────────────────────
-// Primer barrera, en memoria del proceso. En serverless cada instancia lleva su propio
-// contador, así que el límite real es por instancia y no es una garantía dura — pero
-// corta en seco el bucle trivial que hoy puede vaciar la cuenta de Anthropic.
-// Para un tope global y firme, mover a Vercel KV.
-const RATE_LIMIT_MAX = 8;
+// ── Rate limiting híbrido (dispositivo + IP) ────────────────────────────────
+// En México los operadores móviles (Telcel, AT&T) usan CGNAT: cientos de usuarios
+// comparten la misma IP pública. Por eso:
+// 1. Límite fino por dispositivo (deviceId): 8 cada 15 min.
+// 2. Límite grueso por IP (red de seguridad anti-bots masivos): 60 cada 15 min.
+const RATE_LIMIT_DEVICE_MAX = 8;
+const RATE_LIMIT_IP_MAX = 60;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
-const rateLimitHits = new Map<string, number[]>();
+const deviceHits = new Map<string, number[]>();
+const ipHits = new Map<string, number[]>();
 
 function clientIp(req: VercelRequest): string {
   const forwarded = req.headers["x-forwarded-for"];
@@ -28,23 +30,33 @@ function clientIp(req: VercelRequest): string {
   return (raw || "").split(",")[0].trim() || "desconocida";
 }
 
-/** Devuelve true si la IP se pasó del cupo. Purga las entradas viejas de paso. */
-export function isRateLimited(ip: string): boolean {
+function checkLimit(map: Map<string, number[]>, key: string, max: number, now: number, cutoff: number): boolean {
+  if (!key || key === "desconocida") return false;
+  
+  // Purga de marcas viejas
+  const stamps = (map.get(key) || []).filter((t) => t > cutoff);
+  if (stamps.length >= max) return true;
+
+  stamps.push(now);
+  map.set(key, stamps);
+  return false;
+}
+
+/** Devuelve true si el dispositivo o la IP excedieron su cupo. */
+export function isRateLimited(deviceId: string, ip: string): boolean {
   const now = Date.now();
   const cutoff = now - RATE_LIMIT_WINDOW_MS;
 
-  // Purga global: sin esto el Map crece sin tope mientras viva la instancia.
-  for (const [key, stamps] of rateLimitHits) {
-    const alive = stamps.filter((t) => t > cutoff);
-    if (alive.length === 0) rateLimitHits.delete(key);
-    else rateLimitHits.set(key, alive);
+  // 1. Verificar límite por dispositivo si viene presente
+  if (deviceId && checkLimit(deviceHits, `dev_${deviceId}`, RATE_LIMIT_DEVICE_MAX, now, cutoff)) {
+    return true;
   }
 
-  const hits = (rateLimitHits.get(ip) || []).filter((t) => t > cutoff);
-  if (hits.length >= RATE_LIMIT_MAX) return true;
+  // 2. Verificar límite por IP como protección de segundo nivel
+  if (checkLimit(ipHits, `ip_${ip}`, RATE_LIMIT_IP_MAX, now, cutoff)) {
+    return true;
+  }
 
-  hits.push(now);
-  rateLimitHits.set(ip, hits);
   return false;
 }
 
@@ -101,17 +113,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
+  const { text, lang, denomination, deviceId } = req.body || {};
+
   // Rate limit antes de tocar nada: cada llamada que pasa de aquí cuesta dinero.
   const ip = clientIp(req);
-  if (isRateLimited(ip)) {
-    console.warn(`🚫 Rate limit alcanzado para ${ip}.`);
+  const cleanDeviceId = typeof deviceId === "string" ? deviceId.trim().slice(0, 64) : "";
+  if (isRateLimited(cleanDeviceId, ip)) {
+    console.warn(`🚫 Rate limit alcanzado para dev:${cleanDeviceId || "none"} ip:${ip}.`);
     res.setHeader("Retry-After", String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)));
     return res.status(429).json({
       error: "Has hecho demasiadas peticiones seguidas. Respira un momento y vuelve a intentarlo."
     });
   }
-
-  const { text, lang, denomination } = req.body;
 
   if (!text || typeof text !== "string" || text.trim() === "") {
     return res.status(400).json({ error: "El campo 'text' es requerido y no puede estar vacío." });

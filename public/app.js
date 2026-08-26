@@ -1388,13 +1388,20 @@ async function handleRelease() {
   breathingFinishedAndWaiting = false;
   isJustBreathing = false;
 
-  // 1. Disparar API en segundo plano pasando el idioma y denominación actuales
+  // Obtener o generar deviceId único y persistente
+  let deviceId = localStorage.getItem('alivio_device_id');
+  if (!deviceId) {
+    deviceId = 'dev_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
+    localStorage.setItem('alivio_device_id', deviceId);
+  }
+
+  // 1. Disparar API en segundo plano pasando el idioma, denominación y deviceId
   fetch(API_BASE + '/api/comfort', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ text, lang: currentLang, denomination: currentDenomination })
+    body: JSON.stringify({ text, lang: currentLang, denomination: currentDenomination, deviceId })
   })
   .then(async (response) => {
     if (!response.ok) {
