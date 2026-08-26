@@ -47,10 +47,10 @@ if ('serviceWorker' in navigator) {
  */
 const SCREENS = {
   'screen-landing':   { chrome: 'landing' },
-  'screen-hub':       { chrome: 'app' },
-  'screen-evangelio': { chrome: 'app', tab: 'evangelio' },
+  'screen-hub':       { chrome: 'app', headerSlot: 'hub-header' },
+  'screen-evangelio': { chrome: 'app', tab: 'evangelio', headerSlot: 'evangelio-header' },
   'screen-desahogo':  { chrome: 'app', tab: 'desahogo' },
-  'screen-oraciones': { chrome: 'app', tab: 'oraciones' },
+  'screen-oraciones': { chrome: 'app', tab: 'oraciones', headerSlot: 'oraciones-header' },
   'screen-oracion':   { chrome: 'app', tab: 'oraciones' },
   'screen-rosario':   { chrome: 'app', tab: 'oraciones' },
   'screen-suspiro':   { chrome: 'immersive' },
@@ -139,7 +139,100 @@ function changeScreen(screenId) {
     if (globalHeaderLang) globalHeaderLang.classList.add('hidden');
   }
 
+  if (target.headerSlot) renderAppHeader(target.headerSlot);
   renderBottomNav();
+}
+
+/**
+ * ── CABECERA DE APP, UNA SOLA ──────────────────────────────────────────────
+ * Se renderiza en el slot que declare la pantalla en SCREENS.headerSlot, en vez
+ * de copiar el mismo bloque de markup en cada <main>. Una pantalla nueva la
+ * hereda añadiendo `headerSlot` y un <div> vacío: nada más.
+ *
+ * Logotipo → goHome(). Nunca a la landing de marketing: es el argumento previo
+ * a instalar y el usuario recurrente no lo necesita.
+ */
+function renderAppHeader(slotId) {
+  const slot = document.getElementById(slotId);
+  if (!slot) return;
+  const dict = TRANSLATIONS[currentLang];
+  slot.textContent = '';
+
+  const row = document.createElement('div');
+  row.className = 'flex items-center justify-between gap-2';
+
+  // ── Izquierda: logotipo, vuelve al hub ──
+  const brand = document.createElement('button');
+  brand.type = 'button';
+  brand.className = 'flex items-center gap-2 shrink-0 bg-transparent border-0 p-0 cursor-pointer group';
+  brand.title = dict.goHomeLabel;
+  brand.setAttribute('aria-label', dict.goHomeLabel);
+  brand.addEventListener('click', goHome);
+
+  const logo = document.createElement('img');
+  logo.src = '/icon-192.png';
+  logo.alt = '';
+  logo.setAttribute('aria-hidden', 'true');
+  logo.width = 38; logo.height = 38;
+  logo.className = 'w-[38px] h-[38px] rounded-full shadow-sm border border-white/20 group-hover:scale-105 transition-transform';
+
+  const word = document.createElement('span');
+  word.className = 'text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors';
+  word.textContent = 'alivio';
+
+  brand.appendChild(logo);
+  brand.appendChild(word);
+
+  // ── Derecha: idioma, favoritos, apoyar ──
+  const tools = document.createElement('div');
+  tools.className = 'flex items-center gap-2 shrink-0';
+
+  const langBox = document.createElement('div');
+  langBox.className = 'flex items-center gap-1 text-[10px] bg-white/45 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60';
+  const activo = 'font-bold text-indigo-600 transition-colors uppercase cursor-pointer bg-transparent border-0 p-0';
+  const inerte = 'font-light text-slate-400 hover:text-indigo-600 transition-colors uppercase cursor-pointer bg-transparent border-0 p-0';
+  ['es', 'en'].forEach((code, i) => {
+    if (i === 1) {
+      const sep = document.createElement('span');
+      sep.className = 'text-slate-300';
+      sep.textContent = '|';
+      langBox.appendChild(sep);
+    }
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = (currentLang === code) ? activo : inerte;
+    b.textContent = code.toUpperCase();
+    b.addEventListener('click', () => setLang(code));
+    langBox.appendChild(b);
+  });
+
+  const chip = 'bg-white/45 backdrop-blur-md p-1 rounded-full border border-white/60 transition-all cursor-pointer shadow-sm flex items-center justify-center w-[26px] h-[26px] text-xs';
+
+  const fav = document.createElement('button');
+  fav.type = 'button';
+  fav.className = chip + ' text-slate-400 hover:text-indigo-600';
+  fav.title = dict.titleFavorites;
+  fav.setAttribute('aria-label', dict.titleFavorites);
+  fav.textContent = '🔖';
+  fav.addEventListener('click', openFavorites);
+
+  // Discreto a propósito: en una pantalla de rezo, un CTA de donación grande
+  // desentona. Va como icono, no como llamada a la acción.
+  const heart = document.createElement('button');
+  heart.type = 'button';
+  heart.className = chip + ' text-rose-500 hover:text-rose-600';
+  heart.title = dict.supportLabel;
+  heart.setAttribute('aria-label', dict.supportLabel);
+  heart.textContent = '❤️';
+  heart.addEventListener('click', openDonateModal);
+
+  tools.appendChild(langBox);
+  tools.appendChild(fav);
+  tools.appendChild(heart);
+
+  row.appendChild(brand);
+  row.appendChild(tools);
+  slot.appendChild(row);
 }
 
 /**
@@ -310,6 +403,8 @@ const TRANSLATIONS = {
     step3Desc: "Recibe versículos personalizados, tu plegaria íntima y haz un recordatorio. Además, guarda tus oraciones favoritas y mantén tu racha diaria.",
     titleScreenshots: "capturas de la aplicación",
     titleFavorites: "Mis oraciones guardadas",
+    goHomeLabel: "Volver al inicio",
+    supportLabel: "Apoyar a Alivio",
     hubGreeting: "«La paz les dejo, mi paz les doy»",
     hubCardSoon: "muy pronto",
     hubCard_evangelio_title: "Evangelio del Día",
@@ -437,6 +532,8 @@ const TRANSLATIONS = {
     step3Desc: "Receive personalized verses, your intimate prayer, and set a reminder. Plus, save your favorite prayers and keep your daily streak.",
     titleScreenshots: "application screenshots",
     titleFavorites: "My saved prayers",
+    goHomeLabel: "Back to home",
+    supportLabel: "Support Alivio",
     hubGreeting: "“Peace I leave with you; my peace I give you”",
     hubCardSoon: "coming soon",
     hubCard_evangelio_title: "Gospel of the Day",
@@ -1097,20 +1194,13 @@ function applyTranslations() {
   // Bloque del video demo. Guarda de id ausente: estos elementos son nuevos y no
   // deben poder tumbar el resto de applyTranslations() si faltan.
   // ── Hub, barra inferior y pantallas de los módulos nuevos ──────────────
-  // Selector de idioma del hub, con el mismo resaltado que el de la app.
-  const hubBtnEs = document.getElementById('hub-lang-btn-es');
-  const hubBtnEn = document.getElementById('hub-lang-btn-en');
-  if (hubBtnEs && hubBtnEn) {
-    const active = "font-bold text-indigo-600 transition-colors uppercase cursor-pointer";
-    const idle = "font-light text-slate-400 hover:text-indigo-600 transition-colors uppercase cursor-pointer";
-    hubBtnEs.className = (currentLang === 'es') ? active : idle;
-    hubBtnEn.className = (currentLang === 'en') ? active : idle;
-  }
+  // La cabecera de la pantalla activa se repinta entera: sus textos y el idioma
+  // resaltado salen del diccionario al construirla.
+  const activeSlot = (SCREENS[currentScreen] || {}).headerSlot;
+  if (activeSlot) renderAppHeader(activeSlot);
 
   const hubGreetingEl = document.getElementById('hub-greeting');
   if (hubGreetingEl) hubGreetingEl.innerText = dict.hubGreeting;
-  const hubFavBtn = document.getElementById('hub-favorites-btn');
-  if (hubFavBtn) hubFavBtn.title = dict.titleFavorites;
   const appFavBtn = document.getElementById('app-favorites-btn');
   if (appFavBtn) appFavBtn.title = dict.titleFavorites;
 

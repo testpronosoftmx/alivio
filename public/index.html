@@ -899,22 +899,7 @@
       <!-- ================= PANTALLA 0: HUB DE INICIO ================= -->
       <main id="screen-hub" class="screen-fade screen-hidden w-full flex flex-col gap-5">
         <header class="space-y-3">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 shrink-0">
-              <img src="/icon-192.png" alt="" aria-hidden="true" width="38" height="38" class="w-[38px] h-[38px] rounded-full shadow-sm border border-white/20">
-              <span class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold">alivio</span>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <div class="flex items-center gap-1 text-[10px] bg-white/45 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60">
-                <button id="hub-lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
-                <span class="text-slate-300">|</span>
-                <button id="hub-lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
-              </div>
-              <button id="hub-favorites-btn" onclick="openFavorites()" class="text-xs bg-white/45 backdrop-blur-md p-1 rounded-full border border-white/60 text-slate-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm flex items-center justify-center w-[26px] h-[26px]">
-                <span aria-hidden="true">🔖</span>
-              </button>
-            </div>
-          </div>
+          <div id="hub-header"></div>
           <p id="hub-greeting" class="text-sm font-light text-slate-500 leading-relaxed italic">«La paz les dejo, mi paz les doy»</p>
         </header>
 
@@ -1201,17 +1186,23 @@
 
       <!-- ========= PANTALLA 4: EVANGELIO DEL DÍA (fase 3) ========= -->
       <main id="screen-evangelio" class="screen-fade screen-hidden w-full flex flex-col gap-5">
-        <header class="space-y-2">
-          <h2 id="evangelio-title" class="text-lg font-medium text-slate-700">Evangelio del Día</h2>
-          <p id="evangelio-soon" class="text-sm font-light text-slate-500 leading-relaxed">Muy pronto: la Palabra de hoy con su primera lectura, el salmo y el comentario del Papa.</p>
+        <header class="space-y-3">
+          <div id="evangelio-header"></div>
+          <div class="space-y-1">
+            <h2 id="evangelio-title" class="text-lg font-medium text-slate-700">Evangelio del Día</h2>
+            <p id="evangelio-soon" class="text-sm font-light text-slate-500 leading-relaxed">Muy pronto: la Palabra de hoy con su primera lectura, el salmo y el comentario del Papa.</p>
+          </div>
         </header>
       </main>
 
       <!-- ========= PANTALLA 5: ORACIONES ========= -->
       <main id="screen-oraciones" class="screen-fade screen-hidden w-full flex flex-col gap-4">
-        <header class="space-y-2">
-          <h2 id="oraciones-title" class="text-lg font-medium text-slate-700">Oraciones</h2>
-          <p id="oraciones-subtitle" class="text-xs font-light text-slate-500 leading-relaxed">Textos de siempre, sin conexión y sin prisa.</p>
+        <header class="space-y-3">
+          <div id="oraciones-header"></div>
+          <div class="space-y-1">
+            <h2 id="oraciones-title" class="text-lg font-medium text-slate-700">Oraciones</h2>
+            <p id="oraciones-subtitle" class="text-xs font-light text-slate-500 leading-relaxed">Textos de siempre, sin conexión y sin prisa.</p>
+          </div>
         </header>
 
         <!-- Rosario del día: solo para la vertiente católica -->
