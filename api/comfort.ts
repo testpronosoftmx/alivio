@@ -9,6 +9,82 @@ dotenv.config();
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
 const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
 
+// ── Límites de entrada ─────────────────────────────────────────────────────
+// El maxlength="300" del textarea es cosmético: el cliente no es frontera de confianza.
+const MAX_TEXT_LENGTH = 500;
+
+// ── Rate limiting por IP ───────────────────────────────────────────────────
+// Primer barrera, en memoria del proceso. En serverless cada instancia lleva su propio
+// contador, así que el límite real es por instancia y no es una garantía dura — pero
+// corta en seco el bucle trivial que hoy puede vaciar la cuenta de Anthropic.
+// Para un tope global y firme, mover a Vercel KV.
+const RATE_LIMIT_MAX = 8;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const rateLimitHits = new Map<string, number[]>();
+
+function clientIp(req: VercelRequest): string {
+  const forwarded = req.headers["x-forwarded-for"];
+  const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  return (raw || "").split(",")[0].trim() || "desconocida";
+}
+
+/** Devuelve true si la IP se pasó del cupo. Purga las entradas viejas de paso. */
+export function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const cutoff = now - RATE_LIMIT_WINDOW_MS;
+
+  // Purga global: sin esto el Map crece sin tope mientras viva la instancia.
+  for (const [key, stamps] of rateLimitHits) {
+    const alive = stamps.filter((t) => t > cutoff);
+    if (alive.length === 0) rateLimitHits.delete(key);
+    else rateLimitHits.set(key, alive);
+  }
+
+  const hits = (rateLimitHits.get(ip) || []).filter((t) => t > cutoff);
+  if (hits.length >= RATE_LIMIT_MAX) return true;
+
+  hits.push(now);
+  rateLimitHits.set(ip, hits);
+  return false;
+}
+
+// ── Saneado del prompt de imagen ───────────────────────────────────────────
+// El imagePrompt lo redacta el modelo a partir del texto del usuario, así que es
+// una vía indirecta para inyectar contenido en una URL pública de Pollinations.
+// El estilo y las restricciones se prefijan del lado del servidor: no se confía en
+// que el modelo las repita.
+const IMAGE_STYLE_PREFIX =
+  "Serene sacred atmospheric artwork, painterly, reverent, calm. No people, no human figures, no faces, no text, no letters, no logos, no watermarks.";
+const IMAGE_NEGATIVE_SUFFIX =
+  "Avoid: nudity, gore, blood, violence, corpses, weapons, distorted anatomy, photorealistic depictions of sacred persons, any written words.";
+
+const IMAGE_PROMPT_BLOCKLIST = [
+  "nude", "naked", "nsfw", "erotic", "sexy", "lingerie",
+  "blood", "bloody", "gore", "gory", "corpse", "dead body", "decay", "rotting",
+  "violence", "violent", "torture", "wound", "mutilat", "weapon", "gun", "knife",
+  "demon", "satan", "occult", "pentagram", "hell",
+  "photorealistic portrait", "realistic face", "selfie",
+  "child", "kid", "minor",
+  "logo", "watermark", "signature", "caption", "subtitle"
+];
+
+/** Limpia el prompt del modelo o devuelve null si no es utilizable. */
+export function sanitizeImagePrompt(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+
+  // Una sola línea, sin caracteres de control ni longitud absurda.
+  const cleaned = raw.replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim().slice(0, 300);
+  if (cleaned.length < 10) return null;
+
+  const lowered = cleaned.toLowerCase();
+  const hit = IMAGE_PROMPT_BLOCKLIST.find((term) => lowered.includes(term));
+  if (hit) {
+    console.warn(`🚫 imagePrompt rechazado por la lista de bloqueo (término: "${hit}").`);
+    return null;
+  }
+  return cleaned;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Headers CORS — necesarios para Android nativo (Capacitor) y cualquier origen externo
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -25,10 +101,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
+  // Rate limit antes de tocar nada: cada llamada que pasa de aquí cuesta dinero.
+  const ip = clientIp(req);
+  if (isRateLimited(ip)) {
+    console.warn(`🚫 Rate limit alcanzado para ${ip}.`);
+    res.setHeader("Retry-After", String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)));
+    return res.status(429).json({
+      error: "Has hecho demasiadas peticiones seguidas. Respira un momento y vuelve a intentarlo."
+    });
+  }
+
   const { text, lang, denomination } = req.body;
 
   if (!text || typeof text !== "string" || text.trim() === "") {
     return res.status(400).json({ error: "El campo 'text' es requerido y no puede estar vacío." });
+  }
+
+  // Tope duro de longitud en el servidor.
+  const userText = text.trim().slice(0, MAX_TEXT_LENGTH);
+  if (text.trim().length > MAX_TEXT_LENGTH) {
+    console.warn(`✂️ Entrada recortada de ${text.trim().length} a ${MAX_TEXT_LENGTH} caracteres.`);
   }
 
   const targetLang = (lang === "en") ? "en" : "es";
@@ -65,7 +157,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 1. Llamar a Claude Sonnet para obtener el confort y el prompt para la imagen
     const systemInstruction = `Eres un ${cfg.role}. Tu misión es proveer confort espiritual y emocional. Debes responder estrictamente en formato JSON válido y redactado en el idioma: ${languageName}. No incluyas explicaciones ni etiquetas markdown de código (como \`\`\`json) en tu respuesta, solo el objeto JSON plano.`;
 
-    const prompt = `Un usuario ha compartido el siguiente desahogo de su mente/corazón: "${text}".
+    const prompt = `Un usuario ha compartido el siguiente desahogo de su mente/corazón: "${userText}".
     
     Analiza su dolor o angustia y genera un confort espiritual adaptado al enfoque: ${denom}.
     Usa ${cfg.bibleStyle} para las citas de sabiduría o versículos.
@@ -109,10 +201,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const responseText = firstContentBlock.text.trim();
     const comfortData = JSON.parse(responseText);
 
-    // 2. Generar ilustración sacra usando Pollinations.ai (100% gratuito)
-    console.log(`🎨 Generando URL de imagen de Pollinations.ai con prompt: "${comfortData.imagePrompt}"`);
+    // 2. Generar ilustración sacra usando Pollinations.ai (100% gratuito).
+    //    El prompt del modelo se sanea; si no pasa el filtro, se cae al estilo fijo
+    //    de la denominación, que es texto nuestro y siempre es seguro.
+    const safeBody = sanitizeImagePrompt(comfortData.imagePrompt) || cfg.imageStyle;
+    const finalImagePrompt = `${IMAGE_STYLE_PREFIX} ${safeBody}. ${IMAGE_NEGATIVE_SUFFIX}`;
+
+    console.log(`🎨 Generando URL de imagen de Pollinations.ai con prompt: "${finalImagePrompt}"`);
     const randomSeed = Math.floor(Math.random() * 1000000);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(comfortData.imagePrompt)}?width=512&height=512&nologo=true&seed=${randomSeed}`;
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalImagePrompt)}?width=512&height=512&nologo=true&seed=${randomSeed}`;
 
     // 3. Responder al cliente
     return res.status(200).json({
@@ -124,11 +221,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
   } catch (error: any) {
+    // El detalle va al log del servidor, nunca al cliente: devolverlo expone rutas
+    // internas, versiones de dependencias y forma del código.
     console.error("❌ Error en endpoint comfort:", error.stack || error.message || error);
-    return res.status(500).json({
-      error: "Ocurrió un error al procesar el confort espiritual.",
-      details: error.message || error,
-      stack: error.stack
-    });
+    return res.status(500).json({ error: "Ocurrió un error al procesar el confort espiritual." });
   }
 }

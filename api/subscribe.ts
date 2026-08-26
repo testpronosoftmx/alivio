@@ -122,10 +122,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
   } catch (error: any) {
-    console.error("❌ Error en endpoint subscribe:", error.message || error);
-    return res.status(500).json({
-      error: "Error al guardar la suscripción en la base de datos.",
-      details: error.message || error
-    });
+    // El detalle va al log del servidor, nunca al cliente.
+    console.error("❌ Error en endpoint subscribe:", error.stack || error.message || error);
+    return res.status(500).json({ error: "Error al guardar la suscripción en la base de datos." });
   }
 }
