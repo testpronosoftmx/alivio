@@ -208,6 +208,297 @@
       transform: translateY(10px);
     }
 
+    /* ── BARRA DE NAVEGACIÓN INFERIOR ───────────────── */
+    /* env(safe-area-inset-bottom) es obligatorio: sin él la barra queda debajo de
+       la barra de gestos de Android y del notch de iOS, y eso solo se arregla
+       publicando otra vez en Play Store. */
+    #bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      display: flex;
+      align-items: stretch;
+      gap: 6px;
+      padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px));
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 -2px 20px rgba(79, 70, 229, 0.07);
+    }
+    #bottom-nav[hidden] { display: none; }
+
+    /* Reserva de espacio para que el contenido no quede debajo de la barra */
+    body.has-bottom-nav {
+      padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .nav-tab {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 7px 4px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+    }
+    .nav-tab:active { transform: scale(0.94); }
+    .nav-tab svg { width: 20px; height: 20px; }
+    .nav-tab-active { color: #4f46e5; background: rgba(79, 70, 229, 0.08); }
+
+    /* Desahogo va destacado: es el diferenciador real de la app */
+    .nav-tab-center .nav-tab-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin-top: -16px;
+      border-radius: 9999px;
+      color: #fff;
+      background: linear-gradient(135deg, #8b5cf6, #a855f7, #d946ef);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+    }
+    .nav-tab-center.nav-tab-active { background: transparent; }
+
+    /* ── ORACIONES ──────────────────────────────────── */
+    .prayer-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.55);
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color 0.18s ease, transform 0.15s ease;
+    }
+    .prayer-item:hover { background: rgba(255, 255, 255, 0.8); }
+    .prayer-item:active { transform: scale(0.99); }
+
+    /* ── TARJETA DEVOCIONAL ─────────────────────────── */
+    /* Pergamino sobrio: cálido, no literal. La textura la dan la luz y el borde,
+       no una imagen — que además pesaría en el APK. */
+    .devotional-card {
+      position: relative;
+      border-radius: 22px;
+      padding: 30px 24px 26px;
+      background:
+        radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.96) 0%, rgba(253,251,246,.92) 55%, rgba(250,247,255,.90) 100%);
+      border: 1px solid rgba(214, 205, 235, .55);
+      box-shadow:
+        0 1px 2px rgba(49, 32, 92, .04),
+        0 10px 30px -12px rgba(79, 70, 229, .16),
+        inset 0 1px 0 rgba(255, 255, 255, .8);
+    }
+    /* Filete interior: el remate de un devocionario impreso */
+    .devotional-card::before {
+      content: '';
+      position: absolute;
+      inset: 7px;
+      border-radius: 16px;
+      border: 1px solid rgba(199, 186, 230, .28);
+      pointer-events: none;
+    }
+
+    .devotional-head {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Vitral de cabecera. Cuatro variantes según el tipo de rezo, en SVG inline:
+       ~1 KB los cuatro, escalan sin pixelarse y no engordan el APK. */
+    .devotional-banner {
+      width: calc(100% + 48px);
+      margin: -30px -24px 4px;
+      height: 74px;
+      border-radius: 22px 22px 0 0;
+      overflow: hidden;
+      display: block;
+    }
+    @media (min-width: 640px) {
+      .devotional-banner { width: calc(100% + 68px); margin: -36px -34px 6px; height: 86px; }
+    }
+    .devotional-banner svg { width: 100%; height: 100%; display: block; }
+    .devotional-cross {
+      width: 21px;
+      height: 30px;
+      color: #8b7fc7;
+      flex-shrink: 0;
+    }
+    .devotional-rule {
+      width: 62px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(139,127,199,.5), transparent);
+    }
+
+    /* Modo oración: tipografía grande y alto contraste. Nadie quiere entrecerrar
+       los ojos a mitad del Credo. El tamaño lo gobierna --prayer-scale (A- / A+). */
+    .prayer-body {
+      font-size: calc(1.18rem * var(--prayer-scale, 1));
+      line-height: 1.95;
+      color: #241f42;
+      white-space: pre-line;
+      letter-spacing: 0.005em;
+      text-align: center;
+      transition: font-size .18s ease;
+    }
+    @media (min-width: 640px) {
+      .prayer-body { font-size: calc(1.3rem * var(--prayer-scale, 1)); }
+      .devotional-card { padding: 36px 34px 30px; }
+    }
+
+    /* ── CONTROLES DE LECTURA ───────────────────────── */
+    .font-ctl-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, .6);
+      border: 1px solid rgba(255, 255, 255, .8);
+    }
+    .font-ctl {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 26px;
+      border: 0;
+      border-radius: 9999px;
+      background: transparent;
+      color: #7c74a8;
+      font-family: inherit;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease, opacity .15s ease;
+    }
+    .font-ctl:hover:not(:disabled) { background: rgba(139,127,199,.14); color: #4f46e5; }
+    .font-ctl:active:not(:disabled) { transform: scale(.92); }
+    .font-ctl:disabled { opacity: .3; cursor: default; }
+    .font-ctl-sm { font-size: 11px; }
+    .font-ctl-lg { font-size: 15px; }
+
+    /* Referencia espiritual, no pie de contrato: sin mayúsculas ni tono jurídico */
+    .prayer-source {
+      font-size: 11.5px;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.01em;
+      color: #a5a0b5;
+      text-align: center;
+    }
+
+    /* ── ROSARIO GUIADO ─────────────────────────────── */
+    .rosary-beads {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      padding: 4px 0;
+    }
+    .bead {
+      width: 9px;
+      height: 9px;
+      border-radius: 9999px;
+      background: #e0e7ff;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .bead-done { background: #a5b4fc; }
+    .bead-now { background: #4f46e5; transform: scale(1.45); }
+    .bead-big { width: 12px; height: 12px; background: #fbcfe8; }
+    .bead-big.bead-done { background: #f472b6; }
+    .bead-big.bead-now { background: #db2777; transform: scale(1.35); }
+
+    .rosary-btn {
+      flex: 1;
+      padding: 13px 16px;
+      border: 0;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s ease;
+    }
+    .rosary-btn:active { transform: scale(0.97); }
+    .rosary-btn-main {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+    }
+    .rosary-btn-ghost {
+      background: rgba(255, 255, 255, 0.6);
+      color: #64748b;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      flex: 0 0 auto;
+      padding: 13px 18px;
+    }
+    .rosary-btn:disabled { opacity: 0.35; cursor: default; }
+
+    /* ── TARJETAS DEL HUB ───────────────────────────── */
+    .hub-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 16px;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    }
+    .hub-card:hover { background: rgba(255, 255, 255, 0.75); box-shadow: 0 4px 14px rgba(79, 70, 229, 0.08); }
+    .hub-card:active { transform: scale(0.985); }
+    .hub-card-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .hub-card-soon {
+      margin-left: auto;
+      flex-shrink: 0;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a78bfa;
+      background: rgba(167, 139, 250, 0.12);
+      padding: 3px 8px;
+      border-radius: 9999px;
+    }
+
     /* ── DENOMINACIÓN ───────────────────────────────── */
     .denom-btn {
       display: inline-flex;
@@ -443,9 +734,20 @@
             <!-- Video Demostrativo de Funcionalidad -->
             <div class="p-5 rounded-2xl bg-white/50 border border-white/70 shadow-sm flex flex-col items-center gap-3">
               <h3 id="video-demo-title" class="text-xs uppercase tracking-widest text-indigo-700 font-semibold">¿Cómo luce Alivio en mi celular?</h3>
-              <div class="relative w-full max-w-[260px] aspect-[9/16] rounded-2xl overflow-hidden border-4 border-slate-300 bg-black shadow-lg">
-                <video src="/Video Funcionalidad Alivio.mp4" controls preload="metadata" playsinline class="w-full h-full object-cover"></video>
-              </div>
+              <!-- Fachada de YouTube: no se carga nada de YouTube hasta que el usuario pulsa.
+                   Un iframe directo trae ~1 MB de JS en cada carga de la landing. -->
+              <button type="button" id="video-demo-facade" onclick="loadDemoVideo()"
+                      class="group relative w-full max-w-[420px] aspect-video rounded-2xl overflow-hidden border border-slate-300 bg-slate-900 shadow-lg cursor-pointer">
+                <img src="https://i.ytimg.com/vi/eoMOhortt_4/hqdefault.jpg"
+                     alt="" aria-hidden="true" loading="lazy" width="480" height="360"
+                     class="w-full h-full object-cover opacity-80 transition-opacity group-hover:opacity-100">
+                <span class="absolute inset-0 flex items-center justify-center">
+                  <span class="flex items-center justify-center w-14 h-14 rounded-full bg-white/90 shadow-lg transition-transform group-hover:scale-110 group-active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                  </span>
+                </span>
+                <span id="video-demo-cta" class="sr-only">Ver el video de demostración de Alivio</span>
+              </button>
             </div>
           </div>
         </section>
@@ -594,12 +896,39 @@
     <!-- Contenedor para las pantallas de la App (Se mantienen en max-w-md para un enfoque devocional y meditación íntima) -->
     <div class="w-full max-w-md mx-auto px-4 flex-1 flex flex-col justify-start">
       
+      <!-- ================= PANTALLA 0: HUB DE INICIO ================= -->
+      <main id="screen-hub" class="screen-fade screen-hidden w-full flex flex-col gap-5">
+        <header class="space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 shrink-0">
+              <img src="/icon-192.png" alt="" aria-hidden="true" width="38" height="38" class="w-[38px] h-[38px] rounded-full shadow-sm border border-white/20">
+              <span class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold">alivio</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center gap-1 text-[10px] bg-white/45 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60">
+                <button id="hub-lang-btn-es" onclick="setLang('es')" class="transition-colors uppercase cursor-pointer">ES</button>
+                <span class="text-slate-300">|</span>
+                <button id="hub-lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
+              </div>
+              <button id="hub-favorites-btn" onclick="openFavorites()" class="text-xs bg-white/45 backdrop-blur-md p-1 rounded-full border border-white/60 text-slate-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm flex items-center justify-center w-[26px] h-[26px]">
+                <span aria-hidden="true">🔖</span>
+              </button>
+            </div>
+          </div>
+          <p id="hub-greeting" class="text-sm font-light text-slate-500 leading-relaxed italic">«La paz les dejo, mi paz les doy»</p>
+        </header>
+
+        <!-- El orden de las tarjetas lo fija la vertiente desde app.js.
+             El contenido es idéntico para las tres: solo cambia la prominencia. -->
+        <div id="hub-cards" class="flex flex-col gap-3"></div>
+      </main>
+
       <!-- ================= PANTALLA 1: EL DESAHOGO ================= -->
       <main id="screen-desahogo" class="screen-fade screen-hidden w-full flex flex-col gap-4">
         <header class="space-y-3">
           <div class="flex items-center justify-between gap-2">
             <!-- Izquierda: Logo + Nombre -->
-            <div onclick="changeScreen('screen-landing')" class="flex items-center gap-2 cursor-pointer group shrink-0">
+            <div onclick="goHome()" class="flex items-center gap-2 cursor-pointer group shrink-0">
               <img src="/icon-192.png" alt="Alivio Logo" class="w-[38px] h-[38px] rounded-full shadow-sm border border-white/20 group-hover:scale-105 transition-transform">
               <span class="text-xs uppercase tracking-[0.25em] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">alivio</span>
             </div>
@@ -611,7 +940,7 @@
                 <span class="text-slate-300">|</span>
                 <button id="app-lang-btn-en" onclick="setLang('en')" class="transition-colors uppercase cursor-pointer">EN</button>
               </div>
-              <button onclick="openFavorites()" class="text-xs bg-white/45 backdrop-blur-md p-1 rounded-full border border-white/60 text-slate-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm flex items-center justify-center w-[26px] h-[26px]" title="Mis Oraciones">
+              <button id="app-favorites-btn" onclick="openFavorites()" class="text-xs bg-white/45 backdrop-blur-md p-1 rounded-full border border-white/60 text-slate-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm flex items-center justify-center w-[26px] h-[26px]" title="Mis Oraciones">
                 <span>🔖</span>
               </button>
             </div>
@@ -870,9 +1199,125 @@
         </section>
       </main>
 
+      <!-- ========= PANTALLA 4: EVANGELIO DEL DÍA (fase 3) ========= -->
+      <main id="screen-evangelio" class="screen-fade screen-hidden w-full flex flex-col gap-5">
+        <header class="space-y-2">
+          <h2 id="evangelio-title" class="text-lg font-medium text-slate-700">Evangelio del Día</h2>
+          <p id="evangelio-soon" class="text-sm font-light text-slate-500 leading-relaxed">Muy pronto: la Palabra de hoy con su primera lectura, el salmo y el comentario del Papa.</p>
+        </header>
+      </main>
+
+      <!-- ========= PANTALLA 5: ORACIONES ========= -->
+      <main id="screen-oraciones" class="screen-fade screen-hidden w-full flex flex-col gap-4">
+        <header class="space-y-2">
+          <h2 id="oraciones-title" class="text-lg font-medium text-slate-700">Oraciones</h2>
+          <p id="oraciones-subtitle" class="text-xs font-light text-slate-500 leading-relaxed">Textos de siempre, sin conexión y sin prisa.</p>
+        </header>
+
+        <!-- Rosario del día: solo para la vertiente católica -->
+        <button type="button" id="rosary-card" onclick="startRosary()" class="hub-card" hidden>
+          <span class="hub-card-icon bg-sky-50 text-sky-600" aria-hidden="true">📿</span>
+          <span class="flex flex-col gap-0.5 min-w-0">
+            <span id="rosary-card-title" class="text-sm font-medium text-slate-700">Rosario de hoy</span>
+            <span id="rosary-card-desc" class="text-xs font-light text-slate-500 leading-relaxed">Misterios Gozosos</span>
+          </span>
+        </button>
+
+        <!-- La búsqueda aparece sola a partir de 15 oraciones -->
+        <div id="prayer-search-wrap" hidden>
+          <input id="prayer-search" type="search" autocomplete="off"
+                 class="w-full px-4 py-2.5 text-sm rounded-xl border border-white/70 bg-white/60 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+        </div>
+
+        <div id="prayer-list" class="flex flex-col gap-2.5"></div>
+
+        <p id="prayer-empty" class="text-sm font-light text-slate-500 leading-relaxed py-6 text-center" hidden></p>
+      </main>
+
+      <!-- ========= PANTALLA 7: ROSARIO GUIADO ========= -->
+      <main id="screen-rosario" class="screen-fade screen-hidden w-full flex flex-col gap-4">
+        <header class="flex items-center justify-between gap-3">
+          <button type="button" onclick="changeScreen('screen-oraciones')"
+                  class="shrink-0 text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <div class="flex-1 text-center min-w-0">
+            <p id="rosary-set-title" class="text-[11px] uppercase tracking-widest text-indigo-500 font-semibold truncate"></p>
+            <p id="rosary-progress" class="text-[11px] font-light text-slate-400"></p>
+          </div>
+          <span class="w-5 shrink-0" aria-hidden="true"></span>
+        </header>
+
+        <div id="rosary-beads" class="rosary-beads" aria-hidden="true"></div>
+
+        <article class="devotional-card flex-1">
+          <span id="prayer-banner" class="devotional-banner" aria-hidden="true"></span>
+          <div class="devotional-head">
+            <svg class="devotional-cross" viewBox="0 0 24 34" fill="none" aria-hidden="true"><path d="M12 1.5v31M4 10.5h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="10.5" r="3.1" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55"/></svg>
+            <span class="devotional-rule" aria-hidden="true"></span>
+          </div>
+          <div class="flex flex-col gap-2.5 text-center">
+            <p id="rosary-step-label" class="text-[11px] uppercase tracking-widest text-indigo-400 font-semibold"></p>
+            <h3 id="rosary-mystery" class="text-base font-medium text-slate-700 leading-snug"></h3>
+            <p id="rosary-ref" class="prayer-source" hidden></p>
+            <p id="rosary-text" class="prayer-body pt-1"></p>
+          </div>
+        </article>
+
+        <div class="flex items-center gap-2 pt-1">
+          <button type="button" id="rosary-prev" onclick="rosaryPrev()" class="rosary-btn rosary-btn-ghost">←</button>
+          <button type="button" id="rosary-next" onclick="rosaryNext()" class="rosary-btn rosary-btn-main"></button>
+        </div>
+      </main>
+
+      <!-- ========= PANTALLA 6: LECTURA DE UNA ORACIÓN ========= -->
+      <main id="screen-oracion" class="screen-fade screen-hidden w-full flex flex-col gap-5">
+        <header class="flex items-start justify-between gap-3">
+          <button type="button" id="prayer-back" onclick="changeScreen('screen-oraciones')"
+                  class="shrink-0 mt-0.5 text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <h2 id="prayer-title" class="text-base font-medium text-slate-700 flex-1 leading-snug"></h2>
+          <button type="button" id="prayer-fav" onclick="savePrayerFavorite()"
+                  class="shrink-0 text-lg text-slate-300 hover:text-indigo-500 transition-colors cursor-pointer">
+            <span aria-hidden="true">🔖</span>
+          </button>
+        </header>
+
+        <div class="flex justify-end items-center gap-2">
+          <button type="button" id="prayer-share" onclick="sharePrayer()" class="font-ctl-group font-ctl" style="width:32px;height:32px">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M8.7 10.7a3 3 0 1 0 0 2.6m0-2.6 6.6-3.4m-6.6 6 6.6 3.4M18 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm0 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+          </button>
+          <div class="font-ctl-group">
+            <button type="button" id="prayer-font-down" onclick="changePrayerFont(-1)" class="font-ctl font-ctl-sm">A</button>
+            <button type="button" id="prayer-font-up" onclick="changePrayerFont(1)" class="font-ctl font-ctl-lg">A</button>
+          </div>
+        </div>
+
+        <article class="devotional-card">
+          <span id="rosary-banner" class="devotional-banner" aria-hidden="true"></span>
+          <div class="devotional-head">
+            <svg class="devotional-cross" viewBox="0 0 24 34" fill="none" aria-hidden="true"><path d="M12 1.5v31M4 10.5h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="10.5" r="3.1" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55"/></svg>
+            <span class="devotional-rule" aria-hidden="true"></span>
+          </div>
+          <p id="prayer-text" class="prayer-body"></p>
+        </article>
+
+        <footer class="space-y-1.5">
+          <p id="prayer-reference" class="prayer-source" hidden></p>
+          <p id="prayer-source" class="prayer-source" hidden></p>
+          <p id="prayer-awake" class="text-[10px] font-light text-slate-300 text-center" hidden></p>
+        </footer>
+      </main>
+
     </div>
 
   </div>
+
+  <!-- ================= BARRA DE NAVEGACIÓN INFERIOR ================= -->
+  <!-- Se oculta en screen-suspiro y screen-ancla: son pasos del flujo, no destinos.
+       Una barra invitando a irse arruina una respiración guiada. -->
+  <nav id="bottom-nav" hidden aria-label="Navegación principal"></nav>
 
   <!-- Modal de Favoritos — Mis Oraciones Guardadas -->
   <div id="modal-favorites" class="fixed inset-0 bg-slate-900/45 backdrop-blur-md flex items-end justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
@@ -985,6 +1430,7 @@
   </script>
 
   <!-- JS Principal -->
+  <script src="/prayers.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

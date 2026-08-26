@@ -33,11 +33,87 @@ if ('serviceWorker' in navigator) {
 }
 
 /**
+ * ── REGISTRO DE PANTALLAS ──────────────────────────────────────────────────
+ * Sustituye al array literal que había aquí. Toda pantalla nueva se declara en
+ * este objeto y en ningún otro sitio: si no está, changeScreen() no la conoce y
+ * las demás no se ocultan al mostrarla.
+ *
+ * chrome:
+ *   'landing'   → marketing público, con la cabecera flotante y sin barra
+ *   'app'       → módulo con barra de navegación inferior
+ *   'immersive' → paso de un flujo; la barra se oculta (una barra invitando a
+ *                 irse arruina una respiración guiada)
+ * tab: qué pestaña de la barra queda marcada como activa
+ */
+const SCREENS = {
+  'screen-landing':   { chrome: 'landing' },
+  'screen-hub':       { chrome: 'app' },
+  'screen-evangelio': { chrome: 'app', tab: 'evangelio' },
+  'screen-desahogo':  { chrome: 'app', tab: 'desahogo' },
+  'screen-oraciones': { chrome: 'app', tab: 'oraciones' },
+  'screen-oracion':   { chrome: 'app', tab: 'oraciones' },
+  'screen-rosario':   { chrome: 'app', tab: 'oraciones' },
+  'screen-suspiro':   { chrome: 'immersive' },
+  // La respiración es lo único inmersivo: una barra invitando a irse arruina
+  // medio minuto de recogimiento. El ancla sí es un destino y lleva barra.
+  'screen-ancla':     { chrome: 'app', tab: 'desahogo' }
+};
+
+/**
+ * ── MÓDULOS DEL HUB Y DE LA BARRA ──────────────────────────────────────────
+ * `enabled: false` saca el módulo del hub y de la barra sin borrar nada.
+ * `ready: false`   lo muestra con la etiqueta «muy pronto» y su pantalla vacía.
+ *
+ * Fase 2 pone `ready: true` en 'oraciones'. Fase 3, en 'evangelio'.
+ * Si prefieres no publicar placeholders en web, pon `enabled: false` en ambos:
+ * el hub y la barra se ocultan solos cuando queda un único destino.
+ */
+const MODULES = [
+  { id: 'evangelio', screen: 'screen-evangelio', enabled: true, ready: false, icon: '📖', accent: 'bg-amber-50 text-amber-600' },
+  { id: 'desahogo',  screen: 'screen-desahogo',  enabled: true, ready: true,  icon: '✍️', accent: 'bg-violet-50 text-violet-600', center: true },
+  { id: 'oraciones', screen: 'screen-oraciones', enabled: true, ready: true,  icon: '📿', accent: 'bg-emerald-50 text-emerald-600' }
+];
+
+/**
+ * Orden de las tarjetas del hub por vertiente. El CONTENIDO es idéntico para las
+ * tres: lo único que cambia es la prominencia. Es la aplicación literal de
+ * «adapta lo personal, no adaptes lo compartido» — ver el skill
+ * alivio-contenido-liturgico. Nunca ramifiques el contenido aquí.
+ */
+const HUB_ORDER = {
+  catholic:    ['evangelio', 'desahogo', 'oraciones'],
+  evangelical: ['evangelio', 'desahogo', 'oraciones'],
+  spiritual:   ['desahogo', 'oraciones', 'evangelio']
+};
+
+let currentScreen = 'screen-landing';
+
+/** Módulos visibles hoy, en el orden que toca para la vertiente activa. */
+function visibleModules() {
+  const order = HUB_ORDER[currentDenomination] || HUB_ORDER.catholic;
+  return order
+    .map(id => MODULES.find(m => m.id === id))
+    .filter(m => m && m.enabled);
+}
+
+/**
  * Función para cambiar de pantalla con efecto de fade
  */
 function changeScreen(screenId) {
-  const screens = ['screen-landing', 'screen-desahogo', 'screen-suspiro', 'screen-ancla'];
-  screens.forEach(id => {
+  const target = SCREENS[screenId];
+  if (!target) {
+    console.warn(`changeScreen: "${screenId}" no está en SCREENS. Añádela al registro.`);
+    return;
+  }
+  // Salir de la lectura suelta el bloqueo de pantalla: solo se mantiene
+  // encendida mientras se está rezando, no el resto de la sesión.
+  const rezando = ['screen-oracion', 'screen-rosario'];
+  if (rezando.includes(currentScreen) && !rezando.includes(screenId)) {
+    releasePrayerWakeLock();
+  }
+  currentScreen = screenId;
+
+  Object.keys(SCREENS).forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     if (id === screenId) {
@@ -55,13 +131,124 @@ function changeScreen(screenId) {
   // Ocultar cabecera flotante superior (corazón e idiomas de la landing) al entrar a la app
   const headerDonateBtn = document.getElementById('header-donate-btn');
   const globalHeaderLang = document.getElementById('global-header-lang-container');
-  if (screenId === 'screen-landing') {
+  if (target.chrome === 'landing') {
     if (headerDonateBtn) headerDonateBtn.classList.remove('hidden');
     if (globalHeaderLang) globalHeaderLang.classList.remove('hidden');
   } else {
     if (headerDonateBtn) headerDonateBtn.classList.add('hidden');
     if (globalHeaderLang) globalHeaderLang.classList.add('hidden');
   }
+
+  renderBottomNav();
+}
+
+/**
+ * Vuelve al hub. Es lo que hace el logotipo dentro de la app.
+ * Con un solo módulo activo el hub no aporta nada —sería una tarjeta suelta y un
+ * toque de más—, así que se salta y se entra directo. Eso hace que apagar los
+ * módulos con `enabled: false` devuelva exactamente el comportamiento anterior.
+ */
+function goHome() {
+  const mods = visibleModules();
+  if (mods.length <= 1) {
+    changeScreen(mods.length === 1 ? mods[0].screen : 'screen-desahogo');
+    return;
+  }
+  renderHub();
+  changeScreen('screen-hub');
+}
+
+/**
+ * Pinta las tarjetas del hub. Se reconstruyen al cambiar idioma o vertiente.
+ * Todo con createElement: nada de innerHTML.
+ */
+function renderHub() {
+  const host = document.getElementById('hub-cards');
+  if (!host) return;
+  const dict = TRANSLATIONS[currentLang];
+
+  host.textContent = '';
+
+  visibleModules().forEach(mod => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'hub-card';
+    card.addEventListener('click', () => changeScreen(mod.screen));
+
+    const icon = document.createElement('span');
+    icon.className = `hub-card-icon ${mod.accent}`;
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = mod.icon;
+
+    const body = document.createElement('span');
+    body.className = 'flex flex-col gap-0.5 min-w-0';
+
+    const title = document.createElement('span');
+    title.className = 'text-sm font-medium text-slate-700';
+    title.textContent = dict[`hubCard_${mod.id}_title`];
+
+    const desc = document.createElement('span');
+    desc.className = 'text-xs font-light text-slate-500 leading-relaxed';
+    desc.textContent = dict[`hubCard_${mod.id}_desc`];
+
+    body.appendChild(title);
+    body.appendChild(desc);
+    card.appendChild(icon);
+    card.appendChild(body);
+
+    if (!mod.ready) {
+      const soon = document.createElement('span');
+      soon.className = 'hub-card-soon';
+      soon.textContent = dict.hubCardSoon;
+      card.appendChild(soon);
+    }
+
+    host.appendChild(card);
+  });
+}
+
+/**
+ * Pinta la barra inferior y marca la pestaña activa.
+ * Con un solo destino no hay nada que navegar: la barra no se muestra.
+ */
+function renderBottomNav() {
+  const nav = document.getElementById('bottom-nav');
+  if (!nav) return;
+
+  const mods = visibleModules();
+  const chrome = (SCREENS[currentScreen] || {}).chrome;
+  const show = chrome === 'app' && mods.length > 1;
+
+  nav.hidden = !show;
+  document.body.classList.toggle('has-bottom-nav', show);
+  if (!show) {
+    nav.textContent = '';
+    return;
+  }
+
+  const dict = TRANSLATIONS[currentLang];
+  const activeTab = (SCREENS[currentScreen] || {}).tab;
+  nav.textContent = '';
+
+  mods.forEach(mod => {
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'nav-tab' + (mod.center ? ' nav-tab-center' : '') + (mod.id === activeTab ? ' nav-tab-active' : '');
+    if (mod.id === activeTab) tab.setAttribute('aria-current', 'page');
+    tab.addEventListener('click', () => changeScreen(mod.screen));
+
+    const icon = document.createElement('span');
+    icon.className = 'nav-tab-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = mod.icon;
+
+    const label = document.createElement('span');
+    label.textContent = dict[`nav_${mod.id}`];
+
+    tab.appendChild(icon);
+    tab.appendChild(label);
+    nav.appendChild(tab);
+  });
 }
 
 // Datos estáticos de contingencia (Fallback) en Español
@@ -122,6 +309,41 @@ const TRANSLATIONS = {
     step3Title: "Recibe consuelo y recordatorios",
     step3Desc: "Recibe versículos personalizados, tu plegaria íntima y haz un recordatorio. Además, guarda tus oraciones favoritas y mantén tu racha diaria.",
     titleScreenshots: "capturas de la aplicación",
+    titleFavorites: "Mis oraciones guardadas",
+    hubGreeting: "«La paz les dejo, mi paz les doy»",
+    hubCardSoon: "muy pronto",
+    hubCard_evangelio_title: "Evangelio del Día",
+    hubCard_evangelio_desc: "La Palabra de hoy, su salmo y el comentario del Papa.",
+    hubCard_desahogo_title: "Desahogo y consuelo",
+    hubCard_desahogo_desc: "Suelta tu carga en anónimo y respira en calma.",
+    hubCard_oraciones_title: "Oraciones y Rosario",
+    hubCard_oraciones_desc: "Padre Nuestro, el Rosario de hoy y los Salmos.",
+    nav_evangelio: "Evangelio",
+    nav_desahogo: "Desahogo",
+    nav_oraciones: "Oraciones",
+    evangelioTitle: "Evangelio del Día",
+    evangelioSoon: "Muy pronto: la Palabra de hoy con su primera lectura, el salmo y el comentario del Papa.",
+    oracionesTitle: "Oraciones",
+    oracionesSubtitle: "Textos de siempre, sin conexión y sin prisa.",
+    prayerSearchPlaceholder: "Buscar una oración…",
+    prayerNoMatches: "No encontramos ninguna oración con esa palabra.",
+    prayerNoneYet: "Todavía no hay oraciones publicadas para este modo.",
+    prayerScreenAwake: "La pantalla se mantendrá encendida mientras rezas.",
+    rosaryToday: "Rosario de hoy",
+    fontSmaller: "Reducir el tamaño de la letra",
+    fontBigger: "Aumentar el tamaño de la letra",
+    prayerShare: "Compartir esta oración",
+    prayerCopied: "Oración copiada",
+    rosaryMysteryOf: "Misterio {n} de {total}",
+    rosaryAnnounce: "Enunciado del misterio",
+    rosaryAveCount: "Ave María {n} de {total}",
+    rosaryNext: "Continuar",
+    rosaryNextAve: "Siguiente Ave María",
+    rosaryClosing: "Para terminar",
+    rosaryDone: "Terminar",
+    videoDemoTitle: "¿Cómo luce Alivio en mi celular?",
+    videoDemoCta: "Ver el video de demostración de Alivio",
+    videoDemoFrameTitle: "Video de demostración de Alivio",
     titleInstall: "Lleva Alivio en tu teléfono",
     subInstall: "Nuestra app es una PWA ligera. No requiere App Store ni Google Play.",
     btnInstallPwa: "Instalar en este Dispositivo",
@@ -214,6 +436,41 @@ const TRANSLATIONS = {
     step3Title: "Receive comfort & reminders",
     step3Desc: "Receive personalized verses, your intimate prayer, and set a reminder. Plus, save your favorite prayers and keep your daily streak.",
     titleScreenshots: "application screenshots",
+    titleFavorites: "My saved prayers",
+    hubGreeting: "“Peace I leave with you; my peace I give you”",
+    hubCardSoon: "coming soon",
+    hubCard_evangelio_title: "Gospel of the Day",
+    hubCard_evangelio_desc: "Today's Word, its psalm and the Pope's reflection.",
+    hubCard_desahogo_title: "Unburden & comfort",
+    hubCard_desahogo_desc: "Let your burden go anonymously and breathe calmly.",
+    hubCard_oraciones_title: "Prayers & Rosary",
+    hubCard_oraciones_desc: "The Lord's Prayer, today's Rosary and the Psalms.",
+    nav_evangelio: "Gospel",
+    nav_desahogo: "Unburden",
+    nav_oraciones: "Prayers",
+    evangelioTitle: "Gospel of the Day",
+    evangelioSoon: "Coming soon: today's Word with its first reading, the psalm and the Pope's reflection.",
+    oracionesTitle: "Prayers",
+    oracionesSubtitle: "The prayers you know, offline and unhurried.",
+    prayerSearchPlaceholder: "Search a prayer…",
+    prayerNoMatches: "No prayer matches that word.",
+    prayerNoneYet: "No prayers published for this mode yet.",
+    prayerScreenAwake: "The screen will stay on while you pray.",
+    rosaryToday: "Today's Rosary",
+    fontSmaller: "Decrease text size",
+    fontBigger: "Increase text size",
+    prayerShare: "Share this prayer",
+    prayerCopied: "Prayer copied",
+    rosaryMysteryOf: "Mystery {n} of {total}",
+    rosaryAnnounce: "Announcing the mystery",
+    rosaryAveCount: "Hail Mary {n} of {total}",
+    rosaryNext: "Continue",
+    rosaryNextAve: "Next Hail Mary",
+    rosaryClosing: "To close",
+    rosaryDone: "Finish",
+    videoDemoTitle: "What does Alivio look like on my phone?",
+    videoDemoCta: "Watch the Alivio demo video",
+    videoDemoFrameTitle: "Alivio demo video",
     titleInstall: "Carry Alivio on your phone",
     subInstall: "Our app is a lightweight PWA. No App Store or Google Play required.",
     btnInstallPwa: "Install on this Device",
@@ -346,6 +603,12 @@ function setDenomination(denom) {
   currentDenomination = denom;
   localStorage.setItem('alivio_denom', denom);
   applyDenominationUI();
+  // La vertiente reordena las tarjetas del hub. El contenido no cambia.
+  renderHub();
+  renderBottomNav();
+  // Las oraciones SÍ se filtran por vertiente: son devoción personal, no
+  // leccionario compartido. Ver «adapta lo personal, no adaptes lo compartido».
+  renderPrayerList();
 }
 
 function applyDenominationUI() {
@@ -702,7 +965,7 @@ window.addEventListener('beforeinstallprompt', async (e) => {
   if (localStorage.getItem('pwa_installed') === 'true') return;
 
   // Capa 4: banner rechazado en esta sesión
-  if (sessionStorage.getItem('pwa_dismissed') === 'true') return;
+  if (localStorage.getItem('alivio_pwa_dismissed') === 'true') return;
 
   // Mostrar el banner flotante
   const installBanner = document.getElementById('pwa-install-banner');
@@ -745,7 +1008,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Acción: Presionar "Más tarde"
   if (dismissBtn) {
     dismissBtn.addEventListener('click', () => {
-      sessionStorage.setItem('pwa_dismissed', 'true');
+      // localStorage, no sessionStorage: «más tarde» significa más tarde, no
+      // «hasta que cierres la pestaña». Prefijo alivio_ por las reglas de casa.
+      localStorage.setItem('alivio_pwa_dismissed', 'true');
       if (installBanner) {
         installBanner.classList.add('hidden');
       }
@@ -772,7 +1037,7 @@ window.addEventListener('appinstalled', () => {
  */
 function enterApp() {
   localStorage.setItem('alivio_visited', 'true');
-  changeScreen('screen-desahogo');
+  goHome();
 }
 
 /**
@@ -828,6 +1093,49 @@ function applyTranslations() {
   document.getElementById('step-2-desc').innerText = dict.step2Desc;
   document.getElementById('step-3-title').innerText = dict.step3Title;
   document.getElementById('step-3-desc').innerText = dict.step3Desc;
+
+  // Bloque del video demo. Guarda de id ausente: estos elementos son nuevos y no
+  // deben poder tumbar el resto de applyTranslations() si faltan.
+  // ── Hub, barra inferior y pantallas de los módulos nuevos ──────────────
+  // Selector de idioma del hub, con el mismo resaltado que el de la app.
+  const hubBtnEs = document.getElementById('hub-lang-btn-es');
+  const hubBtnEn = document.getElementById('hub-lang-btn-en');
+  if (hubBtnEs && hubBtnEn) {
+    const active = "font-bold text-indigo-600 transition-colors uppercase cursor-pointer";
+    const idle = "font-light text-slate-400 hover:text-indigo-600 transition-colors uppercase cursor-pointer";
+    hubBtnEs.className = (currentLang === 'es') ? active : idle;
+    hubBtnEn.className = (currentLang === 'en') ? active : idle;
+  }
+
+  const hubGreetingEl = document.getElementById('hub-greeting');
+  if (hubGreetingEl) hubGreetingEl.innerText = dict.hubGreeting;
+  const hubFavBtn = document.getElementById('hub-favorites-btn');
+  if (hubFavBtn) hubFavBtn.title = dict.titleFavorites;
+  const appFavBtn = document.getElementById('app-favorites-btn');
+  if (appFavBtn) appFavBtn.title = dict.titleFavorites;
+
+  const evangelioTitleEl = document.getElementById('evangelio-title');
+  if (evangelioTitleEl) evangelioTitleEl.innerText = dict.evangelioTitle;
+  const evangelioSoonEl = document.getElementById('evangelio-soon');
+  if (evangelioSoonEl) evangelioSoonEl.innerText = dict.evangelioSoon;
+  const oracionesTitleEl = document.getElementById('oraciones-title');
+  if (oracionesTitleEl) oracionesTitleEl.innerText = dict.oracionesTitle;
+  const oracionesSubEl = document.getElementById('oraciones-subtitle');
+  if (oracionesSubEl) oracionesSubEl.innerText = dict.oracionesSubtitle;
+  // El listado se repinta entero: sus textos salen del diccionario al construirlo.
+  renderPrayerList();
+  applyPrayerFont();
+
+  // Hub y barra se repintan enteros: su texto sale del diccionario al construirlos.
+  renderHub();
+  renderBottomNav();
+
+  const videoTitleEl = document.getElementById('video-demo-title');
+  if (videoTitleEl) videoTitleEl.innerText = dict.videoDemoTitle;
+  const videoCtaEl = document.getElementById('video-demo-cta');
+  if (videoCtaEl) videoCtaEl.innerText = dict.videoDemoCta;
+  const videoFrameEl = document.querySelector('#video-demo-facade + div iframe, iframe[src*="youtube-nocookie"]');
+  if (videoFrameEl) videoFrameEl.title = dict.videoDemoFrameTitle;
   
   const titleScreenshots = document.getElementById('title-screenshots');
   if (titleScreenshots) titleScreenshots.innerText = dict.titleScreenshots;
@@ -1337,6 +1645,581 @@ function prevMarketingScreenshot() {
   updateMarketingScreenshot();
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+//  ORACIONES
+// ══════════════════════════════════════════════════════════════════════════
+//
+// El corpus vive en public/prayers.js: texto fijo, escrito a mano, nunca
+// generado. Aquí solo se filtra, se busca y se muestra.
+//
+// REGLA: una oración con `verified: false` NO se muestra. Quien reza no puede
+// detectar una palabra equivocada —está rezando, no revisando—, así que nada
+// sin cotejar llega a la pantalla. Ver la cabecera de prayers.js.
+
+const PRAYER_SEARCH_THRESHOLD = 12;
+let currentPrayerId = null;
+let prayerWakeLock = null;
+
+/** Oraciones publicables para la vertiente activa. */
+function availablePrayers() {
+  if (typeof PRAYERS === 'undefined') return [];
+  return PRAYERS.filter(p => p.verified && p.denominations.includes(currentDenomination));
+}
+
+/** Misterios que tocan hoy, según el día de la semana. */
+function todaysRosary() {
+  if (typeof ROSARY_MYSTERIES === 'undefined') return null;
+  const key = ROSARY_MYSTERIES[new Date().getDay()];
+  const set = ROSARY_SETS[key];
+  return (set && set.verified) ? { key, set } : null;
+}
+
+/** Pinta el listado. Todo con createElement: nada de innerHTML. */
+function renderPrayerList() {
+  const host = document.getElementById('prayer-list');
+  if (!host) return;
+  const dict = TRANSLATIONS[currentLang];
+
+  const all = availablePrayers();
+  const searchWrap = document.getElementById('prayer-search-wrap');
+  const searchInput = document.getElementById('prayer-search');
+
+  // La búsqueda aparece sola cuando el listado se hace largo
+  const searchVisible = all.length >= PRAYER_SEARCH_THRESHOLD;
+  if (searchWrap) searchWrap.hidden = !searchVisible;
+  if (searchInput) searchInput.placeholder = dict.prayerSearchPlaceholder;
+
+  // Guarda deliberada: un id ausente o un elemento sin `value` no debe tumbar
+  // el listado entero y dejar la pantalla en blanco.
+  const raw = (searchVisible && searchInput) ? searchInput.value : '';
+  const term = String(raw || '').trim().toLowerCase();
+  const shown = term
+    ? all.filter(p => p[currentLang].title.toLowerCase().includes(term) ||
+                      p[currentLang].body.toLowerCase().includes(term))
+    : all;
+
+  host.textContent = '';
+  shown.forEach(prayer => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'prayer-item';
+    item.addEventListener('click', () => openPrayer(prayer.id));
+
+    const body = document.createElement('span');
+    body.className = 'flex flex-col gap-0.5 min-w-0';
+
+    const title = document.createElement('span');
+    title.className = 'text-sm font-medium text-slate-700';
+    title.textContent = prayer[currentLang].title;
+    body.appendChild(title);
+
+    if (prayer.reference) {
+      const ref = document.createElement('span');
+      ref.className = 'text-[11px] font-light text-slate-400';
+      ref.textContent = prayer.reference[currentLang];
+      body.appendChild(ref);
+    }
+
+    item.appendChild(body);
+    host.appendChild(item);
+  });
+
+  // Estado vacío: honesto sobre por qué está vacío, no un error genérico
+  const empty = document.getElementById('prayer-empty');
+  if (empty) {
+    if (shown.length > 0) {
+      empty.hidden = true;
+    } else {
+      empty.hidden = false;
+      empty.innerText = term ? dict.prayerNoMatches : dict.prayerNoneYet;
+    }
+  }
+
+  // Tarjeta del Rosario: solo si la vertiente es católica y los misterios están cotejados
+  const rosaryCard = document.getElementById('rosary-card');
+  const today = todaysRosary();
+  if (rosaryCard) {
+    const show = currentDenomination === 'catholic' && !!today && !term;
+    rosaryCard.hidden = !show;
+    if (show) {
+      const t = document.getElementById('rosary-card-title');
+      const d = document.getElementById('rosary-card-desc');
+      if (t) t.innerText = dict.rosaryToday;
+      if (d) d.innerText = today.set[currentLang].title;
+    }
+  }
+}
+
+/** Abre una oración en modo lectura. */
+function openPrayer(id) {
+  const prayer = availablePrayers().find(p => p.id === id);
+  if (!prayer) return;
+  currentPrayerId = id;
+
+  const dict = TRANSLATIONS[currentLang];
+  const titleEl = document.getElementById('prayer-title');
+  const textEl = document.getElementById('prayer-text');
+  const refEl = document.getElementById('prayer-reference');
+  const srcEl = document.getElementById('prayer-source');
+
+  if (titleEl) titleEl.innerText = prayer[currentLang].title;
+  if (textEl) textEl.innerText = prayer[currentLang].body;
+
+  // Pie discreto: referencia espiritual, no aviso legal. Para la Escritura se
+  // funden cita y traducción en una línea («Salmo 23 · Reina-Valera 1909»); las
+  // oraciones de la tradición no llevan nada, porque no hay nada que revelar.
+  // El detalle de derechos vive en aviso-legal.html, no en medio del rezo.
+  const sourceLabel = PRAYER_SOURCE_LABELS[prayer.source][currentLang];
+  const refText = prayer.reference ? prayer.reference[currentLang] : '';
+
+  if (refEl) {
+    const linea = (refText && sourceLabel) ? (refText + ' · ' + sourceLabel) : refText;
+    refEl.hidden = !linea;
+    if (linea) refEl.innerText = linea;
+  }
+  if (srcEl) {
+    // Lo propio de Alivio SÍ se declara: no puede pasar por oración de la tradición.
+    const mostrar = !refText && !!sourceLabel;
+    srcEl.hidden = !mostrar;
+    if (mostrar) srcEl.innerText = sourceLabel;
+  }
+
+  renderStainedGlass('prayer-banner', prayerArtKey(prayer));
+  updatePrayerFavIcon();
+  applyPrayerFont();
+  requestPrayerWakeLock();
+  changeScreen('screen-oracion');
+}
+
+/** Abre los misterios del día como una oración más. */
+// ── ROSARIO GUIADO ────────────────────────────────────────────────────────
+// Estructura fija de cada misterio: enunciado → Padre Nuestro → 10 Ave Marías
+// → Gloria → jaculatoria. Al terminar los cinco, la Salve.
+// El día decide los misterios; ROSARY_MYSTERIES vive en prayers.js.
+
+const ROSARY_FLOW = ['mystery', 'padre', 'ave', 'gloria', 'jaculatoria'];
+let rosary = null;
+
+/** Busca una oración del corpus por id, sin importar la vertiente activa. */
+function prayerById(id) {
+  if (typeof PRAYERS === 'undefined') return null;
+  return PRAYERS.find(p => p.id === id && p.verified) || null;
+}
+
+function startRosary() {
+  const today = todaysRosary();
+  if (!today) return;
+  rosary = { setKey: today.key, mystery: 0, step: 0, ave: 1, finished: false };
+  renderStainedGlass('rosary-banner', 'mariano');   // el Rosario es rezo mariano
+  applyPrayerFont();
+  requestPrayerWakeLock();
+  renderRosary();
+  changeScreen('screen-rosario');
+}
+
+function rosaryNext() {
+  if (!rosary) return;
+  const step = ROSARY_FLOW[rosary.step];
+
+  // Las diez Ave Marías se cuentan una a una
+  if (step === 'ave' && rosary.ave < 10) {
+    rosary.ave += 1;
+    renderRosary();
+    return;
+  }
+  if (rosary.step < ROSARY_FLOW.length - 1) {
+    rosary.step += 1;
+    rosary.ave = 1;
+    renderRosary();
+    return;
+  }
+  // Fin del misterio
+  if (rosary.mystery < 4) {
+    rosary.mystery += 1;
+    rosary.step = 0;
+    rosary.ave = 1;
+    renderRosary();
+    return;
+  }
+  // Fin de los cinco: la Salve cierra
+  rosary.finished = true;
+  renderRosary();
+}
+
+function rosaryPrev() {
+  if (!rosary) return;
+  if (rosary.finished) { rosary.finished = false; renderRosary(); return; }
+  if (ROSARY_FLOW[rosary.step] === 'ave' && rosary.ave > 1) {
+    rosary.ave -= 1;
+  } else if (rosary.step > 0) {
+    rosary.step -= 1;
+    rosary.ave = (ROSARY_FLOW[rosary.step] === 'ave') ? 10 : 1;
+  } else if (rosary.mystery > 0) {
+    rosary.mystery -= 1;
+    rosary.step = ROSARY_FLOW.length - 1;
+    rosary.ave = 1;
+  }
+  renderRosary();
+}
+
+function renderRosary() {
+  if (!rosary) return;
+  const dict = TRANSLATIONS[currentLang];
+  const set = ROSARY_SETS[rosary.setKey][currentLang];
+  const item = set.items[rosary.mystery];
+
+  const $ = id => document.getElementById(id);
+  const setTitle = $('rosary-set-title');
+  const progress = $('rosary-progress');
+  const label = $('rosary-step-label');
+  const mystery = $('rosary-mystery');
+  const ref = $('rosary-ref');
+  const text = $('rosary-text');
+  const next = $('rosary-next');
+  const prev = $('rosary-prev');
+  const beads = $('rosary-beads');
+
+  if (setTitle) setTitle.innerText = set.title;
+
+  // ── Cierre: la Salve ────────────────────────────────────────────────────
+  if (rosary.finished) {
+    const salve = prayerById('salve');
+    if (progress) progress.innerText = dict.rosaryClosing;
+    if (label) label.innerText = dict.rosaryClosing;
+    if (mystery) mystery.innerText = salve ? salve[currentLang].title : '';
+    if (ref) ref.hidden = true;
+    if (text) text.innerText = salve ? salve[currentLang].body : '';
+    if (next) { next.innerText = dict.rosaryDone; next.disabled = false; }
+    if (prev) prev.disabled = false;
+    if (beads) beads.textContent = '';
+    return;
+  }
+
+  if (progress) {
+    progress.innerText = dict.rosaryMysteryOf
+      .replace('{n}', String(rosary.mystery + 1))
+      .replace('{total}', '5');
+  }
+
+  const step = ROSARY_FLOW[rosary.step];
+  let bodyPrayer = null;
+  let labelText = '';
+
+  if (step === 'mystery') {
+    labelText = dict.rosaryAnnounce;
+  } else if (step === 'padre') {
+    bodyPrayer = prayerById('padre-nuestro-catolico');
+    labelText = bodyPrayer ? bodyPrayer[currentLang].title : '';
+  } else if (step === 'ave') {
+    bodyPrayer = prayerById('ave-maria');
+    labelText = dict.rosaryAveCount
+      .replace('{n}', String(rosary.ave))
+      .replace('{total}', '10');
+  } else if (step === 'gloria') {
+    bodyPrayer = prayerById('gloria');
+    labelText = bodyPrayer ? bodyPrayer[currentLang].title : '';
+  } else if (step === 'jaculatoria') {
+    bodyPrayer = prayerById('jaculatoria-fatima');
+    labelText = bodyPrayer ? bodyPrayer[currentLang].title : '';
+  }
+
+  if (label) label.innerText = labelText;
+  if (mystery) mystery.innerText = item.name;
+  if (ref) {
+    ref.hidden = !item.ref;
+    if (item.ref) ref.innerText = item.ref;
+  }
+  if (text) text.innerText = bodyPrayer ? bodyPrayer[currentLang].body : '';
+  if (next) {
+    next.disabled = false;
+    next.innerText = (step === 'ave' && rosary.ave < 10) ? dict.rosaryNextAve : dict.rosaryNext;
+  }
+  if (prev) prev.disabled = (rosary.mystery === 0 && rosary.step === 0 && rosary.ave === 1);
+
+  // Rosario visual: una cuenta grande por Padre Nuestro y diez pequeñas
+  if (beads) {
+    beads.textContent = '';
+    const big = document.createElement('span');
+    big.className = 'bead bead-big' + (rosary.step > 1 ? ' bead-done' : (step === 'padre' ? ' bead-now' : ''));
+    beads.appendChild(big);
+    for (let i = 1; i <= 10; i++) {
+      const b = document.createElement('span');
+      let cls = 'bead';
+      if (rosary.step > 2) cls += ' bead-done';
+      else if (step === 'ave') cls += (i < rosary.ave) ? ' bead-done' : (i === rosary.ave ? ' bead-now' : '');
+      b.className = cls;
+      beads.appendChild(b);
+    }
+  }
+}
+
+// ── VITRAL DE CABECERA ────────────────────────────────────────────────────
+// Cuatro familias, en SVG inline. Abstracto y no figurativo a propósito: sin
+// rostros de Jesús, de la Virgen ni de santos (principio 2 de la política de IA).
+
+const STAINED_GLASS = {
+  mariano:  { a: '#c9b8ec', b: '#efd9ec', c: '#a78bd8', lead: '#6b5a9e' },
+  cruz:     { a: '#a9bce8', b: '#d9e2f7', c: '#7f93cf', lead: '#4a5a92' },
+  angeles:  { a: '#a9dbcf', b: '#dcf0e8', c: '#7cc0ae', lead: '#417a6c' },
+  palabra:  { a: '#f0cf9a', b: '#fbeeda', c: '#e0ae66', lead: '#9a7434' }
+};
+
+/** Qué familia de vitral le toca a una oración. */
+function prayerArtKey(prayer) {
+  if (!prayer) return 'palabra';
+  // Las oraciones de la vertiente espiritual nunca llevan iconografía religiosa.
+  if (prayer.denominations && prayer.denominations.length === 1 &&
+      prayer.denominations[0] === 'spiritual') return 'palabra';
+  if (typeof PRAYER_ART === 'undefined') return 'palabra';
+  for (const key of Object.keys(PRAYER_ART)) {
+    if (PRAYER_ART[key].includes(prayer.id)) return key;
+  }
+  return 'palabra';
+}
+
+/** Pinta el vitral en el slot indicado. Se construye con SVG, no con innerHTML de terceros. */
+function renderStainedGlass(slotId, key) {
+  const slot = document.getElementById(slotId);
+  if (!slot) return;
+  const c = STAINED_GLASS[key] || STAINED_GLASS.palabra;
+  const uid = 'sg-' + key;
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 320 86');
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  const defs = document.createElementNS(NS, 'defs');
+  const grad = document.createElementNS(NS, 'linearGradient');
+  grad.setAttribute('id', uid);
+  grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
+  grad.setAttribute('x2', '0'); grad.setAttribute('y2', '1');
+  [[0, c.a], [0.55, c.b], [1, c.c]].forEach(([off, col]) => {
+    const st = document.createElementNS(NS, 'stop');
+    st.setAttribute('offset', String(off));
+    st.setAttribute('stop-color', col);
+    grad.appendChild(st);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const bg = document.createElementNS(NS, 'rect');
+  bg.setAttribute('width', '320'); bg.setAttribute('height', '86');
+  bg.setAttribute('fill', 'url(#' + uid + ')');
+  svg.appendChild(bg);
+
+  // Arcos ojivales: el motivo común a las cuatro familias
+  for (let i = 0; i < 8; i++) {
+    const x = i * 40;
+    const arc = document.createElementNS(NS, 'path');
+    arc.setAttribute('d', `M${x} 86 L${x} 44 Q${x + 20} 8 ${x + 40} 44 L${x + 40} 86`);
+    arc.setAttribute('fill', 'none');
+    arc.setAttribute('stroke', c.lead);
+    arc.setAttribute('stroke-width', '1.1');
+    arc.setAttribute('opacity', '0.34');
+    svg.appendChild(arc);
+  }
+
+  // Roseta central, distinta por familia
+  const cx = 160, cy = 42;
+  if (key === 'mariano') {
+    for (let i = 0; i < 8; i++) {
+      const p = document.createElementNS(NS, 'ellipse');
+      p.setAttribute('cx', String(cx)); p.setAttribute('cy', String(cy - 9));
+      p.setAttribute('rx', '4.5'); p.setAttribute('ry', '10');
+      p.setAttribute('fill', '#fff'); p.setAttribute('opacity', '0.42');
+      p.setAttribute('transform', `rotate(${i * 45} ${cx} ${cy})`);
+      svg.appendChild(p);
+    }
+  } else if (key === 'cruz') {
+    const cr = document.createElementNS(NS, 'path');
+    cr.setAttribute('d', `M${cx} ${cy - 15}v30M${cx - 10} ${cy - 5}h20`);
+    cr.setAttribute('stroke', '#fff'); cr.setAttribute('stroke-width', '3');
+    cr.setAttribute('stroke-linecap', 'round'); cr.setAttribute('opacity', '0.62');
+    svg.appendChild(cr);
+  } else if (key === 'angeles') {
+    for (const dir of [-1, 1]) {
+      const w = document.createElementNS(NS, 'path');
+      w.setAttribute('d', `M${cx} ${cy + 4} q${dir * 16} -14 ${dir * 26} -2 q${dir * -10} 10 ${dir * -26} 2 Z`);
+      w.setAttribute('fill', '#fff'); w.setAttribute('opacity', '0.42');
+      svg.appendChild(w);
+    }
+  } else {
+    for (let i = 0; i < 7; i++) {
+      const ray = document.createElementNS(NS, 'path');
+      const ang = -90 + (i - 3) * 17;
+      const r = (ang * Math.PI) / 180;
+      ray.setAttribute('d', `M${cx} ${cy + 12} L${cx + Math.cos(r) * 34} ${cy + 12 + Math.sin(r) * 34}`);
+      ray.setAttribute('stroke', '#fff'); ray.setAttribute('stroke-width', '2.4');
+      ray.setAttribute('stroke-linecap', 'round'); ray.setAttribute('opacity', '0.4');
+      svg.appendChild(ray);
+    }
+  }
+
+  slot.textContent = '';
+  slot.appendChild(svg);
+}
+
+/** Comparte el texto de la oración abierta con la hoja nativa del sistema. */
+async function sharePrayer() {
+  const dict = TRANSLATIONS[currentLang];
+  const titleEl = document.getElementById('prayer-title');
+  const textEl = document.getElementById('prayer-text');
+  if (!titleEl || !textEl || !textEl.innerText) return;
+
+  const payload = titleEl.innerText + '\n\n' + textEl.innerText + '\n\n— Alivio · alivio.pronosoftmx.com';
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: titleEl.innerText, text: payload });
+      return;
+    }
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(payload);
+      showToast(dict.prayerCopied);
+    }
+  } catch (e) {
+    // El usuario canceló la hoja de compartir: no es un error que reportar.
+  }
+}
+
+// ── TAMAÑO DE LECTURA ─────────────────────────────────────────────────────
+// Persiste: quien necesita letra grande la necesita SIEMPRE, no una vez.
+const PRAYER_FONT_SCALES = [0.85, 1, 1.15, 1.35, 1.6];
+const PRAYER_FONT_DEFAULT = 1;
+
+function currentPrayerFontStep() {
+  const raw = parseInt(localStorage.getItem('alivio_prayer_font'), 10);
+  return Number.isInteger(raw) && raw >= 0 && raw < PRAYER_FONT_SCALES.length
+    ? raw
+    : PRAYER_FONT_DEFAULT;
+}
+
+function applyPrayerFont() {
+  const step = currentPrayerFontStep();
+  document.documentElement.style.setProperty('--prayer-scale', String(PRAYER_FONT_SCALES[step]));
+
+  const down = document.getElementById('prayer-font-down');
+  const up = document.getElementById('prayer-font-up');
+  const dict = TRANSLATIONS[currentLang];
+  if (down) {
+    down.disabled = (step === 0);
+    down.title = dict.fontSmaller;
+    down.setAttribute('aria-label', dict.fontSmaller);
+  }
+  if (up) {
+    up.disabled = (step === PRAYER_FONT_SCALES.length - 1);
+    up.title = dict.fontBigger;
+    up.setAttribute('aria-label', dict.fontBigger);
+  }
+  const share = document.getElementById('prayer-share');
+  if (share) {
+    share.title = dict.prayerShare;
+    share.setAttribute('aria-label', dict.prayerShare);
+  }
+}
+
+function changePrayerFont(delta) {
+  const step = Math.min(PRAYER_FONT_SCALES.length - 1, Math.max(0, currentPrayerFontStep() + delta));
+  localStorage.setItem('alivio_prayer_font', String(step));
+  applyPrayerFont();
+}
+
+/**
+ * Mantener la pantalla encendida mientras se reza.
+ * Nadie quiere que se apague el teléfono a mitad del Credo. La API no existe en
+ * todos los navegadores, así que todo va guardado: si falla, no pasa nada.
+ */
+async function requestPrayerWakeLock() {
+  const note = document.getElementById('prayer-awake');
+  try {
+    if (!('wakeLock' in navigator)) return;
+    prayerWakeLock = await navigator.wakeLock.request('screen');
+    if (note) {
+      note.hidden = false;
+      note.innerText = TRANSLATIONS[currentLang].prayerScreenAwake;
+    }
+    prayerWakeLock.addEventListener('release', () => { prayerWakeLock = null; });
+  } catch (e) {
+    // Permiso denegado, pestaña oculta o navegador sin soporte: se reza igual.
+    if (note) note.hidden = true;
+  }
+}
+
+function releasePrayerWakeLock() {
+  if (prayerWakeLock) {
+    try { prayerWakeLock.release(); } catch (e) {}
+    prayerWakeLock = null;
+  }
+  const note = document.getElementById('prayer-awake');
+  if (note) note.hidden = true;
+}
+
+/** Guarda la oración abierta en el mismo almacén que los favoritos del desahogo. */
+function savePrayerFavorite() {
+  const dict = TRANSLATIONS[currentLang];
+  const titleEl = document.getElementById('prayer-title');
+  const textEl = document.getElementById('prayer-text');
+  if (!titleEl || !textEl || !textEl.innerText) return;
+
+  const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
+  const body = textEl.innerText;
+
+  if (favorites.some(f => f.prayer === body)) {
+    showToast(dict.alreadySaved);
+    return;
+  }
+  favorites.unshift({
+    date: new Date().toISOString(),
+    prayer: body,
+    verse: '',
+    verseRef: '',
+    title: titleEl.innerText,
+    kind: 'prayer'
+  });
+  if (favorites.length > 30) favorites.pop();
+  localStorage.setItem('alivio_favorites', JSON.stringify(favorites));
+  showToast(dict.savedFavorite);
+  updatePrayerFavIcon();
+}
+
+function updatePrayerFavIcon() {
+  const btn = document.getElementById('prayer-fav');
+  const textEl = document.getElementById('prayer-text');
+  if (!btn || !textEl) return;
+  const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
+  const saved = favorites.some(f => f.prayer === textEl.innerText);
+  btn.className = saved
+    ? 'shrink-0 text-lg text-indigo-500 transition-colors cursor-pointer'
+    : 'shrink-0 text-lg text-slate-300 hover:text-indigo-500 transition-colors cursor-pointer';
+  btn.title = saved ? TRANSLATIONS[currentLang].alreadySaved : TRANSLATIONS[currentLang].titleFavorites;
+}
+
+/**
+ * Sustituye la fachada del video demo por el reproductor real de YouTube.
+ * Se llama solo al pulsar: así la landing no carga el JS de YouTube en cada visita.
+ * Dominio nocookie para no plantar cookies de seguimiento antes de que el usuario decida.
+ */
+const DEMO_VIDEO_ID = 'eoMOhortt_4';
+
+function loadDemoVideo() {
+  const facade = document.getElementById('video-demo-facade');
+  if (!facade) return;
+
+  const frame = document.createElement('iframe');
+  frame.src = `https://www.youtube-nocookie.com/embed/${DEMO_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`;
+  frame.title = TRANSLATIONS[currentLang].videoDemoFrameTitle;
+  frame.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+  frame.referrerPolicy = 'strict-origin-when-cross-origin';
+  frame.allowFullscreen = true;
+  frame.className = 'w-full h-full border-0';
+
+  const holder = document.createElement('div');
+  holder.className = 'relative w-full max-w-[420px] aspect-video rounded-2xl overflow-hidden border border-slate-300 bg-black shadow-lg';
+  holder.appendChild(frame);
+
+  facade.replaceWith(holder);
+}
+
 
 
 /**
@@ -1458,6 +2341,37 @@ async function cancelPush() {
   statusEl.innerText = (currentLang === 'en') ? "Deactivating..." : "Desactivando recordatorio...";
 
   try {
+    // ── ANDROID NATIVO: dar de baja por token FCM ───────────────────────────
+    // En la app nativa no existe suscripción push del navegador, así que la rama
+    // web de abajo entraba siempre por error y el recordatorio quedaba activo para
+    // siempre. El token guardado al activarlo es lo que identifica la suscripción.
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      const fcmToken = localStorage.getItem('alivio_fcm_token');
+
+      if (fcmToken) {
+        const response = await fetch(API_BASE + '/api/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fcmToken })
+        });
+        if (!response.ok) throw new Error("No se pudo cancelar el recordatorio en el servidor.");
+      }
+
+      localStorage.removeItem('alivio_alert_time');
+      localStorage.removeItem('alivio_fcm_token');
+
+      const actBtn = document.getElementById('btn-activate-push');
+      const cancelBtn = document.getElementById('btn-cancel-push');
+      if (actBtn) actBtn.classList.remove('hidden');
+      if (cancelBtn) cancelBtn.classList.add('hidden');
+
+      statusEl.classList.remove('text-slate-400');
+      statusEl.classList.add('text-emerald-600');
+      statusEl.innerText = TRANSLATIONS[currentLang].alertDeactivated;
+      return;
+    }
+
+    // ── WEB / PWA: dar de baja por suscripción VAPID ────────────────────────
     const reg = await navigator.serviceWorker.ready;
     const subscription = await reg.pushManager.getSubscription();
 
@@ -1509,6 +2423,27 @@ async function cancelPush() {
  * Verificar si el navegador ya cuenta con una suscripción push activa y actualizar la UI
  */
 async function checkActiveSubscription() {
+  // ── ANDROID NATIVO: el estado lo marca el token FCM guardado ──────────────
+  // Va antes del guard de PushManager: en la app nativa ese guard salía sin más
+  // y la UI se quedaba mostrando "activar" aunque el recordatorio estuviera puesto.
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    const actBtn = document.getElementById('btn-activate-push');
+    const cancelBtn = document.getElementById('btn-cancel-push');
+    const timeInput = document.getElementById('alert-time');
+    const fcmToken = localStorage.getItem('alivio_fcm_token');
+
+    if (fcmToken) {
+      if (actBtn) actBtn.classList.add('hidden');
+      if (cancelBtn) cancelBtn.classList.remove('hidden');
+      const savedTime = localStorage.getItem('alivio_alert_time');
+      if (savedTime && timeInput) timeInput.value = savedTime;
+    } else {
+      if (actBtn) actBtn.classList.remove('hidden');
+      if (cancelBtn) cancelBtn.classList.add('hidden');
+    }
+    return;
+  }
+
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
   try {
@@ -1608,6 +2543,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const isRedirected = urlParams.get('action') === 'ancla' || urlParams.get('from_push') === 'true';
 
+  const prayerSearchEl = document.getElementById('prayer-search');
+  if (prayerSearchEl) prayerSearchEl.addEventListener('input', renderPrayerList);
+  renderPrayerList();
+
   // Verificar la existencia de notificaciones activas para pintar la UI
   checkActiveSubscription();
 
@@ -1623,7 +2562,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }
   } else if (hasVisited) {
-    changeScreen('screen-desahogo');
+    goHome();
   } else {
     changeScreen('screen-landing');
   }

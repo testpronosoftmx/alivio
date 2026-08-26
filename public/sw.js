@@ -1,10 +1,11 @@
-const CACHE_NAME = 'alivio-cache-v4';
+const CACHE_NAME = 'alivio-cache-v12';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/favicon.ico',
   '/manifest.json',
   '/app.js',
+  '/prayers.js',
   '/icon-192.png',
   '/icon-512.png',
   '/fallback-misericordia.png',
