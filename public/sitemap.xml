@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Las fechas de <lastmod> salen de la fecha real del último cambio de cada
+  archivo (git log -1), NUNCA del reloj del build. Estampar la fecha de hoy en
+  todas para "forzar el re-rastreo" es una señal de frescura falsa: Google la
+  detecta, deja de fiarse del sitemap entero y el efecto es el contrario del
+  buscado. Si un archivo no cambia, su fecha no se toca.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://alivio.pronosoftmx.com/</loc>
-    <lastmod>2026-07-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-08-27</lastmod>
   </url>
   <url>
     <loc>https://alivio.pronosoftmx.com/privacidad</loc>
     <lastmod>2026-07-19</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://alivio.pronosoftmx.com/cookies</loc>
     <lastmod>2026-07-19</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://alivio.pronosoftmx.com/aviso-legal</loc>
-    <lastmod>2026-07-19</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <lastmod>2026-08-26</lastmod>
   </url>
 </urlset>

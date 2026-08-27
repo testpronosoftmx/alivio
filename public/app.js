@@ -520,6 +520,7 @@ const TRANSLATIONS = {
     nav_evangelio: "Evangelio",
     nav_desahogo: "Desahogo",
     nav_oraciones: "Oraciones",
+    ventDisclaimer: "Alivio es un espacio de acompañamiento y oración. No sustituye la atención médica, psicológica ni psiquiátrica profesional.",
     evangelioTitle: "Evangelio del Día",
     evangelioLoading: "Buscando la Palabra de hoy…",
     evangelioError: "No pudimos traer las lecturas de hoy. Revisa tu conexión y vuelve a intentarlo.",
@@ -660,6 +661,7 @@ const TRANSLATIONS = {
     nav_evangelio: "Gospel",
     nav_desahogo: "Unburden",
     nav_oraciones: "Prayers",
+    ventDisclaimer: "Alivio is a space for companionship and prayer. It does not replace professional medical, psychological or psychiatric care.",
     evangelioTitle: "Gospel of the Day",
     evangelioLoading: "Fetching today's Word…",
     evangelioError: "We couldn't fetch today's readings. Check your connection and try again.",
@@ -1172,6 +1174,7 @@ function togglePrayerFavorite(id) {
   }
   
   localStorage.setItem('alivio_fav_prayers', JSON.stringify(list));
+  if (isSaved) track('prayer_saved');
   updatePrayerFavIcon();
   
   if (isSaved) {
@@ -1364,7 +1367,28 @@ window.addEventListener('appinstalled', () => {
 /**
  * Navegar a la app de desahogo
  */
+/**
+ * ── MEDICIÓN ───────────────────────────────────────────────────────────────
+ * Registra QUE algo pasó, nunca QUÉ escribió nadie.
+ *
+ * La política de privacidad dice: «no hay analítica de terceros sobre el
+ * contenido de los desahogos». Por eso esta función no acepta parámetros de
+ * contenido y no debe dárselos nunca: ni el texto, ni el versículo, ni el
+ * consuelo, ni el título de la oración. Solo el nombre del evento.
+ *
+ * Falla en silencio si gtag no está —bloqueadores, WebView nativo sin red, o
+ * el usuario que rechazó las cookies—: medir jamás puede romper la app.
+ */
+function track(evento) {
+  try {
+    if (typeof gtag === 'function') gtag('event', evento);
+  } catch (e) {
+    // Ni un console.warn: un fallo de analítica no es asunto del usuario.
+  }
+}
+
 function enterApp() {
+  track('enter_app');
   localStorage.setItem('alivio_visited', 'true');
   goHome();
 }
@@ -1436,6 +1460,8 @@ function applyTranslations() {
   const appFavBtn = document.getElementById('app-favorites-btn');
   if (appFavBtn) appFavBtn.title = dict.titleFavorites;
 
+  const ventDisclaimerEl = document.getElementById('vent-disclaimer');
+  if (ventDisclaimerEl) ventDisclaimerEl.innerText = dict.ventDisclaimer;
   const evangelioTitleEl = document.getElementById('evangelio-title');
   if (evangelioTitleEl) evangelioTitleEl.innerText = dict.evangelioTitle;
   applyEvangelioTranslations();
@@ -1865,6 +1891,7 @@ function exhalePhase() {
  * Desplegar el confort de la IA en pantalla y navegar
  */
 function displayComfortAndNavigate() {
+  track('desahogo_completed');
   const data = comfortDataResolved;
   if (!data) return;
 
@@ -2158,6 +2185,7 @@ function prayerById(id) {
 function startRosary() {
   const today = todaysRosary();
   if (!today) return;
+  track('rosary_started');
   rosary = { setKey: today.key, mystery: 0, step: 0, ave: 1, finished: false };
   renderStainedGlass('rosary-banner', 'mariano');   // el Rosario es rezo mariano
   applyPrayerFont();
@@ -2196,6 +2224,7 @@ function rosaryNext() {
   }
   // Fin de los cinco: la Salve cierra
   rosary.finished = true;
+  track('rosary_completed');
   renderRosary();
   scrollRosaryToTop();
 }
@@ -3200,6 +3229,7 @@ window.addEventListener('DOMContentLoaded', () => {
  * Funciones de Control del Modal de Donaciones
  */
 function openDonateModal() {
+  track('support_click');
   const modal = document.getElementById('modal-donate');
   if (modal) {
     modal.classList.remove('opacity-0', 'pointer-events-none');

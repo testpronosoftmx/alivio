@@ -1,24 +1,36 @@
-# Alivio - Refugio de Paz y Oración Católica PWA
+# Alivio — Refugio de paz, Evangelio del Día y oración católica (PWA)
 
-> Alivio: Espacio seguro católico para desahogo espiritual, meditación y oraciones guiadas en PWA.
+> Alivio es una aplicación devocional católica, gratuita y anónima: desahogo espiritual con consuelo personalizado, Evangelio del Día con el comentario del Papa, devocionario tradicional y Rosario guiado. Sin registro, sin cuentas y sin perfiles de usuario.
 
-Alivio es una aplicación web y PWA católica diseñada para desahogo espiritual anónimo, ejercicios de respiración consciente y acompañamiento mediante versículos bíblicos y oraciones personalizadas.
+Alivio funciona como PWA en el navegador y como aplicación Android. Todo el estado del usuario vive en su dispositivo: no hay registro, login ni perfil, y el texto del desahogo no se guarda en ninguna base de datos.
 
-## Secciones Principales
-- [Inicio y Experiencia Alivio](https://alivio.pronosoftmx.com/): Experiencia principal de desahogo anónimo y confort espiritual.
-- [Sección de Desahogo](https://alivio.pronosoftmx.com/#screen-desahogo): Módulo interactivo para expresar penas y preocupaciones con privacidad total.
-- [Respiración Consciente / Suspiro](https://alivio.pronosoftmx.com/#screen-suspiro): Ejercicio de respiración guiada de 12 segundos para calmar la mente antes de la oración.
-- [Consuelo y Plegaria](https://alivio.pronosoftmx.com/#screen-oracion): Generación de oraciones personalizadas y lectura de versículos bíblicos de aliento.
+## Qué ofrece
 
-## Recursos Clave
-- [Política de Privacidad](https://alivio.pronosoftmx.com/privacidad): Información sobre la privacidad del usuario y confidencialidad del desahogo.
-- [Aviso Legal](https://alivio.pronosoftmx.com/aviso-legal): Términos legales de uso y operación del servicio Alivio.
-- [Política de Cookies](https://alivio.pronosoftmx.com/cookies): Detalles sobre el uso de almacenamiento local y cookies en la plataforma.
+- **Desahogo y consuelo.** La persona escribe lo que le pesa y recibe versículos, un mensaje de consuelo y una plegaria escrita para ese momento. Es contenido generado y se presenta como reflexión personal, nunca como texto de la tradición ni con aprobación eclesial. Se adapta a tres vertientes: católica, evangélica y espiritual.
+- **Respiración guiada.** Un ciclo de doce segundos entre el desahogo y el consuelo.
+- **Evangelio del Día.** Primera lectura, salmo responsorial, segunda lectura los domingos y solemnidades, y el Evangelio, con el santo y el título litúrgico del día. En español incluye el comentario del Papa. El texto procede de Evangelizo.org y de Vatican News, con atribución visible en pantalla; Alivio no lo redacta ni lo retoca.
+- **Devocionario tradicional.** Veinte oraciones de texto fijo, revisadas a mano y disponibles sin conexión: Padre Nuestro, Ave María, Gloria, Credo, Salve, Ángelus, Acto de Contrición, oración a San Miguel, Magníficat y varios salmos.
+- **Rosario guiado.** Los misterios que corresponden al día, cuenta por cuenta, con navegación por gestos en móvil.
+- **Recordatorio diario** por notificación, a la hora que elija la persona.
 
-## Servicios/API
-- [API de Confort Espiritual](https://alivio.pronosoftmx.com/api/comfort): Endpoint backend serverless para procesar el desahogo y generar versículos y plegarias de apoyo.
+Interfaz completa en español e inglés.
 
-## Feeds e Indexación
-- [Mapa del Sitio (Sitemap XML)](https://alivio.pronosoftmx.com/sitemap.xml): Archivo de estructura del sitio e indexabilidad para buscadores y motores de IA.
-- [Especificación LLM (llms.txt)](https://alivio.pronosoftmx.com/llms.txt): Resumen optimizado estándar para Large Language Models y motores AEO.
-- [Especificación LLM Retrocompatible (llm.txt)](https://alivio.pronosoftmx.com/llm.txt): Versión en singular para compatibilidad retroactiva.
+## Lo que Alivio NO es
+
+- No es un asistente doctrinal: no responde preguntas del Magisterio ni dictamina doctrina.
+- No sustituye la atención médica, psicológica ni psiquiátrica profesional. Ante señales de crisis, la app muestra recursos de ayuda profesional de forma prominente.
+- No es una red social: no hay muro, ni peticiones públicas, ni contenido de otros usuarios.
+
+## Uso de inteligencia artificial
+
+El consuelo personal y las ilustraciones atmosféricas se generan con IA. Las oraciones tradicionales y las lecturas litúrgicas **nunca** se generan: son texto fijo o vienen de la fuente, íntegros y sin retocar. Las imágenes se siembran con el día litúrgico —tiempo, color y celebración—, nunca con el texto del pasaje. La política completa está publicada en el repositorio del proyecto.
+
+## Enlaces
+
+- [Alivio](https://alivio.pronosoftmx.com/): la aplicación.
+- [Política de privacidad](https://alivio.pronosoftmx.com/privacidad)
+- [Aviso legal](https://alivio.pronosoftmx.com/aviso-legal): incluye la atribución y los derechos del contenido litúrgico de terceros.
+- [Política de cookies](https://alivio.pronosoftmx.com/cookies)
+- [Mapa del sitio](https://alivio.pronosoftmx.com/sitemap.xml)
+
+Alivio es una aplicación de una sola página: las secciones se abren desde dentro de la app y no tienen dirección propia.
