@@ -157,6 +157,14 @@ Prefija **siempre** con `alivio_`. Ojo: la racha usa `toISOString().slice(0,10)`
   Nunca se commiteó, pero era una mina esperando un `git add -f`.
 - **Los `onclick` viven en `index.html`, no en `app.js`.** Una sustitución sobre el archivo
   equivocado no falla: no hace nada. Verifica siempre que el reemplazo ocurrió.
+- **`Capacitor.Plugins` SÍ funciona aquí, aunque no haya bundler.** El puente de Android
+  genera e inyecta el JS de los plugins en tiempo de ejecución (`JSExport.java`:
+  `var p = (a.Plugins = a.Plugins || {})`), así que `Capacitor.Plugins.Browser` y
+  `Capacitor.Plugins.FirebaseMessaging` existen sin importar nada.
+  Se anotó aquí lo contrario el 27 ago 2026 y era falso: la donación llevaba meses
+  funcionando en el APK. **Antes de declarar rota una ruta nativa, pruébala en el
+  teléfono** — leer el código no basta, y un `try/catch` silencioso invita a inventar
+  causas que encajan pero no son.
 - **`calapi` solo habla `http`.** No tiene certificado válido en `https`. Se llama desde el
   servidor y nunca desde el navegador; meterlo en el front sería contenido mixto.
 - **El RSS de Vatican News miente sobre su codificación.** Se declara UTF-8 y mezcla bytes

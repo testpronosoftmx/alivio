@@ -1027,6 +1027,14 @@
       <span class="label">Verificación</span>
       <p><strong>252 pruebas.</strong> Las de la fase 3 y M1: 49 sobre las fuentes y el banco de plantillas (calapi en cinco fechas incluida 2027, Evangelizo en español e inglés, el parseo del RSS y la reparación de su puntuación), 59 ejercitando el <code>app.js</code> real —cargado con <code>vm</code> sobre un DOM mínimo— sobre el árbol que deja <code>renderEvangelio()</code>, 27 sobre <code>/api/readings</code> con <code>req</code>/<code>res</code> simulados y sin Supabase configurado (el peor caso: obliga a la ingesta en vivo y a la escalera de respaldo), 27 sobre las cuatro puertas del lote con imágenes negras, blancas, planas, truncadas y de otro tamaño, más la autenticación, y 90 de verificación estática que cruzan ids del HTML con <code>getElementById</code>, el registro de pantallas, los <code>onclick</code> y la paridad <code>es</code>/<code>en</code> de las 128 claves. <code>npx tsc --noEmit</code> sale limpio.</p>
       <p>Las pruebas viven en el scratchpad, no en el repositorio: el proyecto no tiene infraestructura de tests y no se le impone una sin acuerdo.</p>
+
+    <div class="aside" style="margin-top:20px">
+      <span class="label">Pendiente con fecha · requisitos nuevos de Google Play</span>
+      <p><strong>Zero-Tap Sign-In (abril 2027): no aplica.</strong> El requisito es para apps con inicio de sesión, opcional u obligatorio. Alivio no tiene ninguno —se buscó <code>signIn</code>, <code>login</code>, <code>auth</code>, <code>GoogleSignIn</code> y <code>Credential</code> en el código web y nativo, sin resultados—. Es un dividendo directo de que todo el estado viva en <code>localStorage</code> sin cuentas. No habrá nada que hacer salvo que algún día se añadan.</p>
+      <p><strong>Optimización de DEX (febrero 2027): hoy no se cumple.</strong> <code>android/app/build.gradle</code> tiene <code>minifyEnabled false</code>, que es la plantilla por defecto de Capacitor: cobertura 0 % frente al 25 % mínimo que exigirá Play con R8. <strong>No se activa en la release 2.0 a propósito.</strong> R8 puede romper plugins que usan reflexión —Firebase Messaging el primero—, y en esta release se estrena la app entera y un push que nunca había funcionado: si después no llega una notificación, sería imposible saber si fue el arreglo o ProGuard. Una variable a la vez. Toca en una 2.0.1 posterior, con <code>minifyEnabled true</code>, <code>shrinkResources true</code> y verificación de push y donación en dispositivo. Hay 18 meses.</p>
+      <p><strong>Memoria y bitmaps:</strong> no se puede afirmar nada sin datos. La métrica de bitmaps cuenta objetos <code>Bitmap</code> de Android, y una app de Capacitor casi no crea ninguno: las imágenes las decodifica el WebView. Se mide en Play Console → Android vitals cuando la 2.0 tenga tráfico, en vez de suponerlo.</p>
+    </div>
+
     </div>
   </section>
 

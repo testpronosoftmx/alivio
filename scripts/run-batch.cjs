@@ -21,13 +21,16 @@ const path = require('path');
 const DEFAULT_BASE = 'https://alivio.pronosoftmx.com';
 
 function readEnvFile() {
-  const file = path.join(__dirname, '..', '.env');
-  if (!fs.existsSync(file)) return {};
   const out = {};
-  for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
-    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
-    if (m) out[m[1]] = m[2].replace(/^["']|["']$/g, '');
-  }
+  ['.env', '.env.local'].forEach((fname) => {
+    const file = path.join(__dirname, '..', fname);
+    if (fs.existsSync(file)) {
+      for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
+        const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
+        if (m && !out[m[1]]) out[m[1]] = m[2].replace(/^["']|["']$/g, '');
+      }
+    }
+  });
   return out;
 }
 
