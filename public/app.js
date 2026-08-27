@@ -521,6 +521,10 @@ const TRANSLATIONS = {
     nav_desahogo: "Desahogo",
     nav_oraciones: "Oraciones",
     ventDisclaimer: "Alivio es un espacio de acompañamiento y oración. No sustituye la atención médica, psicológica ni psiquiátrica profesional.",
+    prayerIndexTitle: "Oraciones incluidas",
+    prayerIndexIntro: "Veinte oraciones de texto fijo, revisadas a mano y disponibles sin conexión. Se rezan dentro de la aplicación.",
+    prayerIndexList: "Señal de la Cruz · Padre Nuestro · Ave María · Gloria · Credo de los Apóstoles · Credo Niceno-Constantinopolitano · Salve · Acto de Contrición · Ángel de la Guarda · Oración a San Miguel Arcángel · Ven, Espíritu Santo · Magníficat · El Ángelus · Bendición de la mesa · Padre Nuestro (versión bíblica) · Salmo 23, El Señor es mi pastor · Salmo 91, El que habita al abrigo del Altísimo · Bendición aarónica · Oración de la serenidad · Jaculatoria de Fátima.",
+    prayerIndexRosary: "Y el Santo Rosario guiado, con los misterios que corresponden a cada día: Gozosos el lunes y el sábado, Dolorosos el martes y el viernes, Gloriosos el miércoles y el domingo, y Luminosos el jueves.",
     evangelioTitle: "Evangelio del Día",
     evangelioLoading: "Buscando la Palabra de hoy…",
     evangelioError: "No pudimos traer las lecturas de hoy. Revisa tu conexión y vuelve a intentarlo.",
@@ -662,6 +666,10 @@ const TRANSLATIONS = {
     nav_desahogo: "Unburden",
     nav_oraciones: "Prayers",
     ventDisclaimer: "Alivio is a space for companionship and prayer. It does not replace professional medical, psychological or psychiatric care.",
+    prayerIndexTitle: "Prayers included",
+    prayerIndexIntro: "Twenty fixed-text prayers, checked by hand and available offline. They are prayed inside the app.",
+    prayerIndexList: "Sign of the Cross · Our Father · Hail Mary · Glory Be · Apostles' Creed · Nicene Creed · Hail, Holy Queen · Act of Contrition · Guardian Angel Prayer · Prayer to St. Michael · Come, Holy Spirit · Magnificat · The Angelus · Grace before Meals · The Lord's Prayer (biblical version) · Psalm 23, The Lord is my shepherd · Psalm 91, He that dwelleth in the secret place · Aaronic Blessing · Serenity Prayer · Fatima Prayer.",
+    prayerIndexRosary: "And the guided Holy Rosary, with the mysteries for each day: Joyful on Monday and Saturday, Sorrowful on Tuesday and Friday, Glorious on Wednesday and Sunday, and Luminous on Thursday.",
     evangelioTitle: "Gospel of the Day",
     evangelioLoading: "Fetching today's Word…",
     evangelioError: "We couldn't fetch today's readings. Check your connection and try again.",
@@ -1491,6 +1499,12 @@ function applyTranslations() {
 
   const ventDisclaimerEl = document.getElementById('vent-disclaimer');
   if (ventDisclaimerEl) ventDisclaimerEl.innerText = dict.ventDisclaimer;
+  ['prayer-index-title:prayerIndexTitle', 'prayer-index-intro:prayerIndexIntro',
+   'prayer-index-list:prayerIndexList', 'prayer-index-rosary:prayerIndexRosary'].forEach(par => {
+    const [id, clave] = par.split(':');
+    const el = document.getElementById(id);
+    if (el) el.innerText = dict[clave];
+  });
   const evangelioTitleEl = document.getElementById('evangelio-title');
   if (evangelioTitleEl) evangelioTitleEl.innerText = dict.evangelioTitle;
   applyEvangelioTranslations();
