@@ -68,7 +68,7 @@ Toda oración generada para el momento se presenta como reflexión personal, nun
 **Escalera de respaldo obligatoria — nunca debe faltar imagen:**
 1. Fila del día en `daily_images` → imagen en Supabase Storage.
 2. Sin fila → **imagen fija por tiempo litúrgico** (Adviento, Navidad, Cuaresma, Pascua, Ordinario, mártir/rojo) servida desde `public/`, para que funcione offline y dentro del APK. Cubre el hueco entre lotes (p. ej. enero antes de generar el año nuevo).
-3. Sin nada → `public/fallback-misericordia.png`. Comprimir a WebP < 200 KB (presupuesto de `alivio-arquitectura`).
+3. Sin nada → `public/fallback-misericordia.webp` (39 KB; el PNG de 891 KB se convirtió y se borró en la fase 3).
 
 **Atmosférica, nunca narrativa.** El prompt se deriva del *consuelo*, no del relato. Ejemplo real: el Evangelio del 26 ago 2026 es "sepulcros blanqueados... llenos de huesos de muertos y de podredumbre" — la imagen correcta es luz entrando por una ventana, no la escena. La Escritura contiene violencia, cuerpos y juicio; ilustrarla literalmente, 365 veces al año sin supervisión, produce imágenes macabras en una app de consuelo.
 
@@ -116,7 +116,7 @@ Si el comentario papal falta ese día, degrada a (2), nunca a un extracto del pa
 
 ## 5. Tono por denominación
 
-`currentDenomination` ∈ `catholic` | `evangelical` | `spiritual`, guardado en `alivio_denom`. **Todo contenido nuevo debe respetar los tres o filtrarse explícitamente por denominación.** Mostrar un Ave María a un usuario evangélico, o lenguaje explícitamente cristiano a uno "spiritual", rompe la promesa del selector.
+`currentDenomination` ∈ `catholic` | `evangelical` | `spiritual`, guardado en `alivio_denom`. Gobierna **el desahogo**: el tono del consuelo, el estilo de la plegaria generada y las citas. **No gobierna el devocionario ni el Evangelio del Día**, que son idénticos para las tres (ver la regla al final de esta sección). Mostrar un Ave María a un usuario evangélico, o lenguaje explícitamente cristiano a uno "spiritual", rompe la promesa del selector.
 
 | | catholic | evangelical | spiritual |
 |---|---|---|---|
@@ -130,12 +130,16 @@ Si el comentario papal falta ese día, degrada a (2), nunca a un extracto del pa
 
 El desahogo es de una persona: el tono del consuelo y el estilo de la plegaria **sí** se ajustan a su vertiente. El leccionario es de toda la Iglesia ese día, idéntico para todos por diseño: adaptarlo lo destruye.
 
+**El devocionario tampoco se bifurca** (decisión del propietario, 27 ago 2026). `availablePrayers()` sirve el mismo catálogo a las tres vertientes: oraciones católicas más los textos bíblicos de dominio público (`rv1909`), que le sirven a cualquier cristiano. El Rosario está siempre visible. Lo que queda fuera son las meditaciones sin lenguaje religioso (`source: 'original'` de la vertiente espiritual), porque no son devocionario católico.
+
+Alivio se presenta como app devocional católica —así lo dicen su landing y sus capturas—, y el selector de vertiente **gobierna el desahogo, no el catálogo**: ahí sí cambia el tono del consuelo, el estilo de la plegaria generada y las citas. La tabla de arriba describe eso, el consuelo personal, no el devocionario.
+
 Por eso **el Evangelio del Día NO se bifurca por denominación**. Se presenta con su identidad real (1ª lectura, salmo, Evangelio, tiempo litúrgico, santo) y es **accesible desde los tres modos**, con contenido idéntico. Dos errores a evitar, ambos condescendientes:
 
 - **No lo maquilles** — vestir el misal con otra traducción y quitarle los santos no lo vuelve evangélico; renombrar un salmo como "poema de sabiduría" es camuflaje.
 - **No lo escondas** — ocultarlo en los modos no católicos es decidir por el usuario que la Palabra de Dios no es suya.
 
-Lo único que puede variar por vertiente es la **prominencia en el hub de inicio**, nunca el contenido. Dentro de la pantalla, el santo va como contexto secundario: se abre con la Escritura y se corona con el Evangelio.
+Lo único que puede variar por vertiente en lo compartido es la **prominencia en el hub de inicio**, nunca el contenido. Dentro de la pantalla, el santo va como contexto secundario: se abre con la Escritura y se corona con el Evangelio.
 
 ## 6. Fuentes externas y derechos
 

@@ -1992,9 +1992,27 @@ let currentPrayerId = null;
 let prayerWakeLock = null;
 
 /** Oraciones del corpus tradicional católico siempre disponibles para todos. */
+/**
+ * El devocionario es el MISMO para las tres vertientes (decisión del propietario,
+ * 27 ago 2026): oraciones católicas y textos bíblicos de dominio público, sin
+ * filtrar por lo que el usuario eligió en el selector. El selector sigue mandando
+ * en el desahogo —el tono del consuelo es personal—, pero no en el devocionario.
+ *
+ * `rv1909` entra porque son los Salmos y el Padre Nuestro bíblico: Reina-Valera
+ * 1909, dominio público, y le sirven a cualquier cristiano. Estaban fuera por una
+ * errata —el filtro pedía un `source` llamado 'biblica' que no existe en el
+ * corpus—, y con ella se cayeron de la app el Salmo 23 y el Salmo 91 para todo
+ * el mundo, también para el usuario católico.
+ *
+ * Lo que queda fuera a propósito: las meditaciones sin lenguaje religioso de la
+ * vertiente espiritual (`source: 'original'`), que no son devocionario católico.
+ */
+const PRAYER_SOURCES_UNIVERSALES = ['tradicional', 'vaticano', 'rv1909'];
+
 function availablePrayers() {
   if (typeof PRAYERS === 'undefined') return [];
-  return PRAYERS.filter(p => p.verified && (p.denominations.includes('catholic') || p.source === 'tradicional' || p.source === 'biblica'));
+  return PRAYERS.filter(p => p.verified &&
+    (p.denominations.includes('catholic') || PRAYER_SOURCES_UNIVERSALES.includes(p.source)));
 }
 
 /** Misterios que tocan hoy, según el día de la semana. */
