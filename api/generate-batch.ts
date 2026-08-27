@@ -143,26 +143,42 @@ function pollinationsUrl(prompt: string, seed: number): string {
     "?width=" + IMAGE_WIDTH + "&height=" + IMAGE_HEIGHT + "&nologo=true&seed=" + seed;
 }
 
-async function generateOne(prompt: string, seed: number): Promise<{ buffer: Buffer; gate: GateResult } | null> {
-  // Puerta 1 — respuesta. Pollinations a veces devuelve un error con cuerpo de texto.
-  const res = await fetchWithTimeout(pollinationsUrl(prompt, seed), POLLINATIONS_TIMEOUT_MS);
-  if (!res.ok) {
-    console.warn("   ✗ seed " + seed + ": HTTP " + res.status);
-    return null;
-  }
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.startsWith("image/")) {
-    console.warn("   ✗ seed " + seed + ": content-type " + contentType);
-    return null;
-  }
+/**
+ * Un intento. Devuelve null en CUALQUIER fallo y nunca lanza: un intento fallido
+ * es un intento fallido, no el final de la tanda.
+ *
+ * Esto no era así y costó una tanda entera: `fetchWithTimeout` lanza cuando la
+ * red parpadea o cuando vence su propio tope, y esa excepción se saltaba el bucle
+ * de reintentos, subía hasta el handler y devolvía 500 con todas las fechas
+ * pendientes de esa invocación sin tocar. El modo de fallo más común de
+ * Pollinations —tardar demasiado— era justo el que no reintentaba.
+ */
+export async function generateOne(prompt: string, seed: number): Promise<{ buffer: Buffer; gate: GateResult } | null> {
+  try {
+    // Puerta 1 — respuesta. Pollinations a veces devuelve un error con cuerpo de texto.
+    const res = await fetchWithTimeout(pollinationsUrl(prompt, seed), POLLINATIONS_TIMEOUT_MS);
+    if (!res.ok) {
+      console.warn("   ✗ seed " + seed + ": HTTP " + res.status);
+      return null;
+    }
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.startsWith("image/")) {
+      console.warn("   ✗ seed " + seed + ": content-type " + contentType);
+      return null;
+    }
 
-  const buffer = Buffer.from(await res.arrayBuffer());
-  const gate = inspectImage(buffer);
-  if (!gate.ok) {
-    console.warn("   ✗ seed " + seed + ": " + gate.reason);
+    const buffer = Buffer.from(await res.arrayBuffer());
+    const gate = inspectImage(buffer);
+    if (!gate.ok) {
+      console.warn("   ✗ seed " + seed + ": " + gate.reason);
+      return null;
+    }
+    return { buffer, gate };
+  } catch (err: any) {
+    // Red caída, socket colgado o el tope de 45 s: se reintenta con seed+1.
+    console.warn("   ✗ seed " + seed + ": " + (err.name === "AbortError" ? "sin respuesta en 45 s" : err.message));
     return null;
   }
-  return { buffer, gate };
 }
 
 async function ensureBucket(): Promise<void> {

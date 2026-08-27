@@ -49,7 +49,9 @@ function arg(name, fallback) {
   const from = arg('from', today);
   const to = arg('to', from.slice(0, 4) + '-12-31');
 
-  console.log('🎨 Lote de imágenes · ' + from + ' → ' + to);
+  const limit = arg('limit', '2');
+
+  console.log('🎨 Lote de imágenes · ' + from + ' → ' + to + ' (límite por tanda: ' + limit + ')');
   console.log('   ' + base + '/api/generate-batch\n');
 
   let cursor = from;
@@ -58,19 +60,35 @@ function arg(name, fallback) {
 
   while (cursor) {
     tandas++;
-    const url = base + '/api/generate-batch?from=' + cursor + '&to=' + to;
-    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + secret } });
+    const url = base + '/api/generate-batch?from=' + cursor + '&to=' + to + '&limit=' + limit;
 
-    if (!res.ok) {
-      const cuerpo = await res.text();
-      console.error('\n❌ Tanda ' + tandas + ' devolvió ' + res.status + ': ' + cuerpo.slice(0, 300));
-      process.exit(1);
+    // Un tropiezo puntual del endpoint o de la red no debe tirar un lote de
+    // horas: se reintenta la misma tanda un par de veces antes de rendirse. Es
+    // seguro porque el endpoint es idempotente — lo ya hecho se salta.
+    let res = null;
+    for (let intento = 1; intento <= 3; intento++) {
+      try {
+        res = await fetch(url, { headers: { Authorization: 'Bearer ' + secret } });
+        if (res.ok) break;
+        const cuerpo = await res.text();
+        console.warn('   ⚠️ tanda ' + tandas + ' devolvió ' + res.status +
+          (intento < 3 ? ' · reintento ' + intento + '/2' : '') + ': ' + cuerpo.slice(0, 160));
+      } catch (e) {
+        console.warn('   ⚠️ tanda ' + tandas + ' no salió' +
+          (intento < 3 ? ' · reintento ' + intento + '/2' : '') + ': ' + e.message);
+        res = null;
+      }
+      if (intento === 3) {
+        console.error('\n❌ Tanda ' + tandas + ' falló tres veces seguidas. Se corta; relanzar reanuda donde quedó.');
+        process.exit(1);
+      }
+      await new Promise((r) => setTimeout(r, 5000 * intento));
     }
 
     const data = await res.json();
     generadas += data.generated;
     fallidas += data.failed;
-    saltadas = data.skipped;
+    saltadas += data.skipped;   // cada tanda arranca en el cursor: no recuenta lo de antes
     if (data.failedDates && data.failedDates.length) fallidasDetalle.push(...data.failedDates);
 
     console.log('   tanda ' + tandas + ': +' + data.generated + ' generadas, ' +
