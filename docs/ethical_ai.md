@@ -6,7 +6,8 @@
 > Además prohibía la generación de imágenes sagradas y de oraciones por IA, que es
 > precisamente lo que Alivio hace — y hacía imposible construir encima sin contradecirlo.
 >
-> Vigente desde el 26 de agosto de 2026.
+> Vigente desde el 26 de agosto de 2026. El principio 3 se revisó el 27 de agosto: las
+> imágenes dejaron de llevar etiqueta en pantalla; el resto sigue igual.
 
 Alivio es una PWA devocional que acompaña a alguien en un momento de dolor: escribe su
 desahogo, respira, y recibe consuelo. No hay cuentas, no hay chatbot doctrinal, no hay
@@ -46,13 +47,24 @@ Esto se hace cumplir en el código, no por convención:
   del pasaje. Así el material sensible jamás llega a un modelo de imagen.
 - Toda imagen validada automáticamente antes de publicarse; si falla, hay imagen de respaldo.
 
-### 3. Etiquetado visible de IA
-
-Toda imagen generada lleva su etiqueta en pantalla: *«Ilustración generada con IA»*.
+### 3. Lo generado no se disfraza de tradición
 
 Lo generado **nunca se presenta como texto de la tradición ni con aprobación eclesial**. Una
 oración creada para ese momento se presenta como reflexión personal. En una misma tarjeta no
 se mezclan, sin distinción visual, un texto tradicional y uno generado.
+
+**Las imágenes no llevan etiqueta en pantalla** (decisión del propietario, 27 de agosto de
+2026). La versión anterior de este principio la exigía; se retiró porque en la práctica no
+protegía nada. Lo que este principio protege es que nadie confunda una voz con otra, y una
+imagen atmosférica no puede confundirse con un texto de la tradición: es ornamento del tiempo
+litúrgico, no contenido. La confusión que sí importaría —tomar una imagen por una fotografía,
+por un icono aprobado o por un documento— la impide el registro visual, no un pie de foto: el
+prompt tiene prohibidos los rostros, las figuras sagradas, el fotorrealismo de personas y el
+texto dentro de la imagen, y esas prohibiciones van fijas del lado del servidor (§2).
+
+Esto vale para la imagen atmosférica del Evangelio del Día y para la del desahogo. **No se
+extiende al texto:** una oración o un consuelo generados siguen presentándose como lo que
+son, y ahí la distinción se mantiene íntegra.
 
 **Los teasers y tarjetas de portada no llevan extractos automáticos de la Escritura.** El
 gancho sale del comentario papal o del título litúrgico del día. Un extracto automático saca

@@ -28,15 +28,19 @@ Razón: son textos fijos de la tradición. Una alucinación aquí es un error do
 
 1. **Primacía del texto canónico** — oraciones tradicionales y lecturas litúrgicas van hardcodeadas o vienen de la fuente; la IA nunca las redacta ni las retoca.
 2. **Prompts no narrativos** — la imagen nace del consuelo del pasaje, nunca de su escena (ver §4).
-3. **Etiquetado visible de IA** — ver §3.
+3. **Lo generado no se disfraza de tradición** — ver §3.
 4. **Asistencia, no sustitución** — la IA acompaña el consuelo personal; no dictamina doctrina ni responde preguntas del Magisterio.
 5. **Salvaguarda de crisis humana** — ver §7.
 
 `docs/ethical_ai.md` **ya fue reescrito** (26 ago 2026) y describe esta política. Los dos documentos deben decir lo mismo: si divergen, uno de los dos está mal y hay que arreglarlo, no ignorarlo.
 
-## 3. Etiquetado obligatorio de IA
+## 3. Lo generado no se disfraza de tradición
 
-Toda imagen generada por IA lleva una etiqueta visible en pantalla: *"Ilustración generada con IA"* / *"AI-generated illustration"*. Toda oración generada para el momento se presenta como reflexión personal, nunca como oración de la tradición ni como texto con aprobación eclesial. No mezcles en la misma tarjeta, sin distinción visual, un texto tradicional y uno generado.
+Toda oración generada para el momento se presenta como reflexión personal, nunca como oración de la tradición ni como texto con aprobación eclesial. No mezcles en la misma tarjeta, sin distinción visual, un texto tradicional y uno generado.
+
+**Las imágenes NO llevan etiqueta en pantalla** (decisión del propietario, 27 ago 2026; `docs/ethical_ai.md` §3 lo recoge). No la vuelvas a añadir «por si acaso»: se quitó a conciencia. La razón es que este principio protege que no se confunda una voz con otra, y una imagen atmosférica no puede pasar por texto de la tradición — es ornamento del tiempo litúrgico, no contenido. Lo que sí importaría (que pase por fotografía, por icono aprobado o por documento) lo impide el registro visual, no un pie de foto: sin rostros, sin figuras sagradas, sin fotorrealismo de personas y sin texto dentro de la imagen, todo fijado del lado del servidor (§4).
+
+**Esto no se extiende al texto.** Un consuelo o una oración generados siguen presentándose como lo que son.
 
 ## 4. Prompts de imagen: guardarraíles
 
@@ -155,7 +159,7 @@ La app ya tiene `#crisis-section`. Cualquier módulo nuevo donde el usuario escr
 
 1. ¿Es texto fijo de la tradición? → hardcodeado y revisado a mano, nunca generado.
 2. ¿Es un teaser, extracto o tarjeta de portada? → **jamás un extracto automático de la Escritura** (ver §4b).
-3. ¿Lo generó IA y se ve? → etiquetado como IA.
+3. ¿Lo generó IA y es TEXTO? → se presenta como reflexión personal, nunca como tradición. Si es imagen, va sin etiqueta (§3).
 4. ¿Viene de un tercero? → atribución visible + revisión de derechos.
 5. ¿Es contenido personal (se adapta a la vertiente) o compartido (identidad única, accesible a los tres)?
 6. ¿Está en `es` y `en`?

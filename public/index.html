@@ -410,15 +410,6 @@
       background: linear-gradient(135deg, rgba(237,233,254,.7), rgba(250,247,255,.7));
       box-shadow: 0 10px 30px -14px rgba(79, 70, 229, .3);
     }
-    /* Etiqueta de IA: obligatoria y visible, nunca escondida en un tooltip. */
-    .ai-badge {
-      font-size: 10.5px;
-      font-weight: 300;
-      letter-spacing: 0.04em;
-      color: #a5a0b5;
-      text-align: right;
-    }
-
     .reading-block {
       border-radius: 18px;
       padding: 20px 20px 18px;
@@ -579,28 +570,12 @@
       padding: 0;
       overflow: hidden;
     }
-    .hub-card-cover-wrap { position: relative; display: block; }
     .hub-card-cover {
       display: block;
       width: 100%;
       height: 116px;
       object-fit: cover;
       background: linear-gradient(135deg, rgba(237,233,254,.7), rgba(250,247,255,.7));
-    }
-    /* La etiqueta de IA acompaña a la imagen esté donde esté: también aquí. */
-    .hub-card-ai {
-      position: absolute;
-      right: 8px;
-      bottom: 8px;
-      font-size: 9px;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      color: rgba(255, 255, 255, 0.92);
-      background: rgba(15, 23, 42, 0.42);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      padding: 2px 7px;
-      border-radius: 9999px;
     }
     .hub-card-live-body {
       display: flex;
@@ -1327,13 +1302,10 @@
         </div>
 
         <div id="evangelio-content" class="flex flex-col gap-5" hidden>
-          <!-- Una sola imagen al día, la del Evangelio: atmosférica, nunca la escena
-               del pasaje, y siempre etiquetada como generada con IA. -->
-          <figure class="space-y-1.5 m-0">
-            <img id="evangelio-image" class="gospel-hero" alt="" width="768" height="512" loading="lazy" decoding="async"
-                 onerror="this.onerror=null; this.src='/fallback-misericordia.webp';">
-            <figcaption id="evangelio-ai-label" class="ai-badge">Ilustración generada con IA</figcaption>
-          </figure>
+          <!-- Una sola imagen al día, la del Evangelio: atmosférica y nunca la escena
+               del pasaje. Va sin pie: es ornamento del tiempo litúrgico, no contenido. -->
+          <img id="evangelio-image" class="gospel-hero" alt="" width="768" height="512" loading="lazy" decoding="async"
+               onerror="this.onerror=null; this.src='/fallback-misericordia.webp';">
 
           <div class="flex justify-end items-center gap-2">
             <button type="button" id="evangelio-share" onclick="shareGospel()" class="font-ctl-group font-ctl" style="width:32px;height:32px">

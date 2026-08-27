@@ -283,7 +283,7 @@ function renderHub() {
     card.className = vivo ? 'hub-card hub-card-live' : 'hub-card';
     card.addEventListener('click', () => changeScreen(mod.screen));
 
-    if (vivo) card.appendChild(hubCoverFor(evangelio.data, dict));
+    if (vivo) card.appendChild(hubCoverFor(evangelio.data));
 
     const icon = document.createElement('span');
     icon.className = `hub-card-icon ${mod.accent}`;
@@ -332,11 +332,8 @@ function renderHub() {
   hydrateHubCard();
 }
 
-/** La portada de la tarjeta viva: imagen del día y su etiqueta de IA, obligatoria. */
-function hubCoverFor(data, dict) {
-  const wrap = document.createElement('span');
-  wrap.className = 'hub-card-cover-wrap';
-
+/** La portada de la tarjeta viva: la imagen del día, sin pie ni etiqueta. */
+function hubCoverFor(data) {
   const cover = document.createElement('img');
   cover.className = 'hub-card-cover';
   cover.src = (data.image && data.image.url) ? data.image.url : '/fallback-misericordia.webp';
@@ -350,13 +347,7 @@ function hubCoverFor(data, dict) {
     if (cover.src.indexOf('fallback-misericordia') === -1) cover.src = '/fallback-misericordia.webp';
   });
 
-  const badge = document.createElement('span');
-  badge.className = 'hub-card-ai';
-  badge.textContent = dict.evangelioAiLabel;
-
-  wrap.appendChild(cover);
-  wrap.appendChild(badge);
-  return wrap;
+  return cover;
 }
 
 /**
@@ -499,7 +490,6 @@ const TRANSLATIONS = {
     evangelioGospel: "Evangelio",
     evangelioPapal: "El pensamiento del Papa",
     evangelioSaint: "Santo del día",
-    evangelioAiLabel: "Ilustración generada con IA",
     evangelioSources: "Lecturas de",
     evangelioShare: "Compartir el Evangelio de hoy",
     evangelioCopied: "Evangelio copiado",
@@ -640,7 +630,6 @@ const TRANSLATIONS = {
     evangelioGospel: "Gospel",
     evangelioPapal: "The Pope's reflection",
     evangelioSaint: "Saint of the day",
-    evangelioAiLabel: "AI-generated illustration",
     evangelioSources: "Readings from",
     evangelioShare: "Share today's Gospel",
     evangelioCopied: "Gospel copied",
@@ -2462,7 +2451,6 @@ function applyEvangelioTranslations() {
   set('evangelio-loading', dict.evangelioLoading);
   set('evangelio-error-text', dict.evangelioError);
   set('evangelio-retry', dict.evangelioRetry);
-  set('evangelio-ai-label', dict.evangelioAiLabel);
   set('evangelio-papal-label', dict.evangelioPapal);
 
   const share = document.getElementById('evangelio-share');
