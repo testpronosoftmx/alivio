@@ -249,17 +249,45 @@ const RED_ARCHETYPES = [
   "an old stone floor washed in the last red light of day"
 ];
 
-/** Cualidad de luz. Se combina con cualquier arquetipo. */
-const LIGHT_QUALITIES = [
-  "soft diffused light",
+/**
+ * Cualidad de luz, agrupada por temperatura.
+ *
+ * NO se sortea de la lista entera. Medido sobre las primeras 44 imágenes del
+ * lote: cuando la luz y la paleta se contradicen —«luz azulada de hora azul» con
+ * «paleta carmesí y ámbar»— gana la luz y el color litúrgico desaparece. El 21
+ * de septiembre, memoria roja de San Mateo, salió un claustro gris azulado.
+ *
+ * Y el color es lo único que ata la imagen al día: sin él la imagen es papel
+ * pintado. Así que la luz se elige de las compatibles con el color de ese día.
+ */
+const LIGHTS_WARM = [
   "low golden light raking across the surfaces",
-  "cool blue hour light, calm and even",
   "a single warm shaft of light in deep shadow",
-  "hazy backlight with gentle bloom",
-  "clear morning light, crisp and quiet",
-  "overcast light, muted and soft-edged",
   "candlelit warmth fading into darkness"
 ];
+const LIGHTS_COOL = [
+  "cool blue hour light, calm and even",
+  "overcast light, muted and soft-edged"
+];
+const LIGHTS_NEUTRAL = [
+  "soft diffused light",
+  "hazy backlight with gentle bloom",
+  "clear morning light, crisp and quiet"
+];
+
+/**
+ * Ninguna paleta se queda con menos de cuatro luces, así que el lote sigue sin
+ * repetirse. Adviento y Cuaresma (violeta) admiten la vela y el haz cálido a
+ * propósito: una luz pequeña en la penumbra es exactamente el registro de la
+ * espera, no una contradicción.
+ */
+export const LIGHT_BY_COLOUR: Record<Colour, string[]> = {
+  red: [...LIGHTS_WARM, "hazy backlight with gentle bloom"],
+  white: [...LIGHTS_WARM, ...LIGHTS_NEUTRAL],
+  green: [...LIGHTS_NEUTRAL, "low golden light raking across the surfaces", "a single warm shaft of light in deep shadow"],
+  violet: [...LIGHTS_COOL, "candlelit warmth fading into darkness", "a single warm shaft of light in deep shadow", "soft diffused light"],
+  rose: [...LIGHTS_WARM, "soft diffused light", "hazy backlight with gentle bloom"]
+};
 
 /** Paleta anclada al color litúrgico del día. */
 const PALETTES: Record<Colour, string> = {
@@ -289,7 +317,7 @@ export function buildPrompt(day: LiturgicDay): string {
   const seed = seedFromDate(day.date);
   const bank = isRedDay(day) ? RED_ARCHETYPES : ARCHETYPES[day.season];
   const scene = pick(bank, seed, 0x9e37);
-  const light = pick(LIGHT_QUALITIES, seed, 0x85eb);
+  const light = pick(LIGHT_BY_COLOUR[day.colour] || LIGHT_BY_COLOUR.green, seed, 0x85eb);
   const palette = PALETTES[day.colour] || PALETTES.green;
   return STYLE_PREFIX + " Scene: " + scene + ". Light: " + light + ". Palette: " + palette + ". " + NEGATIVE_SUFFIX;
 }
