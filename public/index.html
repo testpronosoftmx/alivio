@@ -17,6 +17,13 @@
   
   <!-- SEO & Search Console Optimization -->
   <link rel="canonical" href="https://alivio.pronosoftmx.com">
+
+  <!-- Versiones por idioma. Legítimas desde que ?lang= se aplica de verdad en
+       app.js: antes estas URLs devolvían la misma página en español, y declarar
+       una versión en inglés que no existe es una señal falsa, no una mejora. -->
+  <link rel="alternate" hreflang="es" href="https://alivio.pronosoftmx.com/?lang=es">
+  <link rel="alternate" hreflang="en" href="https://alivio.pronosoftmx.com/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://alivio.pronosoftmx.com/">
   <meta name="description" content="Alivio es una PWA católica de meditación y oración guiada. Desahógate de forma anónima, respira hondo y recibe consuelo espiritual.">
   <meta name="robots" content="index, follow">
   
@@ -29,6 +36,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://alivio.pronosoftmx.com">
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:locale:alternate" content="en_US">
 
   <!-- Twitter / Telegram Card (Para banner grande completo abajo) -->
   <meta name="twitter:card" content="summary_large_image">
@@ -60,6 +69,13 @@
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "Organization",
+        "@id": "https://pronosoftmx.com/#organization",
+        "name": "PronosoftMX",
+        "url": "https://pronosoftmx.com",
+        "email": "ventas@pronosoftmx.com"
+      },
+      {
         "@type": "WebApplication",
         "@id": "https://alivio.pronosoftmx.com/#webapp",
         "name": "Alivio - Oración y Meditación Católica PWA",
@@ -73,7 +89,14 @@
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "MXN"
-        }
+        },
+        "publisher": {
+          "@id": "https://pronosoftmx.com/#organization"
+        },
+        "inLanguage": [
+          "es",
+          "en"
+        ]
       },
       {
         "@type": "FAQPage",
@@ -81,53 +104,54 @@
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "¿Cómo funciona Alivio?",
+            "name": "¿Qué oraciones y funciones incluye Alivio?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Alivio te guía en 3 pasos: desahoga tus aflicciones de forma 100% anónima, realiza un ejercicio de respiración profunda de 12 segundos y recibe versículos bíblicos de consuelo y una oración personalizada según lo que escribiste."
+              "text": "Alivio es una plataforma devocional completa: incluye el Santo Rosario interactivo guiado cuenta por cuenta con los misterios del día, el Evangelio del Día con leccionario completo y el Pensamiento diario del Papa (Vatican News), un Devocionario Católico tradicional (Padre Nuestro, Ave María, Credo, Ángelus), y un espacio íntimo de desahogo espiritual anónimo con respiración zen guiada."
             }
           },
           {
             "@type": "Question",
-            "name": "¿Es Alivio una aplicación gratuita?",
+            "name": "¿Qué es el Evangelio del Día y el Pensamiento del Papa?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sí, Alivio es completamente gratuita. Puedes desahogarte, respirar y recibir oraciones y lecturas bíblicas sin costo. Ofrecemos una opción de apoyo voluntario para mantener el servicio activo para todos."
+              "text": "Cada día Alivio sincroniza las lecturas oficiales de la liturgia católica (Primera lectura, Salmo responsorial y Evangelio) y las acompaña con la homilía y reflexión pastoral oficial del Santo Padre difundida por Vatican News, junto con una ilustración sacra generada acorde al tiempo litúrgico."
             }
           },
           {
             "@type": "Question",
-            "name": "¿Es segura mi información en Alivio?",
+            "name": "¿Cómo funciona el Santo Rosario interactivo?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sí. Alivio procesa tu desahogo de forma 100% anónima. No almacenamos datos personales identificables. No usamos cookies de seguimiento. Tu privacidad es nuestra prioridad absoluta."
+              "text": "Alivio detecta automáticamente el día de la semana y carga los misterios que corresponden (Gozosos, Dolorosos, Gloriosos o Luminosos). Te guía paso a paso, cuenta por cuenta, con textos bíblicos de meditación, oraciones completas y controles de lectura adaptados (A- / A+)."
             }
           },
           {
             "@type": "Question",
-            "name": "¿Funciona Alivio sin conexión a internet?",
+            "name": "¿Es segura y anónima mi información en Alivio?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sí. Alivio es una PWA con tecnología de Service Worker. Una vez visitada, funciona en modo offline. Tus oraciones guardadas y el ejercicio de respiración estarán disponibles sin internet."
+              "text": "Sí. Alivio procesa tu desahogo de forma 100% anónima y privada. No almacenamos datos personales identificables, no vendemos información ni usamos cookies de rastreo invasivas. Tu privacidad espiritual es sagrada. Consulta nuestra política de privacidad."
             }
           },
           {
             "@type": "Question",
-            "name": "¿Alivio es solo para católicos?",
+            "name": "¿Funciona Alivio sin conexión a internet (Offline)?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "No. Aunque su base es bíblica católica, Alivio ofrece tres enfoques: Católico, Evangélico y Espiritual. Cualquier persona que busque paz interior y consuelo espiritual puede usarla."
+              "text": "Sí. Gracias a su arquitectura PWA y tecnología de Service Worker / App Nativa, el devocionario de oraciones tradicionales, el Santo Rosario y el ejercicio de respiración consciente quedan guardados en tu dispositivo para rezar en cualquier momento sin gastar datos móviles ni requerir WiFi."
             }
           },
           {
             "@type": "Question",
-            "name": "¿Cómo instalo Alivio en mi teléfono?",
+            "name": "¿Cómo descargo o instalo Alivio en mi teléfono?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "En Android/Chrome: toca el menú y selecciona 'Instalar app'. En iPhone/Safari: toca el ícono de Compartir y selecciona 'Agregar a Inicio'. No requiere App Store ni Google Play."
+              "text": "En Android puedes instalar la App Oficial directamente desde la Google Play Store. En iPhone (iOS) o navegadores web puedes usarla como PWA: en Safari toca el icono de Compartir y selecciona 'Agregar a Inicio'."
             }
           }
-        ]
+        ],
+        "inLanguage": "es"
       },
       {
         "@type": "BreadcrumbList",

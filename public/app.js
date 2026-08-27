@@ -836,7 +836,36 @@ const SCREENSHOTS_DATA = {
 };
 
 // Estado global de idioma (por defecto español o lo guardado)
-let currentLang = localStorage.getItem('alivio_lang') || 'es';
+/**
+ * Idioma inicial. El parámetro `?lang=` de la URL manda sobre lo guardado.
+ *
+ * Sin esto, un enlace a /?lang=en abría en el idioma que el visitante tuviera
+ * guardado —o en español si era su primera visita—, así que no había forma de
+ * compartir la app en inglés ni de declararle a Google una versión en inglés
+ * que existiera de verdad. El `hreflang` del <head> depende de esto.
+ *
+ * El valor se VALIDA contra los idiomas que existen: `?lang=fr` dejaría
+ * TRANSLATIONS[currentLang] en undefined y reventaría la app entera en la
+ * primera traducción. Y se persiste, porque quien llega por un enlace en inglés
+ * espera seguir en inglés al volver.
+ */
+const IDIOMAS = ['es', 'en'];
+
+function idiomaInicial() {
+  try {
+    const pedido = new URLSearchParams(window.location.search).get('lang');
+    if (pedido && IDIOMAS.includes(pedido)) {
+      localStorage.setItem('alivio_lang', pedido);
+      return pedido;
+    }
+  } catch (e) {
+    // URL rara o localStorage bloqueado: se sigue con lo guardado.
+  }
+  const guardado = localStorage.getItem('alivio_lang');
+  return IDIOMAS.includes(guardado) ? guardado : 'es';
+}
+
+let currentLang = idiomaInicial();
 
 // ── DENOMINACIÓN ──────────────────────────────────────────────────────────────
 let currentDenomination = localStorage.getItem('alivio_denom') || 'catholic';
