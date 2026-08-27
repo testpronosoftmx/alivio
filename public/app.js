@@ -262,6 +262,11 @@ function goHome() {
 /**
  * Pinta las tarjetas del hub. Se reconstruyen al cambiar idioma o vertiente.
  * Todo con createElement: nada de innerHTML.
+ *
+ * La tarjeta del Evangelio no es una entrada de menú: es una superficie de
+ * contenido. Cuando hay datos del día lleva su imagen y su gancho — y el gancho
+ * viene resuelto del servidor (comentario del Papa → título litúrgico → la cita),
+ * NUNCA un extracto automático del pasaje. Ver el skill de contenido §4b.
  */
 function renderHub() {
   const host = document.getElementById('hub-cards');
@@ -271,31 +276,48 @@ function renderHub() {
   host.textContent = '';
 
   visibleModules().forEach(mod => {
+    const vivo = (mod.id === 'evangelio' && mod.ready && evangelioFresco());
+
     const card = document.createElement('button');
     card.type = 'button';
-    card.className = 'hub-card';
+    card.className = vivo ? 'hub-card hub-card-live' : 'hub-card';
     card.addEventListener('click', () => changeScreen(mod.screen));
+
+    if (vivo) card.appendChild(hubCoverFor(evangelio.data, dict));
 
     const icon = document.createElement('span');
     icon.className = `hub-card-icon ${mod.accent}`;
     icon.setAttribute('aria-hidden', 'true');
     icon.textContent = mod.icon;
 
-    const body = document.createElement('span');
-    body.className = 'flex flex-col gap-0.5 min-w-0';
-
     const title = document.createElement('span');
     title.className = 'text-sm font-medium text-slate-700';
     title.textContent = dict[`hubCard_${mod.id}_title`];
 
     const desc = document.createElement('span');
-    desc.className = 'text-xs font-light text-slate-500 leading-relaxed';
-    desc.textContent = dict[`hubCard_${mod.id}_desc`];
+    desc.className = vivo ? 'hub-card-teaser' : 'text-xs font-light text-slate-500 leading-relaxed';
+    desc.textContent = (vivo && evangelio.data.teaser) ? evangelio.data.teaser : dict[`hubCard_${mod.id}_desc`];
 
-    body.appendChild(title);
-    body.appendChild(desc);
-    card.appendChild(icon);
-    card.appendChild(body);
+    if (vivo) {
+      // En la tarjeta viva el icono y el título van en una fila, y el gancho debajo.
+      const fila = document.createElement('span');
+      fila.className = 'hub-card-live-head';
+      fila.appendChild(icon);
+      fila.appendChild(title);
+
+      const cuerpo = document.createElement('span');
+      cuerpo.className = 'hub-card-live-body';
+      cuerpo.appendChild(fila);
+      cuerpo.appendChild(desc);
+      card.appendChild(cuerpo);
+    } else {
+      const body = document.createElement('span');
+      body.className = 'flex flex-col gap-0.5 min-w-0';
+      body.appendChild(title);
+      body.appendChild(desc);
+      card.appendChild(icon);
+      card.appendChild(body);
+    }
 
     if (!mod.ready) {
       const soon = document.createElement('span');
@@ -306,6 +328,49 @@ function renderHub() {
 
     host.appendChild(card);
   });
+
+  hydrateHubCard();
+}
+
+/** La portada de la tarjeta viva: imagen del día y su etiqueta de IA, obligatoria. */
+function hubCoverFor(data, dict) {
+  const wrap = document.createElement('span');
+  wrap.className = 'hub-card-cover-wrap';
+
+  const cover = document.createElement('img');
+  cover.className = 'hub-card-cover';
+  cover.src = (data.image && data.image.url) ? data.image.url : '/fallback-misericordia.webp';
+  cover.alt = '';
+  cover.setAttribute('aria-hidden', 'true');
+  cover.loading = 'lazy';
+  cover.decoding = 'async';
+  cover.width = 768;
+  cover.height = 512;
+  cover.addEventListener('error', function () {
+    if (cover.src.indexOf('fallback-misericordia') === -1) cover.src = '/fallback-misericordia.webp';
+  });
+
+  const badge = document.createElement('span');
+  badge.className = 'hub-card-ai';
+  badge.textContent = dict.evangelioAiLabel;
+
+  wrap.appendChild(cover);
+  wrap.appendChild(badge);
+  return wrap;
+}
+
+/**
+ * Pide las lecturas para la tarjeta del hub y la repinta cuando llegan. No
+ * bloquea el pintado: el hub sale al instante con la tarjeta normal y se
+ * convierte en la viva al llegar los datos. Si falla, se queda la normal.
+ */
+async function hydrateHubCard() {
+  const mod = MODULES.find(m => m.id === 'evangelio');
+  if (!mod || !mod.enabled || !mod.ready) return;
+  if (evangelioFresco()) return;
+
+  const data = await fetchEvangelio(false);
+  if (data && currentScreen === 'screen-hub') renderHub();
 }
 
 /**
@@ -2219,7 +2284,11 @@ async function sharePrayer() {
 // Todo el trabajo pesado vive en /api/readings: doble fuente, caché de CDN y la
 // escalera de respaldo de la imagen. Aquí solo se pinta lo que llega.
 
-const evangelio = { date: null, lang: null, data: null, loading: false };
+const evangelio = { date: null, lang: null, data: null, loading: false, pending: null, failedAt: 0 };
+
+// Tras un fallo no se reintenta en bucle: el hub pide los datos cada vez que se
+// pinta, y sin esto una caída de red se convertiría en una tormenta de peticiones.
+const EVANGELIO_RETRY_MS = 60000;
 
 /** Fecha LOCAL del usuario. La racha usa UTC y descuadra de noche: no imitarlo. */
 function localToday() {
@@ -2237,38 +2306,60 @@ function showEvangelioState(state) {
   if (content) content.hidden = (state !== 'content');
 }
 
+/** ¿Los datos en memoria son los de hoy y en el idioma activo? */
+function evangelioFresco() {
+  return Boolean(evangelio.data && evangelio.date === localToday() && evangelio.lang === currentLang);
+}
+
 /**
- * Trae las lecturas del día. Se llama sola al entrar en la pantalla (SCREENS
- * .onEnter). Con los datos ya en memoria no vuelve a pedir nada: el mismo día en
- * el mismo idioma no cambia.
+ * La única puerta a /api/readings. La usan la pantalla y la tarjeta del hub, así
+ * que comparte la petición en vuelo en vez de lanzar dos. Devuelve los datos o
+ * null: nunca lanza, porque quien la llama a veces solo está pintando una tarjeta.
+ */
+async function fetchEvangelio(force) {
+  if (!force && evangelioFresco()) return evangelio.data;
+  if (evangelio.pending) return evangelio.pending;
+  if (!force && evangelio.failedAt && Date.now() - evangelio.failedAt < EVANGELIO_RETRY_MS) return null;
+
+  evangelio.loading = true;
+  evangelio.pending = (async () => {
+    try {
+      const res = await fetch(API_BASE + '/api/readings?date=' + localToday() + '&lang=' + currentLang);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!data || !data.readings || !data.readings.gospel) throw new Error('respuesta sin Evangelio');
+
+      evangelio.data = data;
+      evangelio.date = localToday();
+      evangelio.lang = currentLang;
+      evangelio.failedAt = 0;
+      return data;
+    } catch (e) {
+      console.warn('⚠️ No se pudieron cargar las lecturas del día:', e);
+      evangelio.failedAt = Date.now();
+      return null;
+    } finally {
+      evangelio.loading = false;
+      evangelio.pending = null;
+    }
+  })();
+
+  return evangelio.pending;
+}
+
+/**
+ * Trae las lecturas y pinta la pantalla. Se llama sola al entrar (SCREENS.onEnter).
+ * Con los datos ya en memoria no pide nada: el mismo día en el mismo idioma no cambia.
  */
 async function loadEvangelio(force) {
-  const today = localToday();
-  if (!force && evangelio.data && evangelio.date === today && evangelio.lang === currentLang) {
+  if (!force && evangelioFresco()) {
     renderEvangelio();
     return;
   }
-  if (evangelio.loading) return;
-
-  evangelio.loading = true;
   showEvangelioState('loading');
-
-  try {
-    const res = await fetch(API_BASE + '/api/readings?date=' + today + '&lang=' + currentLang);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data || !data.readings || !data.readings.gospel) throw new Error('respuesta sin Evangelio');
-
-    evangelio.data = data;
-    evangelio.date = today;
-    evangelio.lang = currentLang;
-    renderEvangelio();
-  } catch (e) {
-    console.warn('⚠️ No se pudieron cargar las lecturas del día:', e);
-    showEvangelioState('error');
-  } finally {
-    evangelio.loading = false;
-  }
+  const data = await fetchEvangelio(force);
+  if (data) renderEvangelio();
+  else showEvangelioState('error');
 }
 
 /** Un bloque de lectura. Todo con textContent: el texto viene de fuera. */

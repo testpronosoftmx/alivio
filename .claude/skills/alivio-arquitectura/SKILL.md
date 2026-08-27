@@ -64,6 +64,13 @@ Con un solo módulo activo, el hub se salta solo y se entra directo al desahogo.
 `HUB_ORDER` fija el orden de las tarjetas por vertiente. **Solo el orden: el contenido
 es idéntico para las tres.** Nunca ramifiques contenido ahí.
 
+La tarjeta del Evangelio es **viva** (`hub-card-live`): lleva la imagen del día, su
+etiqueta de IA y el gancho que devuelve `/api/readings` en `teaser`. El gancho lo
+resuelve el servidor y **jamás sale del texto del pasaje** — ver el skill de contenido
+§4b. `renderHub()` pinta primero la tarjeta normal y `hydrateHubCard()` la sustituye
+cuando llegan los datos; si no llegan, se queda la normal. Pantalla y hub comparten la
+misma petición en vuelo (`fetchEvangelio`), con freno de 60 s tras un fallo.
+
 ## 3. i18n — regla innegociable
 
 `TRANSLATIONS` en `app.js` tiene `es` y `en`. **Cada string visible nuevo va en las dos, y se aplica dentro de `applyTranslations()`.** Nunca dejes texto en duro en el HTML si el usuario lo puede ver: `setLang()` no lo va a poder cambiar y queda congelado en español.
