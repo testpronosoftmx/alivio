@@ -1093,6 +1093,23 @@
     </div>
 
     <p style="margin-top:28px"><strong>Seis días en total</strong> para tener las dos funcionalidades en producción en web y Android, la app segura, la arquitectura preparada y el APK adelgazado. El contador anónimo queda como candidato para después, cuando haya tráfico que lo haga significativo.</p>
+
+    <div class="aside aside-vio" style="margin-top:28px">
+      <span class="label">Decisión pendiente · cómo se actualiza la app de Android</span>
+      <p><strong>El planteamiento original no se cumplió.</strong> Se eligió Capacitor para poder cambiar la web sin recompilar ni volver a pasar por Google Play cada vez. Pero <code>capacitor.config.ts</code> tiene la línea del servidor comentada, así que el WebView carga desde los <strong>assets locales</strong> del APK: cada cambio de interfaz exige <code>cap sync</code>, subir <code>versionCode</code>, firmar, publicar y esperar revisión. Hoy se nota — <code>android/app/src/main/assets/public/app.js</code> sigue siendo el de julio y <code>versionCode</code> nunca pasó de 1.</p>
+
+      <p><strong>El problema es más pequeño de lo que parece.</strong> Lo que cambia a diario ya viaja por la API y llega sin release: el Evangelio, el salmo, el comentario del Papa, las imágenes del lote y el consuelo del desahogo. Solo la <em>interfaz</em> obliga a recompilar.</p>
+
+      <p><strong>Tres salidas, ordenadas por facilidad de mantenimiento</strong> —que es el criterio del propietario, y no coincide con el de riesgo:</p>
+
+      <p><strong>A · Cargar desde la web</strong> (<code>server.url</code>). Es la más simple de mantener a largo plazo: una URL y nada más que construir. Y la más arriesgada. Cuatro contras, ninguno hipotético: la app deja de abrir sin conexión (hoy abre siempre, porque el HTML está en el teléfono); el origen pasa de <code>https://localhost</code> al dominio, y como <code>localStorage</code> es por origen, <strong>los usuarios instalados pierden favoritos, racha, hora del recordatorio y token de push</strong>; cargar el 100 % desde una web es el perfil clásico de rechazo por «funcionalidad mínima» en Play; y el arranque pasa a depender de la red. Tampoco ahorra la release pendiente: cambiar esa línea también obliga a publicar.</p>
+
+      <p><strong>B · Actualizaciones OTA</strong> (Capgo, o Appflow de Ionic). Es literalmente lo que se buscaba: mantiene los assets locales —abre sin red, mismo origen, no se pierde nada— y descarga el bundle web nuevo por detrás. Play lo permite explícitamente para JS, HTML y CSS; lo prohibido es descargar código nativo. <strong>Su coste de mantenimiento no es el montaje, es el contrato de compatibilidad:</strong> cada bundle publicado tiene que funcionar contra la cáscara nativa más vieja que siga instalada. Un bundle que estrene un plugin nativo rompe la app de quien no actualizó el APK. Eso es una disciplina permanente, más un servicio de pago o autoalojado.</p>
+
+      <p><strong>C · Seguir publicando releases.</strong> Cero maquinaria nueva y cero dependencias: el coste es la fricción por release, y el checklist ya existe (§10 del skill de arquitectura). Es lo que hay hoy.</p>
+
+      <p><strong>Recomendación: C ahora, y revisar B cuando haya un dato real.</strong> La release de la fase 4 hace falta con cualquiera de las tres, así que la decisión no la bloquea. El dato que falta es <em>cada cuánto se toca de verdad la interfaz</em>: entre julio y agosto se acumularon meses de trabajo de UI sin publicar ni una vez, lo que sugiere que la cadencia por lotes encaja. Si tras esta release la interfaz se toca una vez al mes, C basta. Si acaba tocándose cada semana, B se paga sola. La A no se recomienda en ningún caso mientras haya usuarios instalados con racha y favoritos que perder.</p>
+    </div>
   </section>
 
   <!-- ══════════════ vi ══════════════ -->
