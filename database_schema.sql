@@ -47,3 +47,57 @@ DROP POLICY IF EXISTS "Permitir lectura al administrador" ON alivio.push_subscri
 
 -- Sin políticas: con RLS activo y sin grants, solo el service role (que las omite)
 -- puede leer o escribir. Es exactamente lo que necesita la API.
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Evangelio del Día — caché de lecturas (fase 3)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Esto es una CACHÉ, no un archivo. El texto litúrgico es de terceros (Evangelizo y
+-- Vatican News, con derechos) y se guarda solo para no pegarles una vez por usuario.
+-- `/api/readings` purga lo que pasa de 45 días. No conviertas esta tabla en un corpus
+-- permanente ni la empaquetes offline sin licencia: ver docs/ethical_ai.md.
+CREATE TABLE IF NOT EXISTS alivio.daily_readings (
+  reading_date DATE NOT NULL,                 -- Día litúrgico, no la fecha de ingesta
+  lang VARCHAR(2) NOT NULL,                   -- 'es' | 'en'
+  liturgic_title TEXT,                        -- litugic_t de Evangelizo (sí, con su errata)
+  saint TEXT,                                 -- Santo del día; contexto secundario en la UI
+  first_reading JSONB,                        -- { ref, label, text }
+  psalm JSONB,                                -- Salmo responsorial. Evangelizo siempre lo trae; Vatican News nunca.
+  second_reading JSONB,                       -- Solo domingos y solemnidades. NULL el 85 % de los días.
+  gospel JSONB,
+  papal_comment TEXT,                         -- Comentario del Papa (Vatican News, solo español)
+  text_source TEXT NOT NULL,                  -- 'evangelizo' | 'evangelizo+vaticannews'
+  vn_applied BOOLEAN DEFAULT FALSE NOT NULL,  -- Falso = la superposición de VN falló y se puede reintentar
+  fetched_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  PRIMARY KEY (reading_date, lang)
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Evangelio del Día — lote anual de imágenes (fase 3)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Una fila por fecha. El prompt se calcula de un banco de plantillas sembrado con el
+-- día litúrgico (calapi), nunca con el texto del pasaje: ver el skill de contenido.
+CREATE TABLE IF NOT EXISTS alivio.daily_images (
+  image_date DATE PRIMARY KEY,
+  storage_path TEXT NOT NULL,                 -- Ruta dentro del bucket 'daily-images'
+  public_url TEXT NOT NULL,
+  prompt TEXT NOT NULL,                       -- El prompt exacto, para poder auditar el lote
+  seed BIGINT NOT NULL,                       -- Derivado de la fecha: el lote es reproducible
+  season TEXT,                                -- advent | christmas | lent | easter | ordinary
+  colour TEXT,                                -- Color litúrgico del día según calapi
+  blocked BOOLEAN DEFAULT FALSE NOT NULL,     -- Interruptor por fecha: /api/readings ignora la fila
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- El lote se salta las fechas ya resueltas: sin índice, cada tanda hace scan completo.
+CREATE INDEX IF NOT EXISTS daily_images_pending_idx
+  ON alivio.daily_images (image_date)
+  WHERE blocked = FALSE;
+
+-- Mismo régimen que push_subscriptions: solo el service role.
+ALTER TABLE alivio.daily_readings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE alivio.daily_images ENABLE ROW LEVEL SECURITY;
+
+GRANT ALL ON TABLE alivio.daily_readings TO service_role;
+GRANT ALL ON TABLE alivio.daily_images TO service_role;
+REVOKE ALL ON TABLE alivio.daily_readings FROM anon, authenticated;
+REVOKE ALL ON TABLE alivio.daily_images FROM anon, authenticated;

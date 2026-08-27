@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alivio-cache-v13';
+const CACHE_NAME = 'alivio-cache-v14';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -8,7 +8,16 @@ const ASSETS_TO_CACHE = [
   '/prayers.js',
   '/icon-192.png',
   '/icon-512.png',
-  '/fallback-misericordia.png',
+  '/fallback-misericordia.webp',
+  // Escalón 2 de la escalera de respaldo del Evangelio del Día: una imagen fija
+  // por tiempo litúrgico. Van cacheadas a propósito — son justo lo que se muestra
+  // cuando no hay red ni fila del día. 89 KB las seis.
+  '/seasons/advent.webp',
+  '/seasons/christmas.webp',
+  '/seasons/lent.webp',
+  '/seasons/easter.webp',
+  '/seasons/ordinary.webp',
+  '/seasons/martyr.webp',
   '/SS11.png',
   '/SS22.png',
   '/SS33.png',

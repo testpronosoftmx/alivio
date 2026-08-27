@@ -44,11 +44,13 @@ if ('serviceWorker' in navigator) {
  *   'immersive' → paso de un flujo; la barra se oculta (una barra invitando a
  *                 irse arruina una respiración guiada)
  * tab: qué pestaña de la barra queda marcada como activa
+ * onEnter: nombre de la función que se llama al mostrar la pantalla. Es cómo un
+ *   módulo pide sus datos sin que changeScreen() sepa de qué módulo se trata.
  */
 const SCREENS = {
   'screen-landing':   { chrome: 'landing' },
   'screen-hub':       { chrome: 'app', headerSlot: 'hub-header' },
-  'screen-evangelio': { chrome: 'app', tab: 'evangelio', headerSlot: 'evangelio-header' },
+  'screen-evangelio': { chrome: 'app', tab: 'evangelio', headerSlot: 'evangelio-header', onEnter: 'loadEvangelio' },
   'screen-desahogo':  { chrome: 'app', tab: 'desahogo' },
   'screen-oraciones': { chrome: 'app', tab: 'oraciones', headerSlot: 'oraciones-header' },
   'screen-oracion':   { chrome: 'app', tab: 'oraciones' },
@@ -64,12 +66,12 @@ const SCREENS = {
  * `enabled: false` saca el módulo del hub y de la barra sin borrar nada.
  * `ready: false`   lo muestra con la etiqueta «muy pronto» y su pantalla vacía.
  *
- * Fase 2 pone `ready: true` en 'oraciones'. Fase 3, en 'evangelio'.
- * Si prefieres no publicar placeholders en web, pon `enabled: false` en ambos:
- * el hub y la barra se ocultan solos cuando queda un único destino.
+ * Los tres están listos desde la fase 3. Si prefieres retirar uno sin borrar
+ * nada, pon `enabled: false`: el hub y la barra se ocultan solos cuando queda un
+ * único destino.
  */
 const MODULES = [
-  { id: 'evangelio', screen: 'screen-evangelio', enabled: true, ready: false, icon: '📖', accent: 'bg-amber-50 text-amber-600' },
+  { id: 'evangelio', screen: 'screen-evangelio', enabled: true, ready: true,  icon: '📖', accent: 'bg-amber-50 text-amber-600' },
   { id: 'desahogo',  screen: 'screen-desahogo',  enabled: true, ready: true,  icon: '✍️', accent: 'bg-violet-50 text-violet-600', center: true },
   { id: 'oraciones', screen: 'screen-oraciones', enabled: true, ready: true,  icon: '📿', accent: 'bg-emerald-50 text-emerald-600' }
 ];
@@ -141,6 +143,12 @@ function changeScreen(screenId) {
 
   if (target.headerSlot) renderAppHeader(target.headerSlot);
   renderBottomNav();
+
+  // El módulo pide sus datos al entrar. Si la función no existe todavía, la
+  // pantalla se muestra igual: nunca es motivo para no navegar.
+  if (target.onEnter && typeof window[target.onEnter] === 'function') {
+    window[target.onEnter]();
+  }
 }
 
 /**
@@ -363,7 +371,7 @@ const FALLBACK_COMFORT_ES = {
   comfort: "Descansa. En momentos de incertidumbre, tu desahogo ha sido escuchado. Permítete soltar tus cargas y confiar en la providencia del Padre que nunca te abandona.",
   prayer: "Señor Jesús, en Ti confío. Te entrego mi cansancio y mis aflicciones en este día. Dame la paz que sobrepasa todo entendimiento, cubre mi corazón con Tu Divina Misericordia y acompáñame a cada paso. Amén.",
   afternoonMessage: "respira. el señor sostiene tus cargas hoy. estás a salvo.",
-  image: "/fallback-misericordia.png"
+  image: "/fallback-misericordia.webp"
 };
 
 // Datos estáticos de contingencia (Fallback) en Inglés
@@ -385,7 +393,7 @@ const FALLBACK_COMFORT_EN = {
   comfort: "Rest. In moments of uncertainty, your plea has been heard. Allow yourself to let go of your burdens and trust in the providence of the Father who never abandons you.",
   prayer: "Lord Jesus, I trust in You. I surrender my fatigue and my afflictions to You today. Give me the peace that surpasses all understanding, cover my heart with Your Divine Mercy, and accompany me at every step. Amen.",
   afternoonMessage: "breathe. the lord carries your burdens today. you are safe.",
-  image: "/fallback-misericordia.png"
+  image: "/fallback-misericordia.webp"
 };
 
 // Diccionario de Traducciones (Landing Page y App)
@@ -417,7 +425,19 @@ const TRANSLATIONS = {
     nav_desahogo: "Desahogo",
     nav_oraciones: "Oraciones",
     evangelioTitle: "Evangelio del Día",
-    evangelioSoon: "Muy pronto: la Palabra de hoy con su primera lectura, el salmo y el comentario del Papa.",
+    evangelioLoading: "Buscando la Palabra de hoy…",
+    evangelioError: "No pudimos traer las lecturas de hoy. Revisa tu conexión y vuelve a intentarlo.",
+    evangelioRetry: "Reintentar",
+    evangelioFirst: "Primera lectura",
+    evangelioPsalm: "Salmo responsorial",
+    evangelioSecond: "Segunda lectura",
+    evangelioGospel: "Evangelio",
+    evangelioPapal: "El pensamiento del Papa",
+    evangelioSaint: "Santo del día",
+    evangelioAiLabel: "Ilustración generada con IA",
+    evangelioSources: "Lecturas de",
+    evangelioShare: "Compartir el Evangelio de hoy",
+    evangelioCopied: "Evangelio copiado",
     oracionesTitle: "Oraciones",
     oracionesSubtitle: "Textos de siempre, sin conexión y sin prisa.",
     prayerSearchPlaceholder: "Buscar una oración…",
@@ -546,7 +566,19 @@ const TRANSLATIONS = {
     nav_desahogo: "Unburden",
     nav_oraciones: "Prayers",
     evangelioTitle: "Gospel of the Day",
-    evangelioSoon: "Coming soon: today's Word with its first reading, the psalm and the Pope's reflection.",
+    evangelioLoading: "Fetching today's Word…",
+    evangelioError: "We couldn't fetch today's readings. Check your connection and try again.",
+    evangelioRetry: "Try again",
+    evangelioFirst: "First reading",
+    evangelioPsalm: "Responsorial psalm",
+    evangelioSecond: "Second reading",
+    evangelioGospel: "Gospel",
+    evangelioPapal: "The Pope's reflection",
+    evangelioSaint: "Saint of the day",
+    evangelioAiLabel: "AI-generated illustration",
+    evangelioSources: "Readings from",
+    evangelioShare: "Share today's Gospel",
+    evangelioCopied: "Gospel copied",
     oracionesTitle: "Prayers",
     oracionesSubtitle: "The prayers you know, offline and unhurried.",
     prayerSearchPlaceholder: "Search a prayer…",
@@ -1206,8 +1238,7 @@ function applyTranslations() {
 
   const evangelioTitleEl = document.getElementById('evangelio-title');
   if (evangelioTitleEl) evangelioTitleEl.innerText = dict.evangelioTitle;
-  const evangelioSoonEl = document.getElementById('evangelio-soon');
-  if (evangelioSoonEl) evangelioSoonEl.innerText = dict.evangelioSoon;
+  applyEvangelioTranslations();
   const oracionesTitleEl = document.getElementById('oraciones-title');
   if (oracionesTitleEl) oracionesTitleEl.innerText = dict.oracionesTitle;
   const oracionesSubEl = document.getElementById('oraciones-subtitle');
@@ -2179,6 +2210,213 @@ async function sharePrayer() {
   }
 }
 
+// ── EVANGELIO DEL DÍA ─────────────────────────────────────────────────────
+// Una sola identidad para las tres vertientes: el Evangelio del día de la
+// Iglesia, con su primera lectura, su salmo, su tiempo litúrgico y su santo.
+// NO se bifurca por denominación — «adapta lo personal, no adaptes lo
+// compartido». Lo único que cambia por vertiente es el orden en el hub.
+//
+// Todo el trabajo pesado vive en /api/readings: doble fuente, caché de CDN y la
+// escalera de respaldo de la imagen. Aquí solo se pinta lo que llega.
+
+const evangelio = { date: null, lang: null, data: null, loading: false };
+
+/** Fecha LOCAL del usuario. La racha usa UTC y descuadra de noche: no imitarlo. */
+function localToday() {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+}
+
+function showEvangelioState(state) {
+  const loading = document.getElementById('evangelio-loading');
+  const error = document.getElementById('evangelio-error');
+  const content = document.getElementById('evangelio-content');
+  if (loading) loading.hidden = (state !== 'loading');
+  if (error) error.hidden = (state !== 'error');
+  if (content) content.hidden = (state !== 'content');
+}
+
+/**
+ * Trae las lecturas del día. Se llama sola al entrar en la pantalla (SCREENS
+ * .onEnter). Con los datos ya en memoria no vuelve a pedir nada: el mismo día en
+ * el mismo idioma no cambia.
+ */
+async function loadEvangelio(force) {
+  const today = localToday();
+  if (!force && evangelio.data && evangelio.date === today && evangelio.lang === currentLang) {
+    renderEvangelio();
+    return;
+  }
+  if (evangelio.loading) return;
+
+  evangelio.loading = true;
+  showEvangelioState('loading');
+
+  try {
+    const res = await fetch(API_BASE + '/api/readings?date=' + today + '&lang=' + currentLang);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data || !data.readings || !data.readings.gospel) throw new Error('respuesta sin Evangelio');
+
+    evangelio.data = data;
+    evangelio.date = today;
+    evangelio.lang = currentLang;
+    renderEvangelio();
+  } catch (e) {
+    console.warn('⚠️ No se pudieron cargar las lecturas del día:', e);
+    showEvangelioState('error');
+  } finally {
+    evangelio.loading = false;
+  }
+}
+
+/** Un bloque de lectura. Todo con textContent: el texto viene de fuera. */
+function appendReading(host, label, reading, crown) {
+  if (!reading || !reading.text) return;
+
+  const block = document.createElement('article');
+  block.className = crown ? 'devotional-card' : 'reading-block';
+
+  const kicker = document.createElement('h3');
+  kicker.className = 'reading-label';
+  kicker.textContent = label;
+  if (crown) kicker.style.textAlign = 'center';
+
+  const ref = document.createElement('p');
+  ref.className = 'reading-ref';
+  ref.textContent = reading.ref || reading.label || '';
+  if (crown) ref.style.textAlign = 'center';
+
+  const body = document.createElement('p');
+  body.className = 'reading-body';
+  body.textContent = reading.text;
+
+  block.appendChild(kicker);
+  if (ref.textContent) block.appendChild(ref);
+  block.appendChild(body);
+  host.appendChild(block);
+}
+
+function renderEvangelio() {
+  const data = evangelio.data;
+  if (!data) return;
+  const dict = TRANSLATIONS[currentLang];
+
+  // Cabecera: fecha y título litúrgico. Nunca un extracto del pasaje.
+  const liturgicEl = document.getElementById('evangelio-liturgic');
+  if (liturgicEl) {
+    let fecha = '';
+    try {
+      fecha = new Date(data.date + 'T12:00:00').toLocaleDateString(
+        currentLang === 'en' ? 'en-US' : 'es-MX', { day: 'numeric', month: 'long' });
+    } catch (e) { fecha = data.date; }
+    liturgicEl.innerText = data.liturgicTitle ? (fecha + ' · ' + data.liturgicTitle) : fecha;
+  }
+
+  const img = document.getElementById('evangelio-image');
+  if (img && data.image && data.image.url) img.src = data.image.url;
+
+  const host = document.getElementById('evangelio-readings');
+  if (host) {
+    host.textContent = '';
+    // Abre con la Escritura y corona con el Evangelio: la jerarquía que le da la
+    // Iglesia al día. La segunda lectura solo existe domingos y solemnidades.
+    appendReading(host, dict.evangelioFirst, data.readings.first, false);
+    appendReading(host, dict.evangelioPsalm, data.readings.psalm, false);
+    appendReading(host, dict.evangelioSecond, data.readings.second, false);
+    appendReading(host, dict.evangelioGospel, data.readings.gospel, true);
+  }
+
+  // Comentario del Papa: otra voz distinta a la de la Escritura, y se ve.
+  const papal = document.getElementById('evangelio-papal');
+  const papalText = document.getElementById('evangelio-papal-text');
+  const hayComentario = Boolean(data.papalComment);
+  if (papal) papal.hidden = !hayComentario;
+  if (papalText && hayComentario) papalText.textContent = data.papalComment;
+
+  // El santo del día es el elemento más marcadamente católico: va como contexto
+  // secundario al pie, nunca como encabezado.
+  const saint = document.getElementById('evangelio-saint');
+  if (saint) {
+    saint.hidden = !data.saint;
+    if (data.saint) saint.innerText = dict.evangelioSaint + ': ' + data.saint;
+  }
+
+  // Atribución visible y enlazada: es lo mínimo que esperan las dos fuentes.
+  const attrib = document.getElementById('evangelio-attrib');
+  if (attrib) {
+    attrib.textContent = '';
+    attrib.appendChild(document.createTextNode(dict.evangelioSources + ' '));
+    (data.attribution || []).forEach((fuente, i) => {
+      if (i > 0) attrib.appendChild(document.createTextNode(' · '));
+      const a = document.createElement('a');
+      a.href = fuente.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = fuente.name;
+      attrib.appendChild(a);
+    });
+  }
+
+  applyPrayerFont();
+  showEvangelioState('content');
+}
+
+/** Textos fijos de la pantalla. Las lecturas SÍ cambian con el idioma: se repiden. */
+function applyEvangelioTranslations() {
+  const dict = TRANSLATIONS[currentLang];
+  const set = (id, texto) => { const el = document.getElementById(id); if (el) el.innerText = texto; };
+
+  set('evangelio-loading', dict.evangelioLoading);
+  set('evangelio-error-text', dict.evangelioError);
+  set('evangelio-retry', dict.evangelioRetry);
+  set('evangelio-ai-label', dict.evangelioAiLabel);
+  set('evangelio-papal-label', dict.evangelioPapal);
+
+  const share = document.getElementById('evangelio-share');
+  if (share) {
+    share.title = dict.evangelioShare;
+    share.setAttribute('aria-label', dict.evangelioShare);
+  }
+
+  if (!evangelio.data) return;
+  if (evangelio.lang !== currentLang) {
+    // Otro idioma es otra traducción del leccionario: hay que volver a pedirla.
+    if (currentScreen === 'screen-evangelio') loadEvangelio(true);
+    else evangelio.data = null;
+    return;
+  }
+  renderEvangelio();
+}
+
+/**
+ * Comparte el Evangelio del día: la cita y su texto, no un extracto suelto.
+ * Ramifica igual que el resto: navigator.share si existe, portapapeles si no.
+ */
+async function shareGospel() {
+  const data = evangelio.data;
+  if (!data || !data.readings || !data.readings.gospel) return;
+  const dict = TRANSLATIONS[currentLang];
+  const gospel = data.readings.gospel;
+
+  const titulo = dict.evangelioGospel + (gospel.ref ? ' · ' + gospel.ref : '');
+  const payload = titulo + '\n\n' + gospel.text + '\n\n— Alivio · alivio.pronosoftmx.com';
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: titulo, text: payload });
+      return;
+    }
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(payload);
+      showToast(dict.evangelioCopied);
+    }
+  } catch (e) {
+    // Cancelar la hoja de compartir no es un error que reportar.
+  }
+}
+
 // ── TAMAÑO DE LECTURA ─────────────────────────────────────────────────────
 // Persiste: quien necesita letra grande la necesita SIEMPRE, no una vez.
 const PRAYER_FONT_SCALES = [0.85, 1, 1.15, 1.35, 1.6];
@@ -2195,19 +2433,23 @@ function applyPrayerFont() {
   const step = currentPrayerFontStep();
   document.documentElement.style.setProperty('--prayer-scale', String(PRAYER_FONT_SCALES[step]));
 
-  const down = document.getElementById('prayer-font-down');
-  const up = document.getElementById('prayer-font-up');
   const dict = TRANSLATIONS[currentLang];
-  if (down) {
-    down.disabled = (step === 0);
-    down.title = dict.fontSmaller;
-    down.setAttribute('aria-label', dict.fontSmaller);
-  }
-  if (up) {
-    up.disabled = (step === PRAYER_FONT_SCALES.length - 1);
-    up.title = dict.fontBigger;
-    up.setAttribute('aria-label', dict.fontBigger);
-  }
+  // El tamaño es uno solo para toda la app, así que los controles de la pantalla
+  // de rezo y los del Evangelio muestran siempre el mismo estado.
+  ['prayer', 'evangelio'].forEach(prefijo => {
+    const down = document.getElementById(prefijo + '-font-down');
+    const up = document.getElementById(prefijo + '-font-up');
+    if (down) {
+      down.disabled = (step === 0);
+      down.title = dict.fontSmaller;
+      down.setAttribute('aria-label', dict.fontSmaller);
+    }
+    if (up) {
+      up.disabled = (step === PRAYER_FONT_SCALES.length - 1);
+      up.title = dict.fontBigger;
+      up.setAttribute('aria-label', dict.fontBigger);
+    }
+  });
   const share = document.getElementById('prayer-share');
   if (share) {
     share.title = dict.prayerShare;

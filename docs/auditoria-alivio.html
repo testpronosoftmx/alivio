@@ -992,7 +992,7 @@
     <div class="sechead">
       <span class="num">iv bis</span>
       <h2>Estado de ejecución</h2>
-      <p>Lo que ya está construido y verificado en el árbol de trabajo, al 26 de agosto. Nada desplegado todavía.</p>
+      <p>Lo que ya está construido y verificado en el árbol de trabajo, al 27 de agosto. Nada desplegado todavía.</p>
     </div>
 
     <div class="tablewrap">
@@ -1005,23 +1005,24 @@
           <tr><td><strong>M2 · Flujo</strong></td><td><strong>Hecho</strong></td><td>Logo → hub; barra visible en <code>screen-ancla</code>, oculta solo en la respiración.</td></tr>
           <tr><td><strong>M3 · Pantalla premium</strong></td><td><strong>Hecho</strong></td><td>Tarjeta devocional; vitral de cabecera en cuatro familias; A− / A+ persistido; compartir nativo.</td></tr>
           <tr><td><strong>M4 · Bugs PWA</strong></td><td><strong>Hecho</strong></td><td>Descarte del banner en <code>localStorage</code>. La detección standalone ya existía.</td></tr>
-          <tr><td><strong>3 · Evangelio del Día</strong></td><td>Pendiente</td><td>Lo siguiente. 2½ días.</td></tr>
-          <tr><td><strong>M1 · Home vivo</strong></td><td>Pendiente</td><td>Después de la fase 3: la tarjeta viva del Evangelio depende de ella.</td></tr>
+          <tr><td><strong>3 · Evangelio del Día</strong></td><td><strong>Hecho</strong></td><td><code>api/readings.ts</code> con ingesta perezosa, doble fuente y caché de CDN; <code>api/generate-batch.ts</code> con banco de plantillas, cuatro puertas y reintentos; tablas <code>daily_readings</code> y <code>daily_images</code>; pantalla con la Escritura primero y el Evangelio coronando; seis imágenes de respaldo por tiempo litúrgico en <code>public/seasons/</code>. <strong>Falta correr el lote</strong> (<code>scripts/run-batch.cjs</code>): hasta entonces todos los días salen por el escalón 2.</td></tr>
+          <tr><td><strong>M1 · Home vivo</strong></td><td>Pendiente</td><td>Lo siguiente. El teaser ya viene resuelto en <code>/api/readings</code> (<code>teaser</code> y <code>teaserSource</code>), listo para la tarjeta del hub.</td></tr>
           <tr><td><strong>4 · Release de Android</strong></td><td>Pendiente</td><td>Al final, una sola.</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="aside">
-      <span class="label">Dos hallazgos nuevos, encontrados al ejecutar</span>
+      <span class="label">Tres hallazgos nuevos, encontrados al ejecutar</span>
       <p><strong>1. El push de Android nunca ha funcionado.</strong> <code>firebase-admin</code> v14 eliminó el namespace: <code>admin.apps</code>, <code>admin.credential</code> y <code>admin.messaging</code> son <code>undefined</code> en runtime, no solo en tipos. La inicialización reventaba dentro de su propio <code>try/catch</code>, <code>firebaseApp</code> quedaba en <code>null</code> y la rama FCM no disparaba jamás. Como las suscripciones nativas guardan <code>subscription: {}</code>, la rama VAPID tampoco entraba. Fallaba en silencio. Migrado a imports modulares.</p>
       <p>Esto corrige el diagnóstico de la rev. 2: la auditoría culpaba a <code>cancelPush</code> de que no se pudiera desactivar el recordatorio. El motivo real es que no había nada que desactivar.</p>
       <p><strong>2. <code>.env.example</code> contenía la <code>PRIVATE_VAPID_KEY</code> real</strong>, idéntica a la de <code>.env</code>. Verificado que nunca entró en el historial de git —<code>.gitignore</code> tiene <code>.env*</code>— pero un archivo de plantilla con una llave privada es una mina esperando un <code>git add -f</code>. Sustituida por placeholders.</p>
+      <p><strong>3. El feed de Vatican News está mal codificado, y de dos maneras distintas.</strong> Se declara UTF-8 pero mete bytes latin-1 en la cabecera del canal, y dentro de los ítems sustituye por <code>?</code> todo carácter que su pipeline no supo escribir: comillas angulares, puntos suspensivos y alguna vocal acentuada. Son ~11 por día — <em>«dijo: ?Velen y estén preparados?»</em> en la pantalla de una app de consuelo. Los ítems resultaron ser ASCII puro con entidades HTML (verificado sobre 14 días), así que se decodifica en latin1 sin pérdida, y los <code>?</code> se reparan por contexto: el español siempre abre con <code>¿</code>, de modo que un <code>?</code> sin su pareja nunca es una interrogación. Por eso también <strong>las citas se toman siempre de Evangelizo</strong>, incluso cuando el texto viene del Vaticano: la errata les cae justo en la línea de la referencia (<code>Isa?as 22, 19-23</code>).</p>
     </div>
 
     <div class="aside aside-green">
       <span class="label">Verificación</span>
-      <p><strong>107 pruebas</strong> ejercitando el <code>app.js</code> real —cargado con <code>vm</code> sobre un DOM mínimo, sin instalar dependencias en un proyecto que deliberadamente no tiene tests— más <strong>23</strong> sobre la lógica de los endpoints y una verificación estática que cruza el registro de pantallas con el HTML y la paridad <code>es</code>/<code>en</code> de las 106 claves. <code>npx tsc --noEmit</code> sale limpio: antes tenía seis errores.</p>
+      <p><strong>220 pruebas.</strong> Las de la fase 3: 40 sobre las fuentes contra la red real (calapi en cinco fechas incluida 2027, Evangelizo en español e inglés, el parseo del RSS y la reparación de su puntuación), 42 ejercitando el <code>app.js</code> real —cargado con <code>vm</code> sobre un DOM mínimo— sobre el árbol que deja <code>renderEvangelio()</code>, 27 sobre <code>/api/readings</code> con <code>req</code>/<code>res</code> simulados y sin Supabase configurado (el peor caso: obliga a la ingesta en vivo y a la escalera de respaldo), 22 sobre las cuatro puertas del lote con imágenes negras, blancas, planas, truncadas y de otro tamaño, más la autenticación, y 89 de verificación estática que cruzan ids del HTML con <code>getElementById</code>, el registro de pantallas, los <code>onclick</code> y la paridad <code>es</code>/<code>en</code> de las 128 claves. <code>npx tsc --noEmit</code> sale limpio.</p>
       <p>Las pruebas viven en el scratchpad, no en el repositorio: el proyecto no tiene infraestructura de tests y no se le impone una sin acuerdo.</p>
     </div>
   </section>

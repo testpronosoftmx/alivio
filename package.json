@@ -18,6 +18,7 @@
     "@supabase/supabase-js": "*",
     "dotenv": "*",
     "firebase-admin": "^14.1.0",
+    "jpeg-js": "^0.4.4",
     "web-push": "*"
   },
   "devDependencies": {

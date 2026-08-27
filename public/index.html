@@ -398,6 +398,76 @@
     .font-ctl-sm { font-size: 11px; }
     .font-ctl-lg { font-size: 15px; }
 
+    /* ── EVANGELIO DEL DÍA ──────────────────────────── */
+    /* La imagen del día. Proporción fija para que la tarjeta no salte mientras
+       carga: sin reserva de espacio, la pantalla entera se desplaza al llegar. */
+    .gospel-hero {
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      object-fit: cover;
+      border-radius: 18px;
+      display: block;
+      background: linear-gradient(135deg, rgba(237,233,254,.7), rgba(250,247,255,.7));
+      box-shadow: 0 10px 30px -14px rgba(79, 70, 229, .3);
+    }
+    /* Etiqueta de IA: obligatoria y visible, nunca escondida en un tooltip. */
+    .ai-badge {
+      font-size: 10.5px;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: #a5a0b5;
+      text-align: right;
+    }
+
+    .reading-block {
+      border-radius: 18px;
+      padding: 20px 20px 18px;
+      background: rgba(255, 255, 255, .62);
+      border: 1px solid rgba(255, 255, 255, .85);
+    }
+    .reading-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #8b7fc7;
+      margin-bottom: 3px;
+    }
+    .reading-ref {
+      font-size: 12.5px;
+      font-weight: 400;
+      color: #6b6480;
+      margin-bottom: 12px;
+    }
+    /* Mismo gobierno de tamaño que el rezo (--prayer-scale): quien necesita letra
+       grande la necesita en toda la app, no solo en las oraciones. */
+    .reading-body {
+      font-size: calc(1.02rem * var(--prayer-scale, 1));
+      line-height: 1.85;
+      color: #302a52;
+      white-space: pre-line;
+      transition: font-size .18s ease;
+    }
+    /* El comentario del Papa es de otra voz que la Escritura: se distingue en
+       pantalla para que no se lean como lo mismo. */
+    .papal-card {
+      border-radius: 18px;
+      padding: 20px 20px 18px;
+      background: linear-gradient(160deg, rgba(255,251,240,.9), rgba(253,246,232,.75));
+      border: 1px solid rgba(226, 207, 166, .5);
+    }
+    .papal-card .reading-label { color: #b08d44; }
+    .papal-card .reading-body { font-size: calc(0.95rem * var(--prayer-scale, 1)); font-style: italic; color: #4a4033; }
+
+    .reading-attrib {
+      font-size: 10.5px;
+      font-weight: 300;
+      color: #a5a0b5;
+      text-align: center;
+      line-height: 1.7;
+    }
+    .reading-attrib a { color: #8b7fc7; text-decoration: underline; text-underline-offset: 2px; }
+
     /* Referencia espiritual, no pie de contrato: sin mayúsculas ni tono jurídico */
     .prayer-source {
       font-size: 11.5px;
@@ -1056,7 +1126,7 @@
           <!-- Overlay sutil de luz divina -->
           <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10 mix-blend-overlay"></div>
           <img id="ancla-image" src="https://images.unsplash.com/photo-1507692049790-de58290a4334?q=80&w=800" 
-               onerror="this.onerror=null; this.src='/fallback-misericordia.png';"
+               onerror="this.onerror=null; this.src='/fallback-misericordia.webp';"
                alt="Ilustración sacra de paz" 
                class="w-full h-full object-contain transition-transform duration-[20s] group-hover:scale-105">
         </div>
@@ -1190,9 +1260,50 @@
           <div id="evangelio-header"></div>
           <div class="space-y-1">
             <h2 id="evangelio-title" class="text-lg font-medium text-slate-700">Evangelio del Día</h2>
-            <p id="evangelio-soon" class="text-sm font-light text-slate-500 leading-relaxed">Muy pronto: la Palabra de hoy con su primera lectura, el salmo y el comentario del Papa.</p>
+            <p id="evangelio-liturgic" class="text-xs font-light text-slate-500 leading-relaxed"></p>
           </div>
         </header>
+
+        <p id="evangelio-loading" class="text-sm font-light text-slate-400 text-center py-10">Buscando la Palabra de hoy…</p>
+
+        <div id="evangelio-error" class="text-center space-y-3 py-8" hidden>
+          <p id="evangelio-error-text" class="text-sm font-light text-slate-500 leading-relaxed"></p>
+          <button type="button" id="evangelio-retry" onclick="loadEvangelio(true)"
+                  class="text-xs font-medium text-indigo-600 border border-indigo-200 rounded-full px-4 py-2 hover:bg-indigo-50 transition-colors cursor-pointer">Reintentar</button>
+        </div>
+
+        <div id="evangelio-content" class="flex flex-col gap-5" hidden>
+          <!-- Una sola imagen al día, la del Evangelio: atmosférica, nunca la escena
+               del pasaje, y siempre etiquetada como generada con IA. -->
+          <figure class="space-y-1.5 m-0">
+            <img id="evangelio-image" class="gospel-hero" alt="" width="768" height="512" loading="lazy" decoding="async"
+                 onerror="this.onerror=null; this.src='/fallback-misericordia.webp';">
+            <figcaption id="evangelio-ai-label" class="ai-badge">Ilustración generada con IA</figcaption>
+          </figure>
+
+          <div class="flex justify-end items-center gap-2">
+            <button type="button" id="evangelio-share" onclick="shareGospel()" class="font-ctl-group font-ctl" style="width:32px;height:32px">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M8.7 10.7a3 3 0 1 0 0 2.6m0-2.6 6.6-3.4m-6.6 6 6.6 3.4M18 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm0 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+            </button>
+            <div class="font-ctl-group">
+              <button type="button" id="evangelio-font-down" onclick="changePrayerFont(-1)" class="font-ctl font-ctl-sm">A</button>
+              <button type="button" id="evangelio-font-up" onclick="changePrayerFont(1)" class="font-ctl font-ctl-lg">A</button>
+            </div>
+          </div>
+
+          <!-- Abre con la Escritura y corona con el Evangelio. Lo pinta renderEvangelio(). -->
+          <div id="evangelio-readings" class="flex flex-col gap-4"></div>
+
+          <article id="evangelio-papal" class="papal-card" hidden>
+            <h3 id="evangelio-papal-label" class="reading-label">El pensamiento del Papa</h3>
+            <p id="evangelio-papal-text" class="reading-body"></p>
+          </article>
+
+          <footer class="space-y-2 pt-1">
+            <p id="evangelio-saint" class="prayer-source" hidden></p>
+            <p id="evangelio-attrib" class="reading-attrib"></p>
+          </footer>
+        </div>
       </main>
 
       <!-- ========= PANTALLA 5: ORACIONES ========= -->

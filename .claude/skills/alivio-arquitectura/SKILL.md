@@ -15,10 +15,14 @@ App devocional (`alivio.pronosoftmx.com`) + envoltorio Android (Capacitor). **Si
 | `public/app.js` | Toda la lógica en **scope global**, sin módulos. ~2500 líneas. |
 | `public/prayers.js` | Corpus de oraciones. **Texto fijo, nunca generado** — ver el skill de contenido. |
 | `public/sw.js` | Service Worker. Network-first con fallback a cache. |
+| `public/seasons/*.webp` | Seis imágenes de respaldo por tiempo litúrgico. 89 KB las seis; cacheadas en el SW a propósito. |
 | `api/comfort.ts` | Claude Sonnet → JSON de consuelo + URL de imagen Pollinations. |
 | `api/subscribe.ts` | Alta/baja de recordatorios (VAPID web + FCM nativo). |
 | `api/cron-push.ts` | Envío programado. Autenticado con `CRON_SECRET`; **falla cerrado** (503 sin secreto). |
-| Supabase | Esquema **`alivio`** (no `public`). Único uso actual: `push_subscriptions`. |
+| `api/readings.ts` | Evangelio del Día. Ingesta perezosa + caché de CDN. **Cero IA, cero coste.** |
+| `api/generate-batch.ts` | Lote anual de imágenes. `CRON_SECRET`, idempotente y reanudable. Se lanza con `scripts/run-batch.cjs`. |
+| `api/_liturgy.ts`, `api/_sources.ts` | Módulos compartidos. El `_` los mantiene fuera del enrutado de Vercel. |
+| Supabase | Esquema **`alivio`** (no `public`): `push_subscriptions`, `daily_readings`, `daily_images`; bucket `daily-images`. |
 | `database_schema.sql` | Al día (`fcm_token`, `last_sent_at`, sin grants a `anon`). Actualízalo con cada cambio de tabla. |
 
 ## 2. Pantallas: el registro
@@ -30,7 +34,7 @@ El array literal **ya no existe**: lo sustituyó un registro declarativo (fase 1
 const SCREENS = {
   'screen-landing':   { chrome: 'landing' },              // marketing, sin barra
   'screen-hub':       { chrome: 'app' },
-  'screen-evangelio': { chrome: 'app', tab: 'evangelio' },
+  'screen-evangelio': { chrome: 'app', tab: 'evangelio', onEnter: 'loadEvangelio' },
   'screen-desahogo':  { chrome: 'app', tab: 'desahogo' },
   'screen-oraciones': { chrome: 'app', tab: 'oraciones' },
   'screen-oracion':   { chrome: 'app', tab: 'oraciones' },
@@ -44,6 +48,9 @@ const SCREENS = {
 avisa por consola y no hace nada — no deja pantallas apiladas en silencio.
 
 - `chrome: 'app'` → lleva barra inferior. `'immersive'` → sin barra.
+- `onEnter` nombra la función que se llama al mostrar la pantalla: así un módulo pide
+  sus datos sin que `changeScreen()` sepa de qué módulo se trata. Si la función no
+  existe, la pantalla se muestra igual — nunca es motivo para no navegar.
 - **Solo `screen-suspiro` es inmersiva**, y es deliberado: una barra invitando a irse
   arruina medio minuto de respiración guiada. No la conviertas en `'app'`.
 - El logotipo dentro de la app llama a `goHome()` → hub. Nunca a la landing.
@@ -136,3 +143,10 @@ Prefija **siempre** con `alivio_`. Ojo: la racha usa `toISOString().slice(0,10)`
   Nunca se commiteó, pero era una mina esperando un `git add -f`.
 - **Los `onclick` viven en `index.html`, no en `app.js`.** Una sustitución sobre el archivo
   equivocado no falla: no hace nada. Verifica siempre que el reemplazo ocurrió.
+- **`calapi` solo habla `http`.** No tiene certificado válido en `https`. Se llama desde el
+  servidor y nunca desde el navegador; meterlo en el front sería contenido mixto.
+- **El RSS de Vatican News miente sobre su codificación.** Se declara UTF-8 y mezcla bytes
+  latin-1; dentro de los ítems, todo carácter que su pipeline no supo escribir es un `?`.
+  Se decodifica en `latin1` (los ítems son ASCII con entidades) y la puntuación se repara
+  por contexto en `_sources.ts`. **Las citas se toman siempre de Evangelizo**, porque la
+  errata les cae justo en la línea de la referencia.
