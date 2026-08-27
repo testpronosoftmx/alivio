@@ -85,7 +85,7 @@ const MODULES = [
 const HUB_ORDER = {
   catholic:    ['evangelio', 'desahogo', 'oraciones'],
   evangelical: ['evangelio', 'desahogo', 'oraciones'],
-  spiritual:   ['desahogo', 'oraciones', 'evangelio']
+  spiritual:   ['evangelio', 'desahogo', 'oraciones']
 };
 
 let currentScreen = 'screen-landing';
@@ -169,13 +169,19 @@ function renderAppHeader(slotId) {
   const row = document.createElement('div');
   row.className = 'flex items-center justify-between gap-2';
 
-  // ── Izquierda: logotipo, vuelve al hub ──
+  // ── Izquierda: logotipo, vuelve al hub (o a la landing page si ya está en el hub) ──
   const brand = document.createElement('button');
   brand.type = 'button';
   brand.className = 'flex items-center gap-2 shrink-0 bg-transparent border-0 p-0 cursor-pointer group';
   brand.title = dict.goHomeLabel;
   brand.setAttribute('aria-label', dict.goHomeLabel);
-  brand.addEventListener('click', goHome);
+  brand.addEventListener('click', () => {
+    if (currentScreen === 'screen-hub') {
+      changeScreen('screen-landing');
+    } else {
+      goHome();
+    }
+  });
 
   const logo = document.createElement('img');
   logo.src = '/icon-192.png';
@@ -216,12 +222,23 @@ function renderAppHeader(slotId) {
 
   const chip = 'bg-white/45 backdrop-blur-md p-1 rounded-full border border-white/60 transition-all cursor-pointer shadow-sm flex items-center justify-center w-[26px] h-[26px] text-xs';
 
+  // Botón de audio ambiente (sonido de oleaje y paz)
+  const audioBtn = document.createElement('button');
+  audioBtn.type = 'button';
+  audioBtn.id = 'audio-toggle-btn';
+  audioBtn.className = chip + ' text-slate-500 hover:text-indigo-600';
+  audioBtn.title = audioActive ? "Silenciar sonido" : "Activar sonido de paz";
+  audioBtn.setAttribute('aria-label', audioBtn.title);
+  audioBtn.innerHTML = `<span id="audio-icon">${audioActive ? '🔊' : '🔇'}</span>`;
+  audioBtn.addEventListener('click', toggleAudio);
+
+  // Botón de mis oraciones guardadas (Estrella)
   const fav = document.createElement('button');
   fav.type = 'button';
-  fav.className = chip + ' text-slate-400 hover:text-indigo-600';
-  fav.title = dict.titleFavorites;
-  fav.setAttribute('aria-label', dict.titleFavorites);
-  fav.textContent = '🔖';
+  fav.className = chip + ' text-amber-500 hover:text-amber-600 hover:scale-105';
+  fav.title = (currentLang === 'en') ? "My saved prayers" : "Mis oraciones guardadas";
+  fav.setAttribute('aria-label', fav.title);
+  fav.textContent = '⭐';
   fav.addEventListener('click', openFavorites);
 
   // Discreto a propósito: en una pantalla de rezo, un CTA de donación grande
@@ -235,6 +252,7 @@ function renderAppHeader(slotId) {
   heart.addEventListener('click', openDonateModal);
 
   tools.appendChild(langBox);
+  tools.appendChild(audioBtn);
   tools.appendChild(fav);
   tools.appendChild(heart);
 
@@ -276,14 +294,16 @@ function renderHub() {
   host.textContent = '';
 
   visibleModules().forEach(mod => {
-    const vivo = (mod.id === 'evangelio' && mod.ready && evangelioFresco());
+    const langData = evangelioCache[currentLang];
+    const anyData = evangelioCache.es || evangelioCache.en;
+    const vivo = (mod.id === 'evangelio' && mod.ready);
 
     const card = document.createElement('button');
     card.type = 'button';
     card.className = vivo ? 'hub-card hub-card-live' : 'hub-card';
     card.addEventListener('click', () => changeScreen(mod.screen));
 
-    if (vivo) card.appendChild(hubCoverFor(evangelio.data));
+    if (vivo) card.appendChild(hubCoverFor(langData || anyData));
 
     const icon = document.createElement('span');
     icon.className = `hub-card-icon ${mod.accent}`;
@@ -296,7 +316,7 @@ function renderHub() {
 
     const desc = document.createElement('span');
     desc.className = vivo ? 'hub-card-teaser' : 'text-xs font-light text-slate-500 leading-relaxed';
-    desc.textContent = (vivo && evangelio.data.teaser) ? evangelio.data.teaser : dict[`hubCard_${mod.id}_desc`];
+    desc.textContent = (vivo && langData && langData.teaser) ? langData.teaser : dict[`hubCard_${mod.id}_desc`];
 
     if (vivo) {
       // En la tarjeta viva el icono y el título van en una fila, y el gancho debajo.
@@ -334,12 +354,26 @@ function renderHub() {
 
 /** La portada de la tarjeta viva: la imagen del día, sin pie ni etiqueta. */
 function hubCoverFor(data) {
+  const url = (data && data.image && data.image.url) ? data.image.url : '';
+
+  // Sin datos todavía (primera visita del día): hueco del mismo alto, no una
+  // imagen prestada. El respaldo de misericordia aquí sería una mentira visual
+  // —no es la imagen de hoy— y además obliga a sustituirla a la vista. La
+  // tarjeta nace con su tamaño final, así que tampoco hay salto de maquetación.
+  if (!url) {
+    const hueco = document.createElement('span');
+    hueco.className = 'hub-card-cover hub-card-cover-espera';
+    hueco.setAttribute('aria-hidden', 'true');
+    return hueco;
+  }
+
   const cover = document.createElement('img');
   cover.className = 'hub-card-cover';
-  cover.src = (data.image && data.image.url) ? data.image.url : '/fallback-misericordia.webp';
+  cover.src = url;
   cover.alt = '';
   cover.setAttribute('aria-hidden', 'true');
-  cover.loading = 'lazy';
+  // eager, no lazy: es lo primero que se ve del hub, y ya está en Storage.
+  cover.loading = 'eager';
   cover.decoding = 'async';
   cover.width = 768;
   cover.height = 512;
@@ -358,7 +392,13 @@ function hubCoverFor(data) {
 async function hydrateHubCard() {
   const mod = MODULES.find(m => m.id === 'evangelio');
   if (!mod || !mod.enabled || !mod.ready) return;
-  if (evangelioFresco()) return;
+
+  // Lo que vino de localStorage ya está pintado: se revalida por detrás, sin
+  // que el usuario espere ni vea nada moverse salvo que algo haya cambiado.
+  if (evangelioFresco()) {
+    revalidarEvangelio();
+    return;
+  }
 
   const data = await fetchEvangelio(false);
   if (data && currentScreen === 'screen-hub') renderHub();
@@ -458,13 +498,13 @@ const TRANSLATIONS = {
     landingTitle: "Un refugio de paz en tu bolsillo",
     landingTagline: "Alivio es tu <strong>espacio seguro</strong> de <strong>meditación</strong> y <strong>oración católica</strong> en formato <strong>PWA</strong>. Un <strong>refugio de paz</strong> en tu <strong>bolsillo</strong> para aliviar el estrés y reconectarte con Dios.",
     btnEnterApp: "comenzar a orar",
-    titleHowWorks: "¿cómo funciona Alivio?",
-    step1Title: "Desahoga tu corazón",
-    step1Desc: "Escribe lo que te aflige hoy de forma segura. Elige tu enfoque: Católico, Evangélico o Espiritual para recibir el consuelo idóneo.",
-    step2Title: "Aquieta tu templo",
-    step2Desc: "Sigue el ciclo de respiración guiado de 12 segundos para calmar tu pecho y relajar la mente.",
-    step3Title: "Recibe consuelo y recordatorios",
-    step3Desc: "Recibe versículos personalizados, tu plegaria íntima y haz un recordatorio. Además, guarda tus oraciones favoritas y mantén tu racha diaria.",
+    titleHowWorks: "¿qué encontrarás en Alivio?",
+    step1Title: "Desahoga, Respira & Recibe Consuelo",
+    step1Desc: "Escribe lo que te aflige de forma 100% anónima (Católico, Evangélico o Espiritual), aquieta tu pecho con la respiración guiada de 12 segundos y recibe versículos bíblicos, tu plegaria íntima y recordatorios de paz.",
+    step2Title: "Evangelio del Día & Pensamiento del Papa",
+    step2Desc: "Lecturas completas del leccionario católico con arte litúrgico generado por IA y la homilía pastoral oficial del Santo Padre (Vatican News) para iluminar tu día.",
+    step3Title: "Santo Rosario & Devocionario Católico",
+    step3Desc: "Rezo guiado del Rosario con los misterios del día (Gozosos, Dolorosos, Gloriosos, Luminosos) y devocionario completo (Padre Nuestro, Ave María, Credo, Ángelus) disponible 100% offline.",
     titleScreenshots: "capturas de la aplicación",
     titleFavorites: "Mis oraciones guardadas",
     goHomeLabel: "Volver al inicio",
@@ -476,7 +516,7 @@ const TRANSLATIONS = {
     hubCard_desahogo_title: "Desahogo y consuelo",
     hubCard_desahogo_desc: "Suelta tu carga en anónimo y respira en calma.",
     hubCard_oraciones_title: "Oraciones y Rosario",
-    hubCard_oraciones_desc: "Padre Nuestro, el Rosario de hoy y los Salmos.",
+    hubCard_oraciones_desc: "Todas las oraciones católicas tradicionales, Santo Rosario de hoy y Salmos.",
     nav_evangelio: "Evangelio",
     nav_desahogo: "Desahogo",
     nav_oraciones: "Oraciones",
@@ -598,13 +638,13 @@ const TRANSLATIONS = {
     landingTitle: "A refuge of peace in your pocket",
     landingTagline: "Alivio is your <strong>safe space</strong> for <strong>meditation</strong> and <strong>Catholic prayer</strong> in <strong>PWA</strong> format. A <strong>refuge of peace</strong> in your <strong>pocket</strong> to relieve daily stress and reconnect with God.",
     btnEnterApp: "start praying",
-    titleHowWorks: "how does Alivio work?",
-    step1Title: "Vent your heart",
-    step1Desc: "Write what troubles you today securely. Choose your focus: Catholic, Evangelical, or Spiritual to receive the ideal comfort.",
-    step2Title: "Quiet your temple",
-    step2Desc: "Follow the mandatory 12-second breathing cycle to calm your chest and relax your mind.",
-    step3Title: "Receive comfort & reminders",
-    step3Desc: "Receive personalized verses, your intimate prayer, and set a reminder. Plus, save your favorite prayers and keep your daily streak.",
+    titleHowWorks: "what will you find in Alivio?",
+    step1Title: "Spiritual Vent, Breathe & Comfort",
+    step1Desc: "Write what troubles you 100% anonymously (Catholic, Evangelical, or Spiritual), calm your chest with guided 12-second breathing, and receive personalized Bible verses, intimate prayer, and peace reminders.",
+    step2Title: "Gospel of the Day & Papal Reflection",
+    step2Desc: "Complete Catholic lectionary readings with AI-generated sacred art and the Holy Father's official pastoral homily (via Vatican News) to illuminate your day.",
+    step3Title: "Holy Rosary & Catholic Devotional",
+    step3Desc: "Guided bead-by-bead Rosary prayer with the day's mysteries (Joyful, Sorrowful, Glorious, Luminous) and traditional prayer collection available 100% offline.",
     titleScreenshots: "application screenshots",
     titleFavorites: "My saved prayers",
     goHomeLabel: "Back to home",
@@ -616,7 +656,7 @@ const TRANSLATIONS = {
     hubCard_desahogo_title: "Unburden & comfort",
     hubCard_desahogo_desc: "Let your burden go anonymously and breathe calmly.",
     hubCard_oraciones_title: "Prayers & Rosary",
-    hubCard_oraciones_desc: "The Lord's Prayer, today's Rosary and the Psalms.",
+    hubCard_oraciones_desc: "All traditional Catholic prayers, today's Holy Rosary and Psalms.",
     nav_evangelio: "Gospel",
     nav_desahogo: "Unburden",
     nav_oraciones: "Prayers",
@@ -736,42 +776,59 @@ const TRANSLATIONS = {
   }
 };
 
-// Datos descriptivos de las capturas de pantalla de marketing (SS1 a SS4)
+// Datos descriptivos de las capturas de pantalla de marketing
+// Orden: Hub → Desahogo → Oraciones → Rosario → Evangelio → Papa
 const SCREENSHOTS_DATA = {
   es: [
     {
-      title: "Paso 1: El Desahogo",
-      desc: "Escribe con total libertad todo lo que pesa en tu corazón y personaliza el enfoque de fe antes de empezar."
+      title: "Tu Refugio de Paz — Hub de Inicio",
+      desc: "Tu pantalla principal: tarjeta viva del Evangelio del día, acceso rápido al Desahogo & Consuelo, y tus Oraciones y Rosario favoritos."
     },
     {
-      title: "Paso 2: El Suspiro",
-      desc: "Una respiración profunda y pausada de 12 segundos para relajar el sistema nervioso y enfocar la atención."
+      title: "Desahogo Espiritual & Consuelo",
+      desc: "Escribe de forma 100% anónima y privada lo que pesa en tu corazón y recibe versículos bíblicos y una oración personalizada de paz."
     },
     {
-      title: "Paso 3: Versículos de Consuelo",
-      desc: "Recibe versículos seleccionados especialmente, guarda la plegaria en tus favoritos y visualiza tu racha consecutiva en el ancla."
+      title: "Devocionario Católico Tradicional",
+      desc: "Catálogo completo de oraciones tradicionales (Padre Nuestro, Ave María, Credo, Ángelus, etc.) disponible 100% sin conexión."
     },
     {
-      title: "Paso 4: Oración y Recordatorio",
-      desc: "Programa tu recordatorio diario para recibir un susurro de paz personalizado directamente en tu teléfono."
+      title: "Santo Rosario Interactivo",
+      desc: "Rezo guiado cuenta por cuenta con los misterios del día (Gozosos, Dolorosos, Gloriosos y Luminosos) y lectura devocional."
+    },
+    {
+      title: "Evangelio del Día con Arte Litúrgico",
+      desc: "Lecturas completas del leccionario católico (Primera lectura, Salmo responsorial y Evangelio) con imagen sacra generada por IA."
+    },
+    {
+      title: "El Pensamiento del Papa",
+      desc: "Homilía y reflexión pastoral diaria del Santo Padre (vía Vatican News) para iluminar espiritualmente el Evangelio de hoy."
     }
   ],
   en: [
     {
-      title: "Step 1: The Vent",
-      desc: "Write freely whatever weighs down your heart and customize your faith focus before starting."
+      title: "Your Refuge of Peace — Home Hub",
+      desc: "Your main screen: live Gospel-of-the-Day card, quick access to Spiritual Vent & Comfort, and your Prayers & Rosary."
     },
     {
-      title: "Step 2: The Sigh",
-      desc: "A deep, paused 12-second breathing cycle to relax your nervous system and focus your attention."
+      title: "Spiritual Vent & Comfort",
+      desc: "Write 100% anonymously and privately whatever weighs on your heart and receive personalized Bible verses and a prayer of peace."
     },
     {
-      title: "Step 3: Verses of Comfort",
-      desc: "Receive verses selected especially for you, save the prayer to your favorites, and track your daily streak."
+      title: "Traditional Catholic Prayer Treasury",
+      desc: "Complete collection of traditional prayers (Our Father, Hail Mary, Creed, Angelus, etc.) available 100% offline."
     },
     {
-      title: "Step 4: Prayer & Reminder",
-      desc: "Schedule your daily reminder to receive a personalized whisper of peace directly on your phone."
+      title: "Interactive Holy Rosary",
+      desc: "Bead-by-bead guided prayer with the mysteries of the day (Joyful, Sorrowful, Glorious, and Luminous) and devotional reading."
+    },
+    {
+      title: "Gospel of the Day with Liturgical Art",
+      desc: "Complete lectionary readings (First reading, Responsorial Psalm, and Gospel) with AI-generated sacred art."
+    },
+    {
+      title: "The Pope's Daily Reflection",
+      desc: "Daily pastoral homily and reflection from the Holy Father (via Vatican News) to illuminate today's Gospel spiritually."
     }
   ]
 };
@@ -944,9 +1001,7 @@ let isJustBreathing = false;
 let currentVerseIndex = 0;
 let loadedVerses = [];
 
-// Variables para el carrusel de capturas de marketing
-let currentMarketingIndex = 1;
-const totalMarketingScreenshots = 4;
+// Variables para el carrusel de capturas de marketing (declaradas junto a SCREENSHOT_FILES abajo)
 
 // Captura del prompt nativo de instalación
 let deferredPrompt = null;
@@ -1037,7 +1092,7 @@ function fadeAudio(targetVolume, durationMs) {
 
 function toggleAudio() {
   const btn = document.getElementById('audio-toggle-btn');
-  const icon = document.getElementById('audio-icon');
+  const icons = document.querySelectorAll('#audio-icon, #audio-icon-desahogo');
   
   if (!audioCtx) initAudio();
 
@@ -1046,13 +1101,13 @@ function toggleAudio() {
   if (!audioActive) {
     audioActive = true;
     fadeAudio(0.6, 2000);
-    if (icon) icon.textContent = '🔊';
+    icons.forEach(ic => ic.textContent = '🔊');
     if (btn) btn.title = 'Silenciar';
     localStorage.setItem('alivio_audio', 'on');
   } else {
     audioActive = false;
     fadeAudio(0, 1500);
-    if (icon) icon.textContent = '🔇';
+    icons.forEach(ic => ic.textContent = '🔇');
     if (btn) btn.title = 'Activar música ambient';
     localStorage.setItem('alivio_audio', 'off');
   }
@@ -1066,9 +1121,9 @@ function initAudioPreference() {
       if (!audioCtx) initAudio();
       audioActive = true;
       fadeAudio(0.6, 3000);
-      const icon = document.getElementById('audio-icon');
+      const icons = document.querySelectorAll('#audio-icon, #audio-icon-desahogo');
       const btn = document.getElementById('audio-toggle-btn');
-      if (icon) icon.textContent = '🔊';
+      icons.forEach(ic => ic.textContent = '🔊');
       if (btn) btn.title = 'Silenciar';
     }, 1000);
   }
@@ -1088,33 +1143,124 @@ function closeFavorites() {
   if (modal) modal.classList.add('opacity-0', 'pointer-events-none');
 }
 
+function isPrayerFavorite(id) {
+  try {
+    const list = JSON.parse(localStorage.getItem('alivio_fav_prayers') || '[]');
+    return list.includes(id);
+  } catch(e) { return false; }
+}
+
+function togglePrayerFavorite(id) {
+  const prayerId = id || currentPrayerId;
+  if (!prayerId) return;
+  const prayer = (typeof availablePrayers === 'function') ? availablePrayers().find(p => p.id === prayerId) : null;
+  const prayerTitle = prayer ? prayer[currentLang].title : (currentLang === 'en' ? 'Prayer' : 'Oración');
+  
+  let list = [];
+  try {
+    list = JSON.parse(localStorage.getItem('alivio_fav_prayers') || '[]');
+  } catch(e) { list = []; }
+  
+  const index = list.indexOf(prayerId);
+  let isSaved = false;
+  if (index >= 0) {
+    list.splice(index, 1);
+    isSaved = false;
+  } else {
+    list.push(prayerId);
+    isSaved = true;
+  }
+  
+  localStorage.setItem('alivio_fav_prayers', JSON.stringify(list));
+  updatePrayerFavIcon();
+  
+  if (isSaved) {
+    showToast((currentLang === 'en') ? `⭐ "${prayerTitle}" added to saved prayers` : `⭐ "${prayerTitle}" guardada en tus oraciones`);
+  } else {
+    showToast((currentLang === 'en') ? `"${prayerTitle}" removed from saved prayers` : `"${prayerTitle}" eliminada de tus oraciones`);
+  }
+}
+
+function updatePrayerFavIcon() {
+  const btn = document.getElementById('prayer-fav');
+  if (!btn || !currentPrayerId) return;
+  const isFav = isPrayerFavorite(currentPrayerId);
+  const icon = isFav ? '⭐' : '☆';
+  const label = isFav 
+    ? ((currentLang === 'en') ? 'Saved prayer (click to remove)' : 'Guardada en mis oraciones (clic para quitar)')
+    : ((currentLang === 'en') ? 'Save to my prayers' : 'Guardar en mis oraciones');
+  
+  btn.innerHTML = `<span aria-hidden="true" class="text-base">${icon}</span>`;
+  btn.title = label;
+  btn.setAttribute('aria-label', label);
+  btn.className = `shrink-0 p-1.5 px-2.5 rounded-full border transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1 ${
+    isFav 
+      ? 'bg-amber-50/90 border-amber-300 text-amber-500 hover:bg-amber-100 hover:scale-105' 
+      : 'bg-white/70 border-slate-300 text-slate-600 hover:text-amber-500 hover:border-amber-300 hover:bg-amber-50/50'
+  }`;
+}
+
 function renderFavoritesList() {
   const list = document.getElementById('favorites-list');
   if (!list) return;
   const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
+  const favPrayerIds = JSON.parse(localStorage.getItem('alivio_fav_prayers') || '[]');
+  const allPrayers = (typeof availablePrayers === 'function') ? availablePrayers() : [];
   const dict = TRANSLATIONS[currentLang];
 
-  if (favorites.length === 0) {
+  if (favorites.length === 0 && favPrayerIds.length === 0) {
     list.innerHTML = `<p class="text-center text-slate-400 text-sm font-light py-8">${currentLang === 'en' ? 'No saved prayers yet.' : 'Aún no tienes oraciones guardadas.'}</p>`;
     return;
   }
 
-  list.innerHTML = favorites.map((fav, i) => {
-    const date = new Date(fav.date).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'es-MX', { day: '2-digit', month: 'short' });
-    return `
-      <div class="border border-slate-100 rounded-2xl p-4 space-y-2 bg-white/70">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold">${fav.verseRef || (currentLang === 'en' ? 'Verse' : 'Versículo')}</span>
-          <span class="text-[10px] text-slate-400">${date}</span>
+  let html = '';
+
+  // Oraciones tradicionales guardadas
+  if (favPrayerIds.length > 0) {
+    html += `<div class="space-y-2 mb-4">
+      <h4 class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">${currentLang === 'en' ? 'Traditional Prayers' : 'Oraciones Católicas'}</h4>`;
+    favPrayerIds.forEach(id => {
+      const p = allPrayers.find(pr => pr.id === id);
+      if (!p) return;
+      html += `
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100">
+          <button type="button" onclick="openPrayer('${p.id}'); closeFavorites();" class="text-left flex-1 min-w-0 pr-2 cursor-pointer">
+            <p class="text-xs font-medium text-indigo-950">${p[currentLang].title}</p>
+            <p class="text-[10px] text-indigo-600 font-light truncate">${p[currentLang].body.slice(0, 50)}...</p>
+          </button>
+          <button type="button" onclick="togglePrayerFavorite('${p.id}'); renderFavoritesList();" class="text-xs text-amber-500 hover:text-rose-500 p-1 cursor-pointer">
+            ⭐
+          </button>
         </div>
-        ${fav.verse ? `<p class="text-xs italic font-light text-slate-600 leading-relaxed border-l-2 border-indigo-200 pl-3">&ldquo;${fav.verse}&rdquo;</p>` : ''}
-        <p class="text-xs font-light text-indigo-900 leading-relaxed">${fav.prayer}</p>
-        <button onclick="deleteFavorite(${i})" class="text-[10px] text-rose-400 hover:text-rose-600 transition-colors">
-          × ${currentLang === 'en' ? 'Remove' : 'Eliminar'}
-        </button>
-      </div>
-    `;
-  }).join('');
+      `;
+    });
+    html += `</div>`;
+  }
+
+  // Oraciones íntimas de confort generadas
+  if (favorites.length > 0) {
+    html += `<div class="space-y-2">
+      <h4 class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">${currentLang === 'en' ? 'Personal Prayers & Verses' : 'Plegarias Íntimas'}</h4>`;
+    favorites.forEach((fav, i) => {
+      const date = new Date(fav.date).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'es-MX', { day: '2-digit', month: 'short' });
+      html += `
+        <div class="border border-slate-100 rounded-2xl p-4 space-y-2 bg-white/70">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold">${fav.verseRef || (currentLang === 'en' ? 'Verse' : 'Versículo')}</span>
+            <span class="text-[10px] text-slate-400">${date}</span>
+          </div>
+          ${fav.verse ? `<p class="text-xs italic font-light text-slate-600 leading-relaxed border-l-2 border-indigo-200 pl-3">&ldquo;${fav.verse}&rdquo;</p>` : ''}
+          <p class="text-xs font-light text-indigo-900 leading-relaxed">${fav.prayer}</p>
+          <button onclick="deleteFavorite(${i})" class="text-[10px] text-rose-400 hover:text-rose-600 transition-colors">
+            × ${currentLang === 'en' ? 'Remove' : 'Eliminar'}
+          </button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  list.innerHTML = html;
 }
 
 function deleteFavorite(index) {
@@ -1747,7 +1893,7 @@ function displayComfortAndNavigate() {
   const saveFavBtn = document.getElementById('btn-save-favorite');
   if (saveFavBtn) {
     saveFavBtn.classList.remove('btn-saved');
-    saveFavBtn.innerHTML = `<span>🔖</span><span id="txt-step-reflect">${TRANSLATIONS[currentLang].nextStepReflect}</span>`;
+    saveFavBtn.innerHTML = `<span>⭐</span><span id="txt-step-reflect">${TRANSLATIONS[currentLang].nextStepReflect}</span>`;
   }
 
   // Actualizar racha al completar el flujo
@@ -1786,7 +1932,10 @@ function prevVerse() {
   renderActiveVerse();
 }
 
-const SCREENSHOT_FILES = ['SS11.png', 'SS22.png', 'SS33.png', 'SS44.png'];
+let currentMarketingIndex = 1;
+// Orden: Hub, Desahogo, Oraciones, Rosario, Evangelio, Papa
+const SCREENSHOT_FILES = ['SS66.png', 'SS11.png', 'SS55.png', 'SS44.png', 'SS22.png', 'SS33.png'];
+const totalMarketingScreenshots = SCREENSHOT_FILES.length;
 
 function updateMarketingScreenshot() {
   const imgEl = document.getElementById('marketing-screenshot');
@@ -1842,10 +1991,10 @@ const PRAYER_SEARCH_THRESHOLD = 12;
 let currentPrayerId = null;
 let prayerWakeLock = null;
 
-/** Oraciones publicables para la vertiente activa. */
+/** Oraciones del corpus tradicional católico siempre disponibles para todos. */
 function availablePrayers() {
   if (typeof PRAYERS === 'undefined') return [];
-  return PRAYERS.filter(p => p.verified && p.denominations.includes(currentDenomination));
+  return PRAYERS.filter(p => p.verified && (p.denominations.includes('catholic') || p.source === 'tradicional' || p.source === 'biblica'));
 }
 
 /** Misterios que tocan hoy, según el día de la semana. */
@@ -1917,11 +2066,11 @@ function renderPrayerList() {
     }
   }
 
-  // Tarjeta del Rosario: solo si la vertiente es católica y los misterios están cotejados
+  // Tarjeta del Rosario: siempre visible con los misterios que tocan hoy
   const rosaryCard = document.getElementById('rosary-card');
   const today = todaysRosary();
   if (rosaryCard) {
-    const show = currentDenomination === 'catholic' && !!today && !term;
+    const show = !!today && !term;
     rosaryCard.hidden = !show;
     if (show) {
       const t = document.getElementById('rosary-card-title');
@@ -2001,18 +2150,21 @@ function startRosary() {
 
 function rosaryNext() {
   if (!rosary) return;
+  if (navigator.vibrate) try { navigator.vibrate(25); } catch(e) {}
   const step = ROSARY_FLOW[rosary.step];
 
   // Las diez Ave Marías se cuentan una a una
   if (step === 'ave' && rosary.ave < 10) {
     rosary.ave += 1;
     renderRosary();
+    scrollRosaryToTop();
     return;
   }
   if (rosary.step < ROSARY_FLOW.length - 1) {
     rosary.step += 1;
     rosary.ave = 1;
     renderRosary();
+    scrollRosaryToTop();
     return;
   }
   // Fin del misterio
@@ -2021,16 +2173,19 @@ function rosaryNext() {
     rosary.step = 0;
     rosary.ave = 1;
     renderRosary();
+    scrollRosaryToTop();
     return;
   }
   // Fin de los cinco: la Salve cierra
   rosary.finished = true;
   renderRosary();
+  scrollRosaryToTop();
 }
 
 function rosaryPrev() {
   if (!rosary) return;
-  if (rosary.finished) { rosary.finished = false; renderRosary(); return; }
+  if (navigator.vibrate) try { navigator.vibrate(20); } catch(e) {}
+  if (rosary.finished) { rosary.finished = false; renderRosary(); scrollRosaryToTop(); return; }
   if (ROSARY_FLOW[rosary.step] === 'ave' && rosary.ave > 1) {
     rosary.ave -= 1;
   } else if (rosary.step > 0) {
@@ -2042,6 +2197,16 @@ function rosaryPrev() {
     rosary.ave = 1;
   }
   renderRosary();
+  scrollRosaryToTop();
+}
+
+function scrollRosaryToTop() {
+  const el = document.getElementById('screen-rosario');
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 function renderRosary() {
@@ -2114,7 +2279,23 @@ function renderRosary() {
   if (text) text.innerText = bodyPrayer ? bodyPrayer[currentLang].body : '';
   if (next) {
     next.disabled = false;
-    next.innerText = (step === 'ave' && rosary.ave < 10) ? dict.rosaryNextAve : dict.rosaryNext;
+    if (step === 'ave') {
+      next.innerText = (currentLang === 'en')
+        ? `Next (Hail Mary ${rosary.ave}/10) →`
+        : `Siguiente (Ave María ${rosary.ave}/10) →`;
+    } else if (step === 'mystery') {
+      next.innerText = (currentLang === 'en') ? 'Start (Our Father) →' : 'Comenzar (Padre Nuestro) →';
+    } else if (step === 'padre') {
+      next.innerText = (currentLang === 'en') ? 'Start Decades (1/10) →' : 'Comenzar Decenas (1/10) →';
+    } else if (step === 'gloria') {
+      next.innerText = (currentLang === 'en') ? 'Next Prayer →' : 'Siguiente Oración →';
+    } else if (step === 'jaculatoria') {
+      next.innerText = (rosary.mystery < 4)
+        ? ((currentLang === 'en') ? `Next (${rosary.mystery + 2}º Mystery) →` : `Siguiente (${rosary.mystery + 2}º Misterio) →`)
+        : ((currentLang === 'en') ? 'Closing (Salve Regina) →' : 'Oración Final (La Salve) →');
+    } else {
+      next.innerText = dict.rosaryNext;
+    }
   }
   if (prev) prev.disabled = (rosary.mystery === 0 && rosary.step === 0 && rosary.ave === 1);
 
@@ -2140,10 +2321,10 @@ function renderRosary() {
 // rostros de Jesús, de la Virgen ni de santos (principio 2 de la política de IA).
 
 const STAINED_GLASS = {
-  mariano:  { a: '#c9b8ec', b: '#efd9ec', c: '#a78bd8', lead: '#6b5a9e' },
-  cruz:     { a: '#a9bce8', b: '#d9e2f7', c: '#7f93cf', lead: '#4a5a92' },
-  angeles:  { a: '#a9dbcf', b: '#dcf0e8', c: '#7cc0ae', lead: '#417a6c' },
-  palabra:  { a: '#f0cf9a', b: '#fbeeda', c: '#e0ae66', lead: '#9a7434' }
+  mariano:  { a: '#7c5cb9', b: '#9d7ed4', c: '#f3ebff', lead: '#5b3d9c' },
+  cruz:     { a: '#3b6cb0', b: '#5c8ed0', c: '#eaf1fc', lead: '#294f88' },
+  angeles:  { a: '#2d8a7c', b: '#4db5a4', c: '#e4f7f4', lead: '#1f665b' },
+  palabra:  { a: '#c4892c', b: '#e0a94d', c: '#fff8ec', lead: '#8a5c15' }
 };
 
 /** Qué familia de vitral le toca a una oración. */
@@ -2264,22 +2445,74 @@ async function sharePrayer() {
   }
 }
 
-// ── EVANGELIO DEL DÍA ─────────────────────────────────────────────────────
-// Una sola identidad para las tres vertientes: el Evangelio del día de la
-// Iglesia, con su primera lectura, su salmo, su tiempo litúrgico y su santo.
-// NO se bifurca por denominación — «adapta lo personal, no adaptes lo
-// compartido». Lo único que cambia por vertiente es el orden en el hub.
-//
-// Todo el trabajo pesado vive en /api/readings: doble fuente, caché de CDN y la
-// escalera de respaldo de la imagen. Aquí solo se pinta lo que llega.
-
-const evangelio = { date: null, lang: null, data: null, loading: false, pending: null, failedAt: 0 };
-
-// Tras un fallo no se reintenta en bucle: el hub pide los datos cada vez que se
-// pinta, y sin esto una caída de red se convertiría en una tormenta de peticiones.
+// ── EVANGELIO DEL DÍA (Caché Bilingüe Inmediata) ───────────────────────────
+const evangelioCache = { es: null, en: null };
+const evangelioPending = { es: null, en: null };
+let evangelioFailedAt = 0;
 const EVANGELIO_RETRY_MS = 60000;
 
-/** Fecha LOCAL del usuario. La racha usa UTC y descuadra de noche: no imitarlo. */
+/**
+ * La caché sobrevive al cierre de la app.
+ *
+ * La imagen del día lleva horas hecha y guardada en Storage; lo único que la
+ * retenía era venir dentro de la respuesta de las lecturas. Guardando esa
+ * respuesta aquí, de la segunda visita del día en adelante la tarjeta nace ya
+ * con su imagen: cero espera y cero sustitución a la vista.
+ *
+ * Se guarda por fecha. Un día viejo no se usa jamás — para eso está el cotejo
+ * contra localToday().
+ */
+const EVANGELIO_STORE = 'alivio_evangelio';
+
+function loadEvangelioStore() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(EVANGELIO_STORE) || '{}');
+    ['es', 'en'].forEach(lang => {
+      const dia = guardado[lang];
+      if (dia && dia.date === localToday() && dia.readings && dia.readings.gospel) {
+        dia._fromStore = true;   // marca para revalidar una vez, sin bloquear el pintado
+        evangelioCache[lang] = dia;
+      }
+    });
+  } catch (e) {
+    // Un localStorage corrupto no puede impedir que la app arranque.
+    console.warn('⚠️ No se pudo leer la caché del Evangelio:', e);
+  }
+}
+
+function saveEvangelioStore() {
+  try {
+    localStorage.setItem(EVANGELIO_STORE, JSON.stringify(evangelioCache));
+  } catch (e) {
+    // Cuota llena o modo privado: la caché es una optimización, no se insiste.
+    console.warn('⚠️ No se pudo guardar la caché del Evangelio:', e);
+  }
+}
+
+/**
+ * Revalida en segundo plano lo que vino de localStorage. La primera visita del
+ * día puede haber llegado antes que el comentario del Papa, que Vatican News
+ * publica el mismo día: sin esto, quien abre temprano se queda sin él hasta
+ * mañana. No bloquea nada — repinta solo si sigue en la pantalla.
+ */
+function revalidarEvangelio() {
+  const dia = evangelioCache[currentLang];
+  if (!dia || !dia._fromStore) return;
+
+  // Se baja la marca ANTES de pedir, no después: renderHub() se ejecuta también
+  // al cambiar de idioma o de vertiente, y sin esto un fallo de red dejaría la
+  // marca puesta y cada repintado lanzaría otra petición. Se intenta una vez por
+  // sesión, que es justo lo que hace falta.
+  dia._fromStore = false;
+
+  fetchEvangelio(true).then(data => {
+    if (!data) return;
+    if (currentScreen === 'screen-hub') renderHub();
+    else if (currentScreen === 'screen-evangelio') renderEvangelio();
+  });
+}
+
+/** Fecha LOCAL del usuario. */
 function localToday() {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
@@ -2297,48 +2530,48 @@ function showEvangelioState(state) {
 
 /** ¿Los datos en memoria son los de hoy y en el idioma activo? */
 function evangelioFresco() {
-  return Boolean(evangelio.data && evangelio.date === localToday() && evangelio.lang === currentLang);
+  const data = evangelioCache[currentLang];
+  return Boolean(data && data.date === localToday());
 }
 
 /**
- * La única puerta a /api/readings. La usan la pantalla y la tarjeta del hub, así
- * que comparte la petición en vuelo en vez de lanzar dos. Devuelve los datos o
- * null: nunca lanza, porque quien la llama a veces solo está pintando una tarjeta.
+ * Petición con caché bilingüe en memoria.
  */
 async function fetchEvangelio(force) {
-  if (!force && evangelioFresco()) return evangelio.data;
-  if (evangelio.pending) return evangelio.pending;
-  if (!force && evangelio.failedAt && Date.now() - evangelio.failedAt < EVANGELIO_RETRY_MS) return null;
+  const lang = currentLang;
+  if (!force && evangelioCache[lang] && evangelioCache[lang].date === localToday()) {
+    return evangelioCache[lang];
+  }
+  if (evangelioPending[lang]) return evangelioPending[lang];
+  if (!force && evangelioFailedAt && Date.now() - evangelioFailedAt < EVANGELIO_RETRY_MS) return null;
 
-  evangelio.loading = true;
-  evangelio.pending = (async () => {
+  evangelioPending[lang] = (async () => {
     try {
-      const res = await fetch(API_BASE + '/api/readings?date=' + localToday() + '&lang=' + currentLang);
+      const res = await fetch(API_BASE + '/api/readings?date=' + localToday() + '&lang=' + lang);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if (!data || !data.readings || !data.readings.gospel) throw new Error('respuesta sin Evangelio');
 
-      evangelio.data = data;
-      evangelio.date = localToday();
-      evangelio.lang = currentLang;
-      evangelio.failedAt = 0;
+      data.date = localToday();
+      data._fromStore = false;   // recién traído: ya no hay nada que revalidar
+      evangelioCache[lang] = data;
+      evangelioFailedAt = 0;
+      saveEvangelioStore();
       return data;
     } catch (e) {
       console.warn('⚠️ No se pudieron cargar las lecturas del día:', e);
-      evangelio.failedAt = Date.now();
+      evangelioFailedAt = Date.now();
       return null;
     } finally {
-      evangelio.loading = false;
-      evangelio.pending = null;
+      evangelioPending[lang] = null;
     }
   })();
 
-  return evangelio.pending;
+  return evangelioPending[lang];
 }
 
 /**
- * Trae las lecturas y pinta la pantalla. Se llama sola al entrar (SCREENS.onEnter).
- * Con los datos ya en memoria no pide nada: el mismo día en el mismo idioma no cambia.
+ * Trae las lecturas y pinta la pantalla.
  */
 async function loadEvangelio(force) {
   if (!force && evangelioFresco()) {
@@ -2379,7 +2612,7 @@ function appendReading(host, label, reading, crown) {
 }
 
 function renderEvangelio() {
-  const data = evangelio.data;
+  const data = evangelioCache[currentLang];
   if (!data) return;
   const dict = TRANSLATIONS[currentLang];
 
@@ -2459,14 +2692,12 @@ function applyEvangelioTranslations() {
     share.setAttribute('aria-label', dict.evangelioShare);
   }
 
-  if (!evangelio.data) return;
-  if (evangelio.lang !== currentLang) {
-    // Otro idioma es otra traducción del leccionario: hay que volver a pedirla.
-    if (currentScreen === 'screen-evangelio') loadEvangelio(true);
-    else evangelio.data = null;
-    return;
+  const langData = evangelioCache[currentLang];
+  if (langData) {
+    renderEvangelio();
+  } else if (currentScreen === 'screen-evangelio') {
+    loadEvangelio(true);
   }
-  renderEvangelio();
 }
 
 /**
@@ -2474,7 +2705,7 @@ function applyEvangelioTranslations() {
  * Ramifica igual que el resto: navigator.share si existe, portapapeles si no.
  */
 async function shareGospel() {
-  const data = evangelio.data;
+  const data = evangelioCache[currentLang];
   if (!data || !data.readings || !data.readings.gospel) return;
   const dict = TRANSLATIONS[currentLang];
   const gospel = data.readings.gospel;
@@ -2572,51 +2803,7 @@ function releasePrayerWakeLock() {
   if (note) note.hidden = true;
 }
 
-/** Guarda la oración abierta en el mismo almacén que los favoritos del desahogo. */
-function savePrayerFavorite() {
-  const dict = TRANSLATIONS[currentLang];
-  const titleEl = document.getElementById('prayer-title');
-  const textEl = document.getElementById('prayer-text');
-  if (!titleEl || !textEl || !textEl.innerText) return;
-
-  const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
-  const body = textEl.innerText;
-
-  if (favorites.some(f => f.prayer === body)) {
-    showToast(dict.alreadySaved);
-    return;
-  }
-  favorites.unshift({
-    date: new Date().toISOString(),
-    prayer: body,
-    verse: '',
-    verseRef: '',
-    title: titleEl.innerText,
-    kind: 'prayer'
-  });
-  if (favorites.length > 30) favorites.pop();
-  localStorage.setItem('alivio_favorites', JSON.stringify(favorites));
-  showToast(dict.savedFavorite);
-  updatePrayerFavIcon();
-}
-
-function updatePrayerFavIcon() {
-  const btn = document.getElementById('prayer-fav');
-  const textEl = document.getElementById('prayer-text');
-  if (!btn || !textEl) return;
-  const favorites = JSON.parse(localStorage.getItem('alivio_favorites') || '[]');
-  const saved = favorites.some(f => f.prayer === textEl.innerText);
-  btn.className = saved
-    ? 'shrink-0 text-lg text-indigo-500 transition-colors cursor-pointer'
-    : 'shrink-0 text-lg text-slate-300 hover:text-indigo-500 transition-colors cursor-pointer';
-  btn.title = saved ? TRANSLATIONS[currentLang].alreadySaved : TRANSLATIONS[currentLang].titleFavorites;
-}
-
-/**
- * Sustituye la fachada del video demo por el reproductor real de YouTube.
- * Se llama solo al pulsar: así la landing no carga el JS de YouTube en cada visita.
- * Dominio nocookie para no plantar cookies de seguimiento antes de que el usuario decida.
- */
+// ── DEMO VIDEO ────────────────────────────────────────────────────────────
 const DEMO_VIDEO_ID = 'eoMOhortt_4';
 
 function loadDemoVideo() {
@@ -2625,7 +2812,7 @@ function loadDemoVideo() {
 
   const frame = document.createElement('iframe');
   frame.src = `https://www.youtube-nocookie.com/embed/${DEMO_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`;
-  frame.title = TRANSLATIONS[currentLang].videoDemoFrameTitle;
+  frame.title = (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang].videoDemoFrameTitle) || "Demostración de Alivio";
   frame.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
   frame.referrerPolicy = 'strict-origin-when-cross-origin';
   frame.allowFullscreen = true;
@@ -2929,6 +3116,11 @@ function updateDynamicGreeting() {
 
 // Inicialización de la app
 window.addEventListener('DOMContentLoaded', () => {
+  // Lo primero: rescatar las lecturas de hoy si ya se pidieron en otra visita.
+  // Va ANTES de applyTranslations() porque de ahí sale el primer renderHub(),
+  // y el objetivo es que la tarjeta nazca ya con la imagen del día.
+  loadEvangelioStore();
+
   // Aplicar traducciones
   applyTranslations();
   updateDynamicGreeting();
@@ -3033,4 +3225,48 @@ async function shareApp() {
     }
   }
 }
+
+/**
+ * Gestos táctiles (Swipe) para el Santo Rosario en Móviles y Atajos de Teclado en PC
+ */
+(function initRosaryGestures() {
+  let touchStartX = 0;
+  let touchStartY = 0;
+  
+  window.addEventListener('touchstart', (e) => {
+    if (currentScreen !== 'screen-rosario') return;
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+  
+  window.addEventListener('touchend', (e) => {
+    if (currentScreen !== 'screen-rosario') return;
+    const diffX = e.changedTouches[0].screenX - touchStartX;
+    const diffY = e.changedTouches[0].screenY - touchStartY;
+    
+    // Solo si el gesto es preponderantemente horizontal y mayor a 45px
+    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+      if (diffX < 0) {
+        // Deslizar a la izquierda (←) -> Siguiente cuenta
+        rosaryNext();
+      } else {
+        // Deslizar a la derecha (→) -> Cuenta anterior
+        rosaryPrev();
+      }
+    }
+  }, { passive: true });
+
+  // Atajos de teclado en PC (Flecha derecha / Espacio para avanzar, Flecha izquierda para retroceder)
+  window.addEventListener('keydown', (e) => {
+    if (currentScreen !== 'screen-rosario') return;
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      rosaryNext();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      rosaryPrev();
+    }
+  });
+})();
+
 

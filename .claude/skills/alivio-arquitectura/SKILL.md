@@ -125,9 +125,16 @@ else { /* API web */ }
 ## 9. Estado del usuario
 
 Todo en `localStorage`, sin cuentas ni backend de usuario: `alivio_lang`, `alivio_denom`,
-`alivio_favorites` (máx 30), `alivio_streak`, `alivio_streak_date`, `alivio_alert_time`,
-`alivio_audio`, `alivio_visited`, `alivio_fcm_token`, `alivio_prayer_font`,
-`alivio_pwa_dismissed`, `ultimo_confort`, `pwa_installed`.
+`alivio_favorites` (máx 30), `alivio_fav_prayers` (ids del corpus tradicional),
+`alivio_streak`, `alivio_streak_date`, `alivio_alert_time`, `alivio_audio`,
+`alivio_visited`, `alivio_fcm_token`, `alivio_prayer_font`, `alivio_pwa_dismissed`,
+`alivio_evangelio` (lecturas del día por idioma), `ultimo_confort`, `pwa_installed`.
+
+`alivio_evangelio` guarda la respuesta de `/api/readings` **con su fecha**, para que la
+tarjeta del hub nazca ya con la imagen del día en vez de esperar a la red. Se coteja
+siempre contra la fecha local antes de usarla: un día viejo no se pinta jamás. Lo que sale
+de ahí se revalida una vez por sesión, porque el comentario del Papa puede publicarse
+después de la primera visita del día.
 
 Prefija **siempre** con `alivio_`. Ojo: la racha usa `toISOString().slice(0,10)` (fecha **UTC**), lo que descuadra a usuarios al oeste de UTC de noche — usa fecha local para lógica de días nueva.
 
