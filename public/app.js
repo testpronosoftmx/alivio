@@ -884,16 +884,16 @@ const CRISIS_POR_PAIS = {
   MX: { nombre: 'Línea de la Vida', tel: '800 911 2000', marcar: '8009112000',
         web: 'https://www.gob.mx/conasama/articulos/linea-de-la-vida-800-911-2000' },
 
-  // Dispositivo Nacional de Orientación y Acompañamiento en Salud Mental.
-  // Verificado en argentina.gob.ar/dispositivo-0800.
-  AR: { nombre: 'Salud Mental Responde', tel: '0800 999 0091', marcar: '08009990091',
-        web: 'https://www.argentina.gob.ar/dispositivo-0800' },
-
-  // República Dominicana y Guatemala: SIN número verificado.
-  // Circulan varios en prensa y redes —809-200-1202, 809-200-1400, un móvil
-  // particular en Guatemala— que no pude confirmar contra ninguna fuente oficial
-  // de gobierno. No se escriben. Estos países caen al directorio internacional
-  // hasta que alguien confirme el número localmente y lo añada aquí.
+  // Decisión del propietario (27 ago 2026): solo México en la tabla. Argentina
+  // llegó a estar con su línea verificada (0800 999 0091, argentina.gob.ar) y se
+  // retiró; si algún día vuelve, ese es el número y esa la fuente.
+  // República Dominicana y Guatemala nunca entraron: los números que circulan en
+  // prensa y redes se contradicen —y en Guatemala el más difundido es el móvil de
+  // un particular— y no hay fuente oficial que los respalde.
+  //
+  // Todo país que no esté aquí cae al directorio internacional. Eso NO es un
+  // hueco: es la respuesta honesta cuando no tenemos un número que podamos
+  // sostener. Lo que no puede pasar es que alguien en crisis no vea nada.
 };
 
 /**
@@ -905,9 +905,7 @@ const CRISIS_POR_PAIS = {
 function paisProbable() {
   const zonas = { 'Mexico': 'MX', 'Tijuana': 'MX', 'Monterrey': 'MX', 'Cancun': 'MX',
                   'Merida': 'MX', 'Chihuahua': 'MX', 'Hermosillo': 'MX', 'Mazatlan': 'MX',
-                  'Matamoros': 'MX', 'Bahia_Banderas': 'MX', 'Ojinaga': 'MX',
-                  'Argentina': 'AR', 'Buenos_Aires': 'AR',
-                  'Santo_Domingo': 'DO', 'Guatemala': 'GT' };
+                  'Matamoros': 'MX', 'Bahia_Banderas': 'MX', 'Ojinaga': 'MX' };
   try {
     const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
     for (const clave in zonas) {

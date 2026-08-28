@@ -165,11 +165,11 @@ La app ya tiene `#crisis-section`. Cualquier módulo nuevo donde el usuario escr
 detectado por zona horaria (y por la región del idioma como respaldo) — **sin pedir
 ubicación ni permisos**, que el anonimato es la promesa de la app.
 
-**Ningún número entra ahí sin fuente oficial de gobierno.** Hoy hay dos, y los dos
-verificados: México (Línea de la Vida, 800 911 2000, `gob.mx/conasama`) y Argentina
-(0800 999 0091, `argentina.gob.ar/dispositivo-0800`). República Dominicana y Guatemala
-circulan en prensa y redes con números contradictorios y **quedan deliberadamente fuera**
-hasta que alguien los confirme localmente.
+**Ningún número entra ahí sin fuente oficial de gobierno.** Hoy solo hay uno: México
+(Línea de la Vida, 800 911 2000, `gob.mx/conasama`). Argentina llegó a estar, con su
+línea verificada, y el propietario decidió retirarla el 27 ago 2026; el número queda
+anotado en el código por si vuelve. República Dominicana y Guatemala nunca entraron:
+los números que circulan en prensa y redes se contradicen y no hay fuente oficial.
 
 Quien no tiene número verificado ve el **directorio internacional**, no un hueco. Un
 teléfono equivocado en esta pantalla es peor que no tener teléfono: quien llama y no
