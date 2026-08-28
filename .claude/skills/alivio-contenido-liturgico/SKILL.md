@@ -159,6 +159,25 @@ Lo único que puede variar por vertiente en lo compartido es la **prominencia en
 
 La app ya tiene `#crisis-section`. Cualquier módulo nuevo donde el usuario escriba **debe** poder derivar a esos recursos. Ante señales de ideación suicida, autolesión, violencia o abuso: la respuesta espiritual **no** sustituye a la ayuda profesional; muestra los recursos de crisis de forma prominente y nunca respondas solo con un versículo. Si el módulo es público (peticiones), ese contenido **nunca se publica**: se atiende en privado.
 
+### Recursos de crisis: por país, y solo verificados
+
+`CRISIS_POR_PAIS` en `app.js` sirve el teléfono que corresponde al país del dispositivo,
+detectado por zona horaria (y por la región del idioma como respaldo) — **sin pedir
+ubicación ni permisos**, que el anonimato es la promesa de la app.
+
+**Ningún número entra ahí sin fuente oficial de gobierno.** Hoy hay dos, y los dos
+verificados: México (Línea de la Vida, 800 911 2000, `gob.mx/conasama`) y Argentina
+(0800 999 0091, `argentina.gob.ar/dispositivo-0800`). República Dominicana y Guatemala
+circulan en prensa y redes con números contradictorios y **quedan deliberadamente fuera**
+hasta que alguien los confirme localmente.
+
+Quien no tiene número verificado ve el **directorio internacional**, no un hueco. Un
+teléfono equivocado en esta pantalla es peor que no tener teléfono: quien llama y no
+obtiene respuesta no vuelve a intentarlo.
+
+Hasta el 27 ago 2026 la app mostraba el `*0311` de la Ciudad de México a todo el mundo,
+con dos tercios de los usuarios fuera de México.
+
 ## 8. Checklist antes de enviar contenido religioso nuevo
 
 1. ¿Es texto fijo de la tradición? → hardcodeado y revisado a mano, nunca generado.

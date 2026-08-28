@@ -525,6 +525,8 @@ const TRANSLATIONS = {
     prayerIndexIntro: "Veinte oraciones de texto fijo, revisadas a mano y disponibles sin conexión. Se rezan dentro de la aplicación.",
     prayerIndexList: "Señal de la Cruz · Padre Nuestro · Ave María · Gloria · Credo de los Apóstoles · Credo Niceno-Constantinopolitano · Salve · Acto de Contrición · Ángel de la Guarda · Oración a San Miguel Arcángel · Ven, Espíritu Santo · Magníficat · El Ángelus · Bendición de la mesa · Padre Nuestro (versión bíblica) · Salmo 23, El Señor es mi pastor · Salmo 91, El que habita al abrigo del Altísimo · Bendición aarónica · Oración de la serenidad · Jaculatoria de Fátima.",
     prayerIndexRosary: "Y el Santo Rosario guiado, con los misterios que corresponden a cada día: Gozosos el lunes y el sábado, Dolorosos el martes y el viernes, Gloriosos el miércoles y el domingo, y Luminosos el jueves.",
+    crisisCall: "Llamar al",
+    crisisDirectory: "Buscar una línea de ayuda cerca de ti",
     evangelioTitle: "Evangelio del Día",
     evangelioLoading: "Buscando la Palabra de hoy…",
     evangelioError: "No pudimos traer las lecturas de hoy. Revisa tu conexión y vuelve a intentarlo.",
@@ -670,6 +672,8 @@ const TRANSLATIONS = {
     prayerIndexIntro: "Twenty fixed-text prayers, checked by hand and available offline. They are prayed inside the app.",
     prayerIndexList: "Sign of the Cross · Our Father · Hail Mary · Glory Be · Apostles' Creed · Nicene Creed · Hail, Holy Queen · Act of Contrition · Guardian Angel Prayer · Prayer to St. Michael · Come, Holy Spirit · Magnificat · The Angelus · Grace before Meals · The Lord's Prayer (biblical version) · Psalm 23, The Lord is my shepherd · Psalm 91, He that dwelleth in the secret place · Aaronic Blessing · Serenity Prayer · Fatima Prayer.",
     prayerIndexRosary: "And the guided Holy Rosary, with the mysteries for each day: Joyful on Monday and Saturday, Sorrowful on Tuesday and Friday, Glorious on Wednesday and Sunday, and Luminous on Thursday.",
+    crisisCall: "Call",
+    crisisDirectory: "Find a helpline near you",
     evangelioTitle: "Gospel of the Day",
     evangelioLoading: "Fetching today's Word…",
     evangelioError: "We couldn't fetch today's readings. Check your connection and try again.",
@@ -857,6 +861,97 @@ const SCREENSHOTS_DATA = {
  * primera traducción. Y se persiste, porque quien llega por un enlace en inglés
  * espera seguir en inglés al volver.
  */
+/**
+ * ── RECURSOS DE CRISIS POR PAÍS ────────────────────────────────────────────
+ *
+ * Hasta hoy la app mostraba un teléfono de la Ciudad de México a TODO el mundo.
+ * Los datos de Play Console del 24 de agosto: de ~53 dispositivos activos, unos
+ * 19 están en México y ~34 en Argentina, República Dominicana, Guatemala y otros.
+ * Dos tercios de la gente veía un número que no le sirve — en la pantalla a la
+ * que se llega en el peor momento.
+ *
+ * REGLA DE ESTE BLOQUE: aquí NO se escribe un número que no se haya verificado
+ * contra la fuente oficial del gobierno correspondiente. Un teléfono equivocado
+ * en una pantalla de crisis es peor que no tener teléfono: quien llama y no
+ * obtiene respuesta ya no vuelve a intentarlo. Si no hay número verificado, se
+ * ofrece el directorio internacional, que alguien mantiene a diario y nosotros no.
+ */
+const CRISIS_DIRECTORIO = 'https://findahelpline.com/es-ES';
+
+const CRISIS_POR_PAIS = {
+  // Línea de la Vida · Comisión Nacional de Salud Mental y Adicciones (CONASAMA).
+  // Verificado en gob.mx/conasama. Sustituye al *0311, que era solo de la CDMX.
+  MX: { nombre: 'Línea de la Vida', tel: '800 911 2000', marcar: '8009112000',
+        web: 'https://www.gob.mx/conasama/articulos/linea-de-la-vida-800-911-2000' },
+
+  // Dispositivo Nacional de Orientación y Acompañamiento en Salud Mental.
+  // Verificado en argentina.gob.ar/dispositivo-0800.
+  AR: { nombre: 'Salud Mental Responde', tel: '0800 999 0091', marcar: '08009990091',
+        web: 'https://www.argentina.gob.ar/dispositivo-0800' },
+
+  // República Dominicana y Guatemala: SIN número verificado.
+  // Circulan varios en prensa y redes —809-200-1202, 809-200-1400, un móvil
+  // particular en Guatemala— que no pude confirmar contra ninguna fuente oficial
+  // de gobierno. No se escriben. Estos países caen al directorio internacional
+  // hasta que alguien confirme el número localmente y lo añada aquí.
+};
+
+/**
+ * País probable del dispositivo, SIN pedir permisos ni geolocalización: sale de
+ * la zona horaria y, si no basta, de la región del idioma del sistema. Alivio no
+ * pide ubicación y no va a empezar ahora — el anonimato es la promesa.
+ * Devuelve null si no hay una respuesta clara: mejor el directorio que adivinar.
+ */
+function paisProbable() {
+  const zonas = { 'Mexico': 'MX', 'Tijuana': 'MX', 'Monterrey': 'MX', 'Cancun': 'MX',
+                  'Merida': 'MX', 'Chihuahua': 'MX', 'Hermosillo': 'MX', 'Mazatlan': 'MX',
+                  'Matamoros': 'MX', 'Bahia_Banderas': 'MX', 'Ojinaga': 'MX',
+                  'Argentina': 'AR', 'Buenos_Aires': 'AR',
+                  'Santo_Domingo': 'DO', 'Guatemala': 'GT' };
+  try {
+    const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+    for (const clave in zonas) {
+      if (tz.indexOf(clave) !== -1) return zonas[clave];
+    }
+  } catch (e) { /* Intl puede no existir: se sigue con el idioma */ }
+
+  try {
+    const region = (navigator.language || '').split('-')[1];
+    if (region && region.length === 2) return region.toUpperCase();
+  } catch (e) { /* nada que hacer */ }
+
+  return null;
+}
+
+/**
+ * Pinta el recurso que toca. Sin país reconocido o sin número verificado, se
+ * muestra solo el directorio internacional — que es una respuesta honesta, no
+ * un hueco.
+ */
+function renderCrisisResources() {
+  const dict = TRANSLATIONS[currentLang];
+  const llamar = document.getElementById('crisis-call');
+  const texto = document.getElementById('txt-crisis-call');
+  const web = document.getElementById('crisis-web');
+  const textoWeb = document.getElementById('txt-crisis-web');
+  if (!llamar || !web) return;
+
+  const recurso = CRISIS_POR_PAIS[paisProbable()];
+
+  if (recurso) {
+    llamar.hidden = false;
+    llamar.href = 'tel:' + recurso.marcar;
+    if (texto) texto.innerText = dict.crisisCall + ' ' + recurso.tel;
+    web.href = recurso.web;
+    if (textoWeb) textoWeb.innerText = recurso.nombre;
+  } else {
+    llamar.hidden = true;
+    web.href = CRISIS_DIRECTORIO;
+    if (textoWeb) textoWeb.innerText = dict.crisisDirectory;
+  }
+}
+
+
 const IDIOMAS = ['es', 'en'];
 
 function idiomaInicial() {
@@ -1507,6 +1602,7 @@ function applyTranslations() {
   });
   const evangelioTitleEl = document.getElementById('evangelio-title');
   if (evangelioTitleEl) evangelioTitleEl.innerText = dict.evangelioTitle;
+  renderCrisisResources();
   applyEvangelioTranslations();
   const oracionesTitleEl = document.getElementById('oraciones-title');
   if (oracionesTitleEl) oracionesTitleEl.innerText = dict.oracionesTitle;

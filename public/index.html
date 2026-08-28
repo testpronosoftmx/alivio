@@ -1353,13 +1353,18 @@
             </div>
           </div>
           <div class="flex flex-col gap-2">
-            <a href="tel:*0311" class="crisis-link crisis-link-call">
+            <!-- El teléfono lo pone renderCrisisResources() según el país del
+                 dispositivo. Dos tercios de los usuarios NO están en México y hasta
+                 ahora todos veían un número de la Ciudad de México.
+                 El HTML nace con el directorio internacional y el teléfono oculto,
+                 para que la sección siga sirviendo aunque el JavaScript falle. -->
+            <a id="crisis-call" href="tel:911" class="crisis-link crisis-link-call" hidden>
               <span>📞</span>
-              <span id="txt-crisis-call">Llamar al *0311</span>
+              <span id="txt-crisis-call">Llamar</span>
             </a>
-            <a href="https://cms311.cdmx.gob.mx/prevencion-suicidio/" target="_blank" rel="noopener noreferrer" class="crisis-link crisis-link-web">
+            <a id="crisis-web" href="https://findahelpline.com/es-ES" target="_blank" rel="noopener noreferrer" class="crisis-link crisis-link-web">
               <span>🌐</span>
-              <span id="txt-crisis-web">Visitar recurso de apoyo</span>
+              <span id="txt-crisis-web">Buscar una línea de ayuda cerca de ti</span>
             </a>
           </div>
         </section>
@@ -1612,6 +1617,9 @@
     // openDonation: usa Capacitor Browser en Android/iOS, window.open en web
     const STRIPE_DONATION_URL = 'https://buy.stripe.com/4gM8wP5ZkcWyeIYfx6gYU04';
     async function openDonation() {
+      // La conversión real: los cuatro botones de donar pasan por aquí. `support_click`
+      // solo cubre el corazón de la cabecera, que abre el modal y nada más.
+      if (typeof track === 'function') track('donation_opened');
       try {
         // Si estamos en Capacitor nativo (Android/iOS)
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
