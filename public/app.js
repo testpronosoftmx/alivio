@@ -2894,7 +2894,7 @@ function releasePrayerWakeLock() {
 }
 
 // ── DEMO VIDEO ────────────────────────────────────────────────────────────
-const DEMO_VIDEO_ID = '0EmXdxKKqc8';
+const DEMO_VIDEO_ID = 'QO0Ry8_xaKg';
 
 function loadDemoVideo() {
   const facade = document.getElementById('video-demo-facade');
