@@ -936,16 +936,21 @@ function renderCrisisResources() {
 
   const recurso = CRISIS_POR_PAIS[paisProbable()];
 
+  // Decisión del propietario (27 ago 2026): solo se muestra el recurso de México.
+  // Fuera de México no se ofrece nada — ni directorio internacional. Queda dicho
+  // porque es la pantalla de crisis y conviene que quien lea esto lo sepa: unos
+  // dos tercios de los dispositivos activos están fuera de México y ven la sección
+  // sin ningún enlace al que acudir. El directorio queda abajo, listo para volver.
   if (recurso) {
     llamar.hidden = false;
     llamar.href = 'tel:' + recurso.marcar;
     if (texto) texto.innerText = dict.crisisCall + ' ' + recurso.tel;
+    web.hidden = false;
     web.href = recurso.web;
     if (textoWeb) textoWeb.innerText = recurso.nombre;
   } else {
     llamar.hidden = true;
-    web.href = CRISIS_DIRECTORIO;
-    if (textoWeb) textoWeb.innerText = dict.crisisDirectory;
+    web.hidden = true;
   }
 }
 

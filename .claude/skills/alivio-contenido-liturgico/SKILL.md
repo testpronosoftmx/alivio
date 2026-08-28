@@ -171,9 +171,14 @@ línea verificada, y el propietario decidió retirarla el 27 ago 2026; el númer
 anotado en el código por si vuelve. República Dominicana y Guatemala nunca entraron:
 los números que circulan en prensa y redes se contradicen y no hay fuente oficial.
 
-Quien no tiene número verificado ve el **directorio internacional**, no un hueco. Un
-teléfono equivocado en esta pantalla es peor que no tener teléfono: quien llama y no
-obtiene respuesta no vuelve a intentarlo.
+**Fuera de México no se muestra nada** (decisión del propietario, 27 ago 2026). El
+directorio internacional llegó a estar como respaldo y se retiró. Queda en el código,
+listo para volver con una línea. Consecuencia, dicha para quien lea esto: unos dos
+tercios de los dispositivos activos están fuera de México y ven la sección de crisis
+sin ningún enlace al que acudir.
+
+Un teléfono equivocado en esta pantalla es peor que no tener teléfono: quien llama y no
+obtiene respuesta no vuelve a intentarlo. Por eso ninguno entra sin fuente oficial.
 
 Hasta el 27 ago 2026 la app mostraba el `*0311` de la Ciudad de México a todo el mundo,
 con dos tercios de los usuarios fuera de México.
